@@ -1,0 +1,5 @@
+use_frameworks!
+
+target 'Sundial_Example' do
+  pod 'Sundial', :path => '../'
+end
