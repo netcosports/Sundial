@@ -8,6 +8,7 @@
 
 import UIKit
 import Astrolabe
+import RxSwift
 import RxCocoa
 
 public protocol Titleable {
@@ -43,6 +44,11 @@ public enum Anchor {
   case right(offset: CGFloat)
 }
 
+public enum DecorationAlignment {
+  case top
+  case topOffset(variable: Variable<CGFloat>)
+}
+
 public struct Settings {
   let stripHeight: CGFloat
   let markerHeight: CGFloat
@@ -50,18 +56,21 @@ public struct Settings {
   let bottomStripSpacing: CGFloat
   let anchor: Anchor
   let inset: UIEdgeInsets
+  let alignment: DecorationAlignment
 
   public init(stripHeight: CGFloat = 80.0,
               markerHeight: CGFloat = 5.5,
               itemMargin: CGFloat = 12.0,
               bottomStripSpacing: CGFloat = 0.0,
               anchor: Anchor = .centered,
-              inset: UIEdgeInsets = .zero) {
+              inset: UIEdgeInsets = .zero,
+              alignment: DecorationAlignment = .top) {
     self.stripHeight = stripHeight
     self.markerHeight = markerHeight
     self.itemMargin = itemMargin
     self.bottomStripSpacing = bottomStripSpacing
     self.anchor = anchor
     self.inset = inset
+    self.alignment = alignment
   }
 }

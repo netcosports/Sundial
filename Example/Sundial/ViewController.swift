@@ -12,6 +12,7 @@ import Sundial
 
 class ViewController: UIViewController {
 
+  let controller0 = CollapsingHeaderViewController()
   let controller1 = ViewControllerInner(.content)
   let controller2 = ViewControllerInner(.centered)
   let controller3 = ViewControllerInner(.fillEqual)
@@ -38,6 +39,7 @@ class ViewController: UIViewController {
       $0.edges.equalToSuperview()
     }
 
+    controller0.view.backgroundColor = .red
     controller1.view.backgroundColor = .red
     controller2.view.backgroundColor = .red
     controller3.view.backgroundColor = .red
@@ -54,6 +56,7 @@ extension ViewController: CollectionViewPager {
 
   var pages: [Page] {
     return [
+      Page(controller: controller0, id: "Title 0"),
       Page(controller: controller1, id: "Title 1"),
       Page(controller: controller2, id: "Title 2"),
       Page(controller: controller3, id: "Title 3"),
@@ -69,6 +72,7 @@ extension ViewController {
 
   var titles: [TitleCollectionViewCell.TitleViewModel] {
     return [
+      TitleCollectionViewCell.TitleViewModel(title: "collapsing", indicatorColor: .blue),
       TitleCollectionViewCell.TitleViewModel(title: "content", indicatorColor: .blue),
       TitleCollectionViewCell.TitleViewModel(title: "centered", indicatorColor: .black),
       TitleCollectionViewCell.TitleViewModel(title: "fillEqual", indicatorColor: .green),
