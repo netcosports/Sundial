@@ -12,34 +12,32 @@
 		607FACDB1AFB9204008FA782 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 607FACD91AFB9204008FA782 /* Main.storyboard */; };
 		607FACDD1AFB9204008FA782 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 607FACDC1AFB9204008FA782 /* Images.xcassets */; };
 		607FACE01AFB9204008FA782 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 607FACDE1AFB9204008FA782 /* LaunchScreen.xib */; };
+		931DF1A916361586DCBEBDF8 /* Pods_Demo.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F946F9EAF20150C5D126D0EE /* Pods_Demo.framework */; };
 		AA22E94B1FC4569C0070DD70 /* TestViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA22E94A1FC4569C0070DD70 /* TestViewController.swift */; };
 		AA22E94D1FC4595E0070DD70 /* CollapsingHeaderViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA22E94C1FC4595E0070DD70 /* CollapsingHeaderViewController.swift */; };
 		AAC615A11FBF807E00C1F91B /* ViewControllerInner.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAC615A01FBF807E00C1F91B /* ViewControllerInner.swift */; };
 		AAC615A31FC0CAA100C1F91B /* CustomCells.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAC615A21FC0CAA100C1F91B /* CustomCells.swift */; };
 		AAE7481B1FC21A1600F66501 /* CustomViewsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAE7481A1FC21A1600F66501 /* CustomViewsViewController.swift */; };
-		AD0F680C7884EB4922F15988 /* Pods_Sundial_Example.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 53D773FADDB497676A9AC9D5 /* Pods_Sundial_Example.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		10BE733B7DFC8FEE0E963989 /* Pods_Sundial_Tests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Sundial_Tests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		12ED5FDB6CB7EFDC4878D1C5 /* Pods-Sundial_Example.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Sundial_Example.release.xcconfig"; path = "Pods/Target Support Files/Pods-Sundial_Example/Pods-Sundial_Example.release.xcconfig"; sourceTree = "<group>"; };
-		199AC235584A7B37A3EEDF50 /* Sundial.podspec */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; name = Sundial.podspec; path = ../Sundial.podspec; sourceTree = "<group>"; };
-		3C1FF49D1A0103D831A4A39A /* LICENSE */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; name = LICENSE; path = ../LICENSE; sourceTree = "<group>"; };
-		53D773FADDB497676A9AC9D5 /* Pods_Sundial_Example.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Sundial_Example.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		607FACD01AFB9204008FA782 /* Sundial_Example.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Sundial_Example.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		199AC235584A7B37A3EEDF50 /* Sundial.podspec */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; path = Sundial.podspec; sourceTree = "<group>"; };
+		607FACD01AFB9204008FA782 /* Demo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Demo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		607FACD41AFB9204008FA782 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		607FACD51AFB9204008FA782 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		607FACD71AFB9204008FA782 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
 		607FACDA1AFB9204008FA782 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		607FACDC1AFB9204008FA782 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		607FACDF1AFB9204008FA782 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/LaunchScreen.xib; sourceTree = "<group>"; };
-		A3C1E8423C944E7A0607154F /* README.md */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = net.daringfireball.markdown; name = README.md; path = ../README.md; sourceTree = "<group>"; };
+		6B83C4E7D65D0EC91CEBDDBD /* Pods-Demo.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Demo.debug.xcconfig"; path = "Pods/Target Support Files/Pods-Demo/Pods-Demo.debug.xcconfig"; sourceTree = "<group>"; };
+		A34D8A759193196EEE6E28EF /* Pods-Demo.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Demo.release.xcconfig"; path = "Pods/Target Support Files/Pods-Demo/Pods-Demo.release.xcconfig"; sourceTree = "<group>"; };
+		A3C1E8423C944E7A0607154F /* README.md */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		AA22E94A1FC4569C0070DD70 /* TestViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestViewController.swift; sourceTree = "<group>"; };
 		AA22E94C1FC4595E0070DD70 /* CollapsingHeaderViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CollapsingHeaderViewController.swift; sourceTree = "<group>"; };
 		AAC615A01FBF807E00C1F91B /* ViewControllerInner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewControllerInner.swift; sourceTree = "<group>"; };
 		AAC615A21FC0CAA100C1F91B /* CustomCells.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomCells.swift; sourceTree = "<group>"; };
 		AAE7481A1FC21A1600F66501 /* CustomViewsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomViewsViewController.swift; sourceTree = "<group>"; };
-		FB261DB13F1C9810E1B84525 /* Pods-Sundial_Example.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Sundial_Example.debug.xcconfig"; path = "Pods/Target Support Files/Pods-Sundial_Example/Pods-Sundial_Example.debug.xcconfig"; sourceTree = "<group>"; };
+		F946F9EAF20150C5D126D0EE /* Pods_Demo.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Demo.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -47,7 +45,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				AD0F680C7884EB4922F15988 /* Pods_Sundial_Example.framework in Frameworks */,
+				931DF1A916361586DCBEBDF8 /* Pods_Demo.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -57,8 +55,7 @@
 		39D93D0A6FD179DFDF5800BD /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				53D773FADDB497676A9AC9D5 /* Pods_Sundial_Example.framework */,
-				10BE733B7DFC8FEE0E963989 /* Pods_Sundial_Tests.framework */,
+				F946F9EAF20150C5D126D0EE /* Pods_Demo.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -67,7 +64,7 @@
 			isa = PBXGroup;
 			children = (
 				607FACF51AFB993E008FA782 /* Podspec Metadata */,
-				607FACD21AFB9204008FA782 /* Example for Sundial */,
+				607FACD21AFB9204008FA782 /* Demo */,
 				607FACD11AFB9204008FA782 /* Products */,
 				B13B502134859A290788CD16 /* Pods */,
 				39D93D0A6FD179DFDF5800BD /* Frameworks */,
@@ -77,12 +74,12 @@
 		607FACD11AFB9204008FA782 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				607FACD01AFB9204008FA782 /* Sundial_Example.app */,
+				607FACD01AFB9204008FA782 /* Demo.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
 		};
-		607FACD21AFB9204008FA782 /* Example for Sundial */ = {
+		607FACD21AFB9204008FA782 /* Demo */ = {
 			isa = PBXGroup;
 			children = (
 				AA22E9491FC4567C0070DD70 /* CollapsingHeader */,
@@ -96,8 +93,7 @@
 				607FACDE1AFB9204008FA782 /* LaunchScreen.xib */,
 				607FACD31AFB9204008FA782 /* Supporting Files */,
 			);
-			name = "Example for Sundial";
-			path = Sundial;
+			path = Demo;
 			sourceTree = "<group>";
 		};
 		607FACD31AFB9204008FA782 /* Supporting Files */ = {
@@ -113,7 +109,6 @@
 			children = (
 				199AC235584A7B37A3EEDF50 /* Sundial.podspec */,
 				A3C1E8423C944E7A0607154F /* README.md */,
-				3C1FF49D1A0103D831A4A39A /* LICENSE */,
 			);
 			name = "Podspec Metadata";
 			sourceTree = "<group>";
@@ -130,8 +125,8 @@
 		B13B502134859A290788CD16 /* Pods */ = {
 			isa = PBXGroup;
 			children = (
-				FB261DB13F1C9810E1B84525 /* Pods-Sundial_Example.debug.xcconfig */,
-				12ED5FDB6CB7EFDC4878D1C5 /* Pods-Sundial_Example.release.xcconfig */,
+				6B83C4E7D65D0EC91CEBDDBD /* Pods-Demo.debug.xcconfig */,
+				A34D8A759193196EEE6E28EF /* Pods-Demo.release.xcconfig */,
 			);
 			name = Pods;
 			sourceTree = "<group>";
@@ -139,9 +134,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		607FACCF1AFB9204008FA782 /* Sundial_Example */ = {
+		607FACCF1AFB9204008FA782 /* Demo */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 607FACEF1AFB9204008FA782 /* Build configuration list for PBXNativeTarget "Sundial_Example" */;
+			buildConfigurationList = 607FACEF1AFB9204008FA782 /* Build configuration list for PBXNativeTarget "Demo" */;
 			buildPhases = (
 				E30BE740D15751965ED687DB /* [CP] Check Pods Manifest.lock */,
 				607FACCC1AFB9204008FA782 /* Sources */,
@@ -154,9 +149,9 @@
 			);
 			dependencies = (
 			);
-			name = Sundial_Example;
+			name = Demo;
 			productName = Sundial;
-			productReference = 607FACD01AFB9204008FA782 /* Sundial_Example.app */;
+			productReference = 607FACD01AFB9204008FA782 /* Demo.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -175,7 +170,7 @@
 					};
 				};
 			};
-			buildConfigurationList = 607FACCB1AFB9204008FA782 /* Build configuration list for PBXProject "Sundial" */;
+			buildConfigurationList = 607FACCB1AFB9204008FA782 /* Build configuration list for PBXProject "Demo" */;
 			compatibilityVersion = "Xcode 3.2";
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
@@ -188,7 +183,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				607FACCF1AFB9204008FA782 /* Sundial_Example */,
+				607FACCF1AFB9204008FA782 /* Demo */,
 			);
 		};
 /* End PBXProject section */
@@ -213,7 +208,7 @@
 			files = (
 			);
 			inputPaths = (
-				"${SRCROOT}/Pods/Target Support Files/Pods-Sundial_Example/Pods-Sundial_Example-frameworks.sh",
+				"${SRCROOT}/Pods/Target Support Files/Pods-Demo/Pods-Demo-frameworks.sh",
 				"${BUILT_PRODUCTS_DIR}/Astrolabe/Astrolabe.framework",
 				"${BUILT_PRODUCTS_DIR}/RxCocoa/RxCocoa.framework",
 				"${BUILT_PRODUCTS_DIR}/RxSwift/RxSwift.framework",
@@ -230,7 +225,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-Sundial_Example/Pods-Sundial_Example-frameworks.sh\"\n";
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-Demo/Pods-Demo-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 		7449A50090B8DC86175983E2 /* [CP] Copy Pods Resources */ = {
@@ -245,7 +240,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-Sundial_Example/Pods-Sundial_Example-resources.sh\"\n";
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-Demo/Pods-Demo-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 		E30BE740D15751965ED687DB /* [CP] Check Pods Manifest.lock */ = {
@@ -259,7 +254,7 @@
 			);
 			name = "[CP] Check Pods Manifest.lock";
 			outputPaths = (
-				"$(DERIVED_FILE_DIR)/Pods-Sundial_Example-checkManifestLockResult.txt",
+				"$(DERIVED_FILE_DIR)/Pods-Demo-checkManifestLockResult.txt",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -406,10 +401,10 @@
 		};
 		607FACF01AFB9204008FA782 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = FB261DB13F1C9810E1B84525 /* Pods-Sundial_Example.debug.xcconfig */;
+			baseConfigurationReference = 6B83C4E7D65D0EC91CEBDDBD /* Pods-Demo.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				INFOPLIST_FILE = Sundial/Info.plist;
+				INFOPLIST_FILE = Demo/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				MODULE_NAME = ExampleApp;
 				PRODUCT_BUNDLE_IDENTIFIER = "org.cocoapods.demo.$(PRODUCT_NAME:rfc1034identifier)";
@@ -421,10 +416,10 @@
 		};
 		607FACF11AFB9204008FA782 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 12ED5FDB6CB7EFDC4878D1C5 /* Pods-Sundial_Example.release.xcconfig */;
+			baseConfigurationReference = A34D8A759193196EEE6E28EF /* Pods-Demo.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				INFOPLIST_FILE = Sundial/Info.plist;
+				INFOPLIST_FILE = Demo/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				MODULE_NAME = ExampleApp;
 				PRODUCT_BUNDLE_IDENTIFIER = "org.cocoapods.demo.$(PRODUCT_NAME:rfc1034identifier)";
@@ -437,7 +432,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		607FACCB1AFB9204008FA782 /* Build configuration list for PBXProject "Sundial" */ = {
+		607FACCB1AFB9204008FA782 /* Build configuration list for PBXProject "Demo" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				607FACED1AFB9204008FA782 /* Debug */,
@@ -446,7 +441,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		607FACEF1AFB9204008FA782 /* Build configuration list for PBXNativeTarget "Sundial_Example" */ = {
+		607FACEF1AFB9204008FA782 /* Build configuration list for PBXNativeTarget "Demo" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				607FACF01AFB9204008FA782 /* Debug */,
