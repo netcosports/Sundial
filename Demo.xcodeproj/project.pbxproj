@@ -37,6 +37,10 @@
 		AAC615A01FBF807E00C1F91B /* ViewControllerInner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewControllerInner.swift; sourceTree = "<group>"; };
 		AAC615A21FC0CAA100C1F91B /* CustomCells.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomCells.swift; sourceTree = "<group>"; };
 		AAE7481A1FC21A1600F66501 /* CustomViewsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomViewsViewController.swift; sourceTree = "<group>"; };
+		B555DCEC1FC6DAEC00296E4B /* Fastfile */ = {isa = PBXFileReference; lastKnownFileType = text; path = Fastfile; sourceTree = "<group>"; };
+		B555DCED1FC6DAEC00296E4B /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
+		B555DCEF1FC6DAEC00296E4B /* pod_spec_lint.rb */ = {isa = PBXFileReference; lastKnownFileType = text.script.ruby; path = pod_spec_lint.rb; sourceTree = "<group>"; };
+		B555DCF01FC6DAEC00296E4B /* pod_lib_lint.rb */ = {isa = PBXFileReference; lastKnownFileType = text.script.ruby; path = pod_lib_lint.rb; sourceTree = "<group>"; };
 		F946F9EAF20150C5D126D0EE /* Pods_Demo.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Demo.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -63,6 +67,7 @@
 		607FACC71AFB9204008FA782 = {
 			isa = PBXGroup;
 			children = (
+				B555DCE81FC6DAEC00296E4B /* .fastlane */,
 				607FACF51AFB993E008FA782 /* Podspec Metadata */,
 				607FACD21AFB9204008FA782 /* Demo */,
 				607FACD11AFB9204008FA782 /* Products */,
@@ -129,6 +134,25 @@
 				A34D8A759193196EEE6E28EF /* Pods-Demo.release.xcconfig */,
 			);
 			name = Pods;
+			sourceTree = "<group>";
+		};
+		B555DCE81FC6DAEC00296E4B /* .fastlane */ = {
+			isa = PBXGroup;
+			children = (
+				B555DCEE1FC6DAEC00296E4B /* actions */,
+				B555DCEC1FC6DAEC00296E4B /* Fastfile */,
+				B555DCED1FC6DAEC00296E4B /* README.md */,
+			);
+			path = .fastlane;
+			sourceTree = "<group>";
+		};
+		B555DCEE1FC6DAEC00296E4B /* actions */ = {
+			isa = PBXGroup;
+			children = (
+				B555DCEF1FC6DAEC00296E4B /* pod_spec_lint.rb */,
+				B555DCF01FC6DAEC00296E4B /* pod_lib_lint.rb */,
+			);
+			path = actions;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
