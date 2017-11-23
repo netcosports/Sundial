@@ -50,13 +50,13 @@ public enum DecorationAlignment {
 }
 
 public struct Settings {
-  let stripHeight: CGFloat
-  let markerHeight: CGFloat
-  let itemMargin: CGFloat
-  let bottomStripSpacing: CGFloat
-  let anchor: Anchor
-  let inset: UIEdgeInsets
-  let alignment: DecorationAlignment
+  public var stripHeight: CGFloat
+  public var markerHeight: CGFloat
+  public var itemMargin: CGFloat
+  public var bottomStripSpacing: CGFloat
+  public var anchor: Anchor
+  public var inset: UIEdgeInsets
+  public var alignment: DecorationAlignment
 
   public init(stripHeight: CGFloat = 80.0,
               markerHeight: CGFloat = 5.5,

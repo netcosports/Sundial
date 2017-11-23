@@ -1,5 +1,5 @@
 # Xcode
-#
+.DS_Store
 build/
 *.pbxuser
 !default.pbxuser
@@ -9,28 +9,18 @@ build/
 !default.mode2v3
 *.perspectivev3
 !default.perspectivev3
+*.xcworkspace
+!default.xcworkspace
 xcuserdata
-*.xccheckout
+profile
 *.moved-aside
 DerivedData
-*.hmap
-*.ipa
-*.xcuserstate
-.DS_Store
-*.orig
-.idea
-swiftlint_result.txt
-build/
-fastlane/test_output
-fastlane/report.xml
-fastlane/.env
-.bundle
-vendor
-
-# CocoaPods
-#
-# We recommend against adding the Pods directory to your .gitignore. However
-# you should judge for yourself, the pros and cons are mentioned at:
-# http://guides.cocoapods.org/using/using-cocoapods.html#should-i-ignore-the-pods-directory-in-source-control
-#
+.idea/
 Pods/
+*.orig
+
+# Fastlane
+fastlane/test_output
+.fastlane/test_output
+fastlane/report.xml
+.fastlane/report.xml
