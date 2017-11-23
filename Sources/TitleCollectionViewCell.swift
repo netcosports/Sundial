@@ -48,14 +48,14 @@ open class TitleCollectionViewCell: CollectionViewCell, Reusable {
          fadeTextColor: UIColor = .green,
          indicatorColor: UIColor = .red,
          textFont: UIFont = UIFont.systemFont(ofSize: 15),
-         fadeTextFont: UIFont = UIFont.systemFont(ofSize: 15)) {
+         fadeTextFont: UIFont? = nil) {
 
       self.title = title
       self.textColor = textColor
       self.fadeTextColor = fadeTextColor
       self.indicatorColor = indicatorColor
       self.textFont = textFont
-      self.fadeTextFont = fadeTextFont
+      self.fadeTextFont = fadeTextFont ?? textFont
     }
   }
 
