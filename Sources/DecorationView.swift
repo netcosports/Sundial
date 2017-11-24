@@ -11,7 +11,7 @@ import Astrolabe
 import RxSwift
 import RxCocoa
 
-let DecorationViewId = "DecorationView"
+public let DecorationViewId = "DecorationView"
 
 class DecorationView<TitleCell: CollectionViewCell, MarkerCell: CollectionViewCell>: CollectionViewCell
       where TitleCell: Reusable, TitleCell.Data: ViewModelable {
