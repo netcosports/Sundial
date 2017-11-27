@@ -71,3 +71,20 @@ extension String {
     return boundingBox.height
   }
 }
+
+extension UIEdgeInsets {
+
+  var inverted: UIEdgeInsets {
+    return UIEdgeInsets(top: -top, left: -left, bottom: -bottom, right: -right)
+  }
+
+  func inset(rect: CGRect) -> CGRect {
+    return UIEdgeInsetsInsetRect(rect, self)
+  }
+
+  func inset(size: CGSize) -> CGSize {
+    let rect = CGRect(origin: .zero, size: size)
+    return UIEdgeInsetsInsetRect(rect, self).size
+  }
+
+}

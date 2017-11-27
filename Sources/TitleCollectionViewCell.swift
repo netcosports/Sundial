@@ -29,9 +29,20 @@ open class TitleCollectionViewCell: CollectionViewCell, Reusable {
 
   open override func setup() {
     contentView.addSubview(titleLabel)
-    titleLabel.snp.remakeConstraints { make in
-      make.edges.equalToSuperview()
-    }
+  }
+
+  open override func layoutSubviews() {
+    super.layoutSubviews()
+
+    titleLabel.frame = titleInsets.inset(rect: contentView.frame)
+  }
+
+  private var titleInsets: UIEdgeInsets = .zero
+
+  open override func prepareForReuse() {
+    super.prepareForReuse()
+
+    titleInsets = .zero
   }
 
   public struct TitleViewModel: Titleable, Indicatorable {
@@ -42,13 +53,15 @@ open class TitleCollectionViewCell: CollectionViewCell, Reusable {
     public let indicatorColor: UIColor
     public let textFont: UIFont
     public let fadeTextFont: UIFont
+    public let padding: UIEdgeInsets
 
     public init(title: String,
          textColor: UIColor = .black,
          fadeTextColor: UIColor = .green,
          indicatorColor: UIColor = .red,
          textFont: UIFont = UIFont.systemFont(ofSize: 15),
-         fadeTextFont: UIFont? = nil) {
+         fadeTextFont: UIFont? = nil,
+         padding: UIEdgeInsets = .zero) {
 
       self.title = title
       self.textColor = textColor
@@ -56,6 +69,7 @@ open class TitleCollectionViewCell: CollectionViewCell, Reusable {
       self.indicatorColor = indicatorColor
       self.textFont = textFont
       self.fadeTextFont = fadeTextFont ?? textFont
+      self.padding = padding
     }
   }
 
@@ -87,12 +101,14 @@ open class TitleCollectionViewCell: CollectionViewCell, Reusable {
   }
 
   open func setup(with data: Data) {
+    titleInsets = data.padding
     titleLabel.text = data.title
     self.data = data
   }
 
   open static func size(for data: Data, containerSize: CGSize) -> CGSize {
     let width = data.title.width(with: data.textFont) + 1
-    return CGSize(width: ceil(width), height: containerSize.height)
+    let size = CGSize(width: ceil(width), height: containerSize.height)
+    return data.padding.inverted.inset(size: size)
   }
 }
