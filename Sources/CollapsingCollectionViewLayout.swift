@@ -85,6 +85,8 @@ open class CollapsingCollectionViewLayout<Source: CollectionViewSource, HeaderCe
     guard var layoutAttributes = super.layoutAttributesForElements(in: rect) else { return nil }
     guard let collectionView = collectionView else { return layoutAttributes }
 
+    crashIfHeaderPresent(in: layoutAttributes)
+
     let headerIndexPath = IndexPath(item: 0, section: 0)
     let сollapsingHeaderViewAttributes = CollapsingHeaderViewAttributes(forSupplementaryViewOfKind: UICollectionElementKindSectionHeader,
                                                                          with: headerIndexPath)
@@ -95,6 +97,16 @@ open class CollapsingCollectionViewLayout<Source: CollectionViewSource, HeaderCe
     layoutAttributes.append(сollapsingHeaderViewAttributes)
 
     return layoutAttributes
+  }
+
+  private func crashIfHeaderPresent(in items: [UICollectionViewLayoutAttributes]) {
+    for attributes in items {
+      if attributes.representedElementCategory == .supplementaryView && attributes.representedElementKind == UICollectionElementKindSectionHeader {
+        if attributes.size != .zero {
+          fatalError("collapsing header size(for:, containerSize:) -> CGSize should return .zero")
+        }
+      }
+    }
   }
 
   open override var decorationFrame: CGRect {
