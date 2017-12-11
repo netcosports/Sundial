@@ -40,11 +40,6 @@ open class CollapsingCollectionViewLayout<Source: CollectionViewSource, HeaderCe
 
   var handlers: [CollapsingHeaderHandler] = []
 
-  open override func prepare() {
-    super.prepare()
-    register(HeaderCell.self, forDecorationViewOfKind: CollapsingHeaderViewId)
-  }
-
   fileprivate var items: [CollapsingItem] = []
 
   public init(items: [CollapsingItem], hostPagerSource: Source, settings: Settings? = nil, pager: PagerClosure?) {
@@ -90,13 +85,12 @@ open class CollapsingCollectionViewLayout<Source: CollectionViewSource, HeaderCe
     guard var layoutAttributes = super.layoutAttributesForElements(in: rect) else { return nil }
     guard let collectionView = collectionView else { return layoutAttributes }
 
-    let decorationIndexPath = IndexPath(item: 1, section: 0)
-    let сollapsingHeaderViewAttributes = CollapsingHeaderViewAttributes(forDecorationViewOfKind: CollapsingHeaderViewId, with: decorationIndexPath)
+    let headerIndexPath = IndexPath(item: 0, section: 0)
+    let сollapsingHeaderViewAttributes = CollapsingHeaderViewAttributes(forSupplementaryViewOfKind: UICollectionElementKindSectionHeader,
+                                                                         with: headerIndexPath)
     сollapsingHeaderViewAttributes.zIndex = 1024
-    сollapsingHeaderViewAttributes.frame = CGRect(x: collectionView.contentOffset.x,
-                                        y: 0.0,
-                                        width: collectionView.frame.width,
-                                        height: headerHeight.value)
+    сollapsingHeaderViewAttributes.frame = CGRect(x: collectionView.contentOffset.x, y: 0.0,
+                                                  width: collectionView.frame.width, height: headerHeight.value)
 
     layoutAttributes.append(сollapsingHeaderViewAttributes)
 

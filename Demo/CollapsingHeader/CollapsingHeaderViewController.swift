@@ -11,13 +11,35 @@ import Astrolabe
 import Sundial
 import RxSwift
 
-class Header: CollectionViewCell {
+class Header: CollectionViewCell, Reusable {
+
+  typealias Data = String
+
+  func setup(with data: String) {
+    title.text = data
+  }
+
+  static func size(for data: String, containerSize: CGSize) -> CGSize {
+    return .zero
+  }
+
+  let title = UILabel()
 
   override func setup() {
     super.setup()
 
     contentView.backgroundColor = .purple
+
+    title.textColor = .white
+    contentView.addSubview(title)
   }
+
+  override func layoutSubviews() {
+    super.layoutSubviews()
+
+    title.frame = contentView.bounds.insetBy(dx: 15, dy: 15)
+  }
+
 }
 
 class CollapsingHeaderViewController: UIViewController {
@@ -80,6 +102,7 @@ class CollapsingHeaderViewController: UIViewController {
 
     collectionView.source.reloadData()
   }
+
 }
 
 extension CollapsingHeaderViewController: CollectionViewPager {
@@ -93,6 +116,11 @@ extension CollapsingHeaderViewController: CollectionViewPager {
       Page(controller: controller5, id: "Title 5")
     ]
   }
+
+  func section(with cells: [Cellable]) -> Sectionable {
+    return CollectionHeaderSection<Header>(cells: cells, headerData: "Customizable Header title")
+  }
+
 }
 
 extension CollapsingHeaderViewController {
