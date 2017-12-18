@@ -1,5 +1,5 @@
 PODS:
-  - Astrolabe/Core (3.0.5):
+  - Astrolabe/Core (3.0.6):
     - RxCocoa (~> 4.0)
     - RxSwift (~> 4.0)
     - SnapKit (~> 4.0)
@@ -18,7 +18,7 @@ EXTERNAL SOURCES:
     :path: .
 
 SPEC CHECKSUMS:
-  Astrolabe: fd6995508992dde9a25311e0d8e01efdd59f0b35
+  Astrolabe: d324c8f9da196bad74dfa2a7124baff5fc3a3a85
   RxCocoa: d62846ca96495d862fa4c59ea7d87e5031d7340e
   RxSwift: fd680d75283beb5e2559486f3c0ff852f0d35334
   SnapKit: a42d492c16e80209130a3379f73596c3454b7694

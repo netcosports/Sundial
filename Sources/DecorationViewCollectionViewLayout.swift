@@ -101,10 +101,12 @@ class DecorationViewCollectionViewLayout<TitleViewModel: ViewModelable, MarkerCe
 
   override var collectionViewContentSize: CGSize {
     let contentSize = super.collectionViewContentSize
+    guard let collectionView = collectionView else { return contentSize }
 
     switch anchor {
+    case .fillEqual:
+      return CGSize(width: collectionView.frame.width, height: contentSize.height)
     case .equal(let size):
-      guard let collectionView = collectionView else { return contentSize }
       guard collectionView.numberOfSections > 0 else { return contentSize }
 
       let count = CGFloat(collectionView.numberOfItems(inSection: 0))
