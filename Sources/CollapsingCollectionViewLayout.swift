@@ -36,7 +36,6 @@ open class CollapsingCollectionViewLayout<Source: CollectionViewSource, HeaderCe
   public let maxHeaderHeight = Variable<CGFloat>(240)
   public let headerInset = Variable<CGFloat>(0)
   public let headerHeight = Variable<CGFloat>(120)
-  public let expanded = Variable<Bool>(true)
 
   var handlers: [CollapsingHeaderHandler] = []
 
@@ -49,8 +48,7 @@ open class CollapsingCollectionViewLayout<Source: CollectionViewSource, HeaderCe
       let handler = CollapsingHeaderHandler(with: $0, min: minHeaderHeight,
                                             max: maxHeaderHeight,
                                             headerInset: headerInset,
-                                            headerHeight: headerHeight,
-                                            expanded: expanded)
+                                            headerHeight: headerHeight)
 
       $0.visible.asDriver().drive(onNext: { [weak handler] visible in
         if visible {
@@ -67,7 +65,6 @@ open class CollapsingCollectionViewLayout<Source: CollectionViewSource, HeaderCe
       maxHeaderHeight.asObservable().skip(1).distinctUntilChanged().map { _ in () },
       headerInset.asObservable().skip(1).distinctUntilChanged().map { _ in () },
       headerHeight.asObservable().skip(1).distinctUntilChanged().map { _ in () },
-      expanded.asObservable().skip(1).distinctUntilChanged().map { _ in () }
     ]).merge()
 
     observable.subscribe(onNext: { [weak self] _ in
@@ -131,7 +128,6 @@ class CollapsingHeaderHandler {
   let minHeaderHeight: Variable<CGFloat>
   let maxHeaderHeight: Variable<CGFloat>
   let headerInset: Variable<CGFloat>
-  let expanded: Variable<Bool>
 
   private weak var collapsingItem: CollapsingItem?
 
@@ -144,14 +140,12 @@ class CollapsingHeaderHandler {
        min: Variable<CGFloat>,
        max: Variable<CGFloat>,
        headerInset: Variable<CGFloat>,
-       headerHeight: Variable<CGFloat>,
-       expanded: Variable<Bool>) {
+       headerHeight: Variable<CGFloat>) {
 
     self.collapsingItem = collapsingItem
     self.minHeaderHeight = min
     self.maxHeaderHeight = max
     self.headerHeight = headerHeight
-    self.expanded = expanded
     self.headerInset = headerInset
 
     maxHeaderHeight.asDriver().drive(onNext: { [weak collapsingItem = self.collapsingItem] maxHeight in
@@ -177,10 +171,10 @@ class CollapsingHeaderHandler {
       }.asDriver(onErrorJustReturn: maxHeaderHeight.value).distinctUntilChanged().drive(headerHeight)
 
     let maxHeaderHeightDispose = maxHeaderHeight.asDriver().skip(1)
-      .withLatestFrom(expanded.asDriver()) { ($0, $1) }
-      .drive(onNext: { [weak collapsingItem = self.collapsingItem] height, expanded in
-        if expanded {
-          collapsingItem?.scrollView.contentOffset = CGPoint(x: 0, y: -height - self.headerInset.value) // -40
+      .withLatestFrom(headerHeight.asDriver()) { ($0, $1) }
+      .drive(onNext: { [weak collapsingItem = self.collapsingItem] maxHeight, height in
+        if maxHeight == height {
+          collapsingItem?.scrollView.contentOffset = CGPoint(x: 0, y: -maxHeight - self.headerInset.value) // -40
         }
       })
     if let headerHeightDispose = headerHeightDispose {
