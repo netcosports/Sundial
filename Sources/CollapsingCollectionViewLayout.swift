@@ -81,6 +81,8 @@ open class CollapsingCollectionViewLayout<Source: CollectionViewSource, HeaderCe
     fatalError("init(coder:) has not been implemented")
   }
 
+  open class var headerZIndex: Int { return 1024 }
+
   open override func layoutAttributesForElements(in rect: CGRect) -> [UICollectionViewLayoutAttributes]? {
     guard var layoutAttributes = super.layoutAttributesForElements(in: rect) else { return nil }
     guard let collectionView = collectionView else { return layoutAttributes }
@@ -90,7 +92,7 @@ open class CollapsingCollectionViewLayout<Source: CollectionViewSource, HeaderCe
     let headerIndexPath = IndexPath(item: 0, section: 0)
     let сollapsingHeaderViewAttributes = CollapsingHeaderViewAttributes(forSupplementaryViewOfKind: UICollectionElementKindSectionHeader,
                                                                          with: headerIndexPath)
-    сollapsingHeaderViewAttributes.zIndex = 1024
+    сollapsingHeaderViewAttributes.zIndex = type(of: self).headerZIndex
     сollapsingHeaderViewAttributes.frame = CGRect(x: collectionView.contentOffset.x, y: 0.0,
                                                   width: collectionView.frame.width, height: headerHeight.value)
 
