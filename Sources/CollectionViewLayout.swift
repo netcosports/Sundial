@@ -80,9 +80,14 @@ open class CollectionViewLayout<T: CollectionViewSource,
       decorationAttributes.titles = titles
       decorationAttributes.hostPagerSource = hostPagerSource
       decorationAttributes.backgroundColor = pageStripBackgroundColor
+      let validPagesRange = 0...(titles.count - settings.pagesOnScreen)
       decorationAttributes.selectionClosure = { [weak self] in
         if let selectedItem = self?.hostPagerSource?.selectedItem {
-          selectedItem.onNext($0)
+          if validPagesRange ~= $0 {
+            selectedItem.onNext($0)
+          } else {
+            selectedItem.onNext(min(max(validPagesRange.lowerBound, $0), validPagesRange.upperBound))
+          }
         }
       }
       decorationAttributes.frame = decorationFrame

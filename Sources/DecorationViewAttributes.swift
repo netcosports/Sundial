@@ -27,6 +27,7 @@ class DecorationViewAttributes<TitleViewModel: Titleable>: UICollectionViewLayou
     typedCopy.hostPagerSource = self.hostPagerSource
     typedCopy.backgroundColor = self.backgroundColor
     typedCopy.selectionClosure = self.selectionClosure
+    typedCopy.settings = self.settings
     return typedCopy
   }
 
