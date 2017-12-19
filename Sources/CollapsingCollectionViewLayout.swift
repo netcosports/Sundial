@@ -36,6 +36,8 @@ open class CollapsingCollectionViewLayout<Source: CollectionViewSource, HeaderCe
   public let maxHeaderHeight = Variable<CGFloat>(240)
   public let headerInset = Variable<CGFloat>(0)
   public let headerHeight = Variable<CGFloat>(120)
+  private let expandedSubject = BehaviorSubject<Bool>(value: true)
+  public var expanded: Observable<Bool> { return expandedSubject.asObservable() }
 
   var handlers: [CollapsingHeaderHandler] = []
 
@@ -48,7 +50,8 @@ open class CollapsingCollectionViewLayout<Source: CollectionViewSource, HeaderCe
       let handler = CollapsingHeaderHandler(with: $0, min: minHeaderHeight,
                                             max: maxHeaderHeight,
                                             headerInset: headerInset,
-                                            headerHeight: headerHeight)
+                                            headerHeight: headerHeight,
+                                            expanded: expandedSubject)
 
       $0.visible.asDriver().drive(onNext: { [weak handler] visible in
         if visible {
@@ -128,6 +131,7 @@ class CollapsingHeaderHandler {
   let minHeaderHeight: Variable<CGFloat>
   let maxHeaderHeight: Variable<CGFloat>
   let headerInset: Variable<CGFloat>
+  let expanded: BehaviorSubject<Bool>
 
   private weak var collapsingItem: CollapsingItem?
 
@@ -140,13 +144,15 @@ class CollapsingHeaderHandler {
        min: Variable<CGFloat>,
        max: Variable<CGFloat>,
        headerInset: Variable<CGFloat>,
-       headerHeight: Variable<CGFloat>) {
+       headerHeight: Variable<CGFloat>,
+       expanded: BehaviorSubject<Bool>) {
 
     self.collapsingItem = collapsingItem
     self.minHeaderHeight = min
     self.maxHeaderHeight = max
     self.headerHeight = headerHeight
     self.headerInset = headerInset
+    self.expanded = expanded
 
     maxHeaderHeight.asDriver().drive(onNext: { [weak collapsingItem = self.collapsingItem] maxHeight in
       guard let collapsingItem = collapsingItem else { return }
@@ -155,6 +161,9 @@ class CollapsingHeaderHandler {
       collapsingItem.scrollView.contentInset = UIEdgeInsets(top: topOffset, left: 0, bottom: 0, right: 0)
       collapsingItem.scrollView.scrollIndicatorInsets = UIEdgeInsets(top: topOffset, left: 0, bottom: 0, right: 0)
     }).disposed(by: disposeBag)
+
+    Observable.combineLatest(headerHeight.asObservable(), maxHeaderHeight.asObservable()) { $0 == $1 }
+      .bind(to: expanded).disposed(by: disposeBag)
   }
 
   func connect() {
