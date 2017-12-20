@@ -12,7 +12,7 @@ import Astrolabe
 
 class DecorationViewCollectionViewLayout<TitleViewModel: ViewModelable, MarkerCell: CollectionViewCell>: UICollectionViewFlowLayout {
 
-  let progressVariable = Variable<Progress>((0, 0))
+  let progressVariable = Variable<Progress>((0...0, 0))
   var anchor: Anchor = .content
   var markerHeight: CGFloat = 15
   var titles: [TitleViewModel] = []
@@ -50,8 +50,8 @@ class DecorationViewCollectionViewLayout<TitleViewModel: ViewModelable, MarkerCe
 
     let progress = progressVariable.value
 
-    var currentPage: TitleAttributes?
-    var nextPage: TitleAttributes?
+    var currentPages = [TitleAttributes]()
+    var nextPages = [TitleAttributes]()
 
     switch anchor {
     case .fillEqual, .equal:
@@ -81,19 +81,27 @@ class DecorationViewCollectionViewLayout<TitleViewModel: ViewModelable, MarkerCe
     default: break
     }
 
+    let currentRange = progress.pages
+    let nextRange = progress.pages.next
+
     attributes.forEach { itemAttributes in
-      switch itemAttributes.indexPath.item {
-      case progress.page:
+      let index = itemAttributes.indexPath.item
+      if currentRange ~= index && nextRange ~= index {
+        itemAttributes.fade = 1.0
+        currentPages.append(itemAttributes)
+        nextPages.append(itemAttributes)
+      } else if currentRange ~= index {
         itemAttributes.fade = 1.0 - progress.progress
-        currentPage = itemAttributes
-      case progress.page + 1:
+        currentPages.append(itemAttributes)
+      } else if nextRange ~= index {
         itemAttributes.fade = progress.progress
-        nextPage = itemAttributes
-      default: itemAttributes.fade = 0.0
+        nextPages.append(itemAttributes)
+      } else {
+        itemAttributes.fade = 0.0
       }
     }
 
-    let markerAttributes = decorationAttributes(for: currentPage, nextPage: nextPage)
+    let markerAttributes = decorationAttributes(for: currentPages, nextPages: nextPages.count > 0 ? nextPages : nil)
     let results: [UICollectionViewLayoutAttributes] = [markerAttributes].flatMap { $0 } + attributes
 
     return results
@@ -124,43 +132,55 @@ class DecorationViewCollectionViewLayout<TitleViewModel: ViewModelable, MarkerCe
 
 extension DecorationViewCollectionViewLayout {
 
-  fileprivate func decorationAttributes(for currentPage: TitleAttributes?,
-                                        nextPage: TitleAttributes?) -> MarkerDecorationAttributes<TitleViewModel, MarkerCell>? {
+  fileprivate func decorationAttributes(for currentPages: [TitleAttributes],
+                                        nextPages: [TitleAttributes]?) -> MarkerDecorationAttributes<TitleViewModel, MarkerCell>? {
 
-    guard let currentPage = currentPage, let collectionView = collectionView else {
-      return nil
-    }
+    guard let collectionView = collectionView, currentPages.count > 0 else { return nil }
 
     let progress = progressVariable.value
     let decorationAttributes = MarkerAttributes(forDecorationViewOfKind: MarkerDecorationViewId, with: IndexPath(item: 0, section: 0))
 
-    decorationAttributes.apply(currentTitle: titles[safe: currentPage.indexPath.item],
-                               nextTitle: titles[safe: currentPage.indexPath.item + 1],
+    decorationAttributes.apply(currentTitle: titles[safe: currentPages[0].indexPath.item],
+                               nextTitle: titles[safe: currentPages[0].indexPath.item + 1],
                                progress: progress.progress)
+
+    let currentFrame = currentPages.reduce(into: CGRect(), { result, attributes in
+      if result == .zero {
+        result = attributes.frame
+      } else {
+        result = result.union(attributes.frame)
+      }
+    })
+
+    let nextFrame = nextPages?.reduce(into: CGRect(), { result, attributes in
+      if result == .zero {
+        result = attributes.frame
+      } else {
+        result = result.union(attributes.frame)
+      }
+    })
 
     decorationAttributes.frame = {
       let x: CGFloat
-      let y = currentPage.frame.maxY - markerHeight
+      let y = currentFrame.maxY - markerHeight
       let width: CGFloat
       let height = markerHeight
 
-      if let nextPage = nextPage {
-        width = currentPage.frame.width + progress.progress * (nextPage.frame.width - currentPage.frame.width)
-        x = currentPage.frame.minX + progress.progress * (nextPage.frame.minX - currentPage.frame.minX)
+      if let nextFrame = nextFrame {
+        width = currentFrame.width + progress.progress * (nextFrame.width - currentFrame.width)
+        x = currentFrame.minX + progress.progress * (nextFrame.minX - currentFrame.minX)
       } else {
-        width = currentPage.frame.width
-        x = currentPage.frame.minX
+        width = currentFrame.width
+        x = currentFrame.minX
       }
       return CGRect(x: x, y: y, width: width, height: height)
     }()
-
-
 
     switch anchor {
     case .content, .equal:
       adjustContentOffset(for: decorationAttributes,
                           collectionView: collectionView,
-                          currentPage: currentPage, nextPage: nextPage)
+                          currentPage: currentPages, nextPage: nextPages)
     case .centered:
       adjustCenteredContentOffset(for: decorationAttributes,
                                   collectionView: collectionView)
@@ -180,15 +200,15 @@ extension DecorationViewCollectionViewLayout {
 
   fileprivate func adjustContentOffset(for decorationAttributes: MarkerDecorationAttributes<TitleViewModel, MarkerCell>,
                                        collectionView: UICollectionView,
-                                       currentPage: TitleAttributes,
-                                       nextPage: TitleAttributes?) {
+                                       currentPage: [TitleAttributes],
+                                       nextPage: [TitleAttributes]?) {
 
     if decorationAttributes.frame.minX < collectionView.contentOffset.x && !isScrolling {
       isScrolling = true
-      if currentPage.indexPath.item == 0 {
+      if currentPage[0].indexPath.item == 0 {
         collectionView.setContentOffset(.zero, animated: true)
       } else {
-        let point = CGPoint(x: currentPage.frame.minX - minimumInteritemSpacing, y: 0)
+        let point = CGPoint(x: currentPage[0].frame.minX - minimumInteritemSpacing, y: 0)
         collectionView.setContentOffset(point, animated: true)
       }
     }
@@ -196,11 +216,11 @@ extension DecorationViewCollectionViewLayout {
     if decorationAttributes.frame.maxX > collectionView.contentOffset.x + collectionView.frame.width && !isScrolling,
       let nextPage = nextPage {
       isScrolling = true
-      if nextPage.indexPath.item == collectionView.numberOfItems(inSection: 0) - 1 {
+      if nextPage[0].indexPath.item == collectionView.numberOfItems(inSection: 0) - 1 {
         let target = CGPoint(x: collectionView.contentSize.width - collectionView.frame.width, y: 0)
         collectionView.setContentOffset(target, animated: true)
       } else {
-        let point = CGPoint(x: nextPage.frame.maxX + minimumInteritemSpacing - collectionView.frame.width, y: 0)
+        let point = CGPoint(x: nextPage[0].frame.maxX + minimumInteritemSpacing - collectionView.frame.width, y: 0)
         collectionView.setContentOffset(point, animated: true)
       }
     }

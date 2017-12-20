@@ -129,21 +129,20 @@ extension DecorationView {
           return self?.hostPagerSource?.containerView?.contentOffset ?? CGPoint.zero
         })
 
-    if let contentOffsetObservable =
-      layoutAttributes.hostPagerSource?.containerView?.rx.contentOffset.asObservable() {
+    if let contentOffsetObservable = layoutAttributes.hostPagerSource?.containerView?.rx.contentOffset.asObservable() {
       let workaroundObservable = self.workaroundObservable()
       Observable.of(contentOffsetObservable, contentSizeObservable, workaroundObservable)
         .merge()
         .map { [weak self] offset -> Progress in
-          if let containerView = self?.hostPagerSource?.containerView {
-            let width = containerView.frame.width
+          if let containerView = self?.hostPagerSource?.containerView, let settings = layoutAttributes.settings {
+            let width = containerView.frame.width / CGFloat(settings.pagesOnScreen)
             if width > 0.0 {
               let page = Int(offset.x / width)
               let progress = (offset.x - (width * CGFloat(page))) / width
-              return (page: page, progress: progress)
+              return (pages: page...(page + settings.pagesOnScreen - 1), progress: progress)
             }
           }
-          return (page: 0, progress: 0.0)
+          return (pages: 0...0, progress: 0.0)
         }.bind(to: layout.progressVariable).disposed(by: disposeBag)
     }
   }

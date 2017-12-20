@@ -33,7 +33,15 @@ extension CollectionViewReusedPagerSource: Selectable {
   public var selectedItem: ControlProperty<Int> { return rx.selectedItem }
 }
 
-public typealias Progress = (page: Int, progress: CGFloat)
+public typealias Progress = (pages: ClosedRange<Int>, progress: CGFloat)
+
+extension ClosedRange where Bound == Int {
+
+  var next: ClosedRange<Int> {
+    return lowerBound.advanced(by: 1)...upperBound.advanced(by: 1)
+  }
+
+}
 
 public enum Anchor {
   case content
@@ -57,6 +65,7 @@ public struct Settings {
   public var anchor: Anchor
   public var inset: UIEdgeInsets
   public var alignment: DecorationAlignment
+  public var pagesOnScreen: Int
 
   public init(stripHeight: CGFloat = 80.0,
               markerHeight: CGFloat = 5.5,
@@ -64,7 +73,8 @@ public struct Settings {
               bottomStripSpacing: CGFloat = 0.0,
               anchor: Anchor = .centered,
               inset: UIEdgeInsets = .zero,
-              alignment: DecorationAlignment = .top) {
+              alignment: DecorationAlignment = .top,
+              pagesOnScreen: Int = 1) {
     self.stripHeight = stripHeight
     self.markerHeight = markerHeight
     self.itemMargin = itemMargin
@@ -72,5 +82,7 @@ public struct Settings {
     self.anchor = anchor
     self.inset = inset
     self.alignment = alignment
+    assert(pagesOnScreen > 0, "number of pages on screen should be greater than 0")
+    self.pagesOnScreen = pagesOnScreen
   }
 }
