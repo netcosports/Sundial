@@ -14,7 +14,7 @@ import RxCocoa
 open class CollectionViewLayout<T: CollectionViewSource,
   TitleCell: CollectionViewCell,
   MarkerCell: CollectionViewCell>: UICollectionViewFlowLayout
-  where T: Selectable, TitleCell: Reusable, TitleCell.Data: ViewModelable {
+where T: Selectable, TitleCell: Reusable, TitleCell.Data: ViewModelable {
 
   public typealias ViewModel = TitleCell.Data
 
@@ -31,6 +31,8 @@ open class CollectionViewLayout<T: CollectionViewSource,
   open var settings: Settings = Settings()
 
   let disposeBag = DisposeBag()
+  private var jumpSourceLayoutAttribute: UICollectionViewLayoutAttributes?
+  private var jumpTargetLayoutAttribute: UICollectionViewLayoutAttributes?
 
   public init(hostPagerSource: T, settings: Settings? = nil, pager: PagerClosure?) {
     super.init()
@@ -61,42 +63,23 @@ open class CollectionViewLayout<T: CollectionViewSource,
 
   open override func layoutAttributesForElements(in rect: CGRect) -> [UICollectionViewLayoutAttributes]? {
     let oldAttributes = super.layoutAttributesForElements(in: rect)
-
-    if var attributes = oldAttributes?.flatMap({ $0.copy() as? UICollectionViewLayoutAttributes }) {
-      if attributes.count == 0 { return oldAttributes }
-      guard let titles = pager?() else { return oldAttributes }
-
-      guard titles.count > 0 else { return oldAttributes }
-
-      attributes.forEach {
-        $0.frame = adjustItem(frame: $0.frame)
-      }
-
-      let decorationIndexPath = IndexPath(item: 0, section: 0)
-      let decorationAttributes = DecorationViewAttributes<ViewModel>(forDecorationViewOfKind: DecorationViewId, with: decorationIndexPath)
-
-      decorationAttributes.zIndex = 1024
-      decorationAttributes.settings = settings
-      decorationAttributes.titles = titles
-      decorationAttributes.hostPagerSource = hostPagerSource
-      decorationAttributes.backgroundColor = pageStripBackgroundColor
-      let validPagesRange = 0...(titles.count - settings.pagesOnScreen)
-      decorationAttributes.selectionClosure = { [weak self] in
-        if let selectedItem = self?.hostPagerSource?.selectedItem {
-          if validPagesRange ~= $0 {
-            selectedItem.onNext($0)
-          } else {
-            selectedItem.onNext(min(max(validPagesRange.lowerBound, $0), validPagesRange.upperBound))
-          }
-        }
-      }
-      decorationAttributes.frame = decorationFrame
-      attributes.append(decorationAttributes)
-      return attributes
+    guard var attributes = oldAttributes?.flatMap({ $0.copy() as? UICollectionViewLayoutAttributes }) else {
+      return oldAttributes
     }
 
-    return oldAttributes
+    addDecorationAttributes(to: &attributes)
+    addJumpAttributes(to: &attributes)
+    return attributes
   }
+
+//  open override func layoutAttributesForItem(at indexPath: IndexPath) -> UICollectionViewLayoutAttributes? {
+//    if let jumpAttribute = [jumpSourceLayoutAttribute, jumpTargetLayoutAttribute]
+//      .flatMap({ $0 })
+//      .first(where: { $0.indexPath == indexPath }) {
+//      return jumpAttribute
+//    }
+//    return super.layoutAttributesForItem(at: indexPath)
+//  }
 
   open var decorationFrame: CGRect {
     guard let collectionView = collectionView else { return .zero }
@@ -126,5 +109,151 @@ open class CollectionViewLayout<T: CollectionViewSource,
 
   open override func shouldInvalidateLayout(forBoundsChange newBounds: CGRect) -> Bool {
     return true
+  }
+}
+
+// MARK: - Private
+
+private extension CollectionViewLayout {
+
+  func addDecorationAttributes(to attributes: inout [UICollectionViewLayoutAttributes]) {
+    guard attributes.count > 0 else { return }
+    guard let decorationAttributes = self.decorationAttributes(with: pager?()) else {
+      return
+    }
+
+    attributes.forEach {
+      $0.frame = adjustItem(frame: $0.frame)
+    }
+    attributes.append(decorationAttributes)
+  }
+
+  func decorationAttributes(with titles: [ViewModel]?) -> UICollectionViewLayoutAttributes? {
+    guard let titles = titles, titles.count > 0 else {
+      return nil
+    }
+
+    let decorationIndexPath = IndexPath(item: 0, section: 0)
+    let decorationAttributes = DecorationViewAttributes<ViewModel>(forDecorationViewOfKind: DecorationViewId, with: decorationIndexPath)
+    decorationAttributes.zIndex = 1024
+    decorationAttributes.settings = settings
+    decorationAttributes.titles = titles
+    decorationAttributes.hostPagerSource = hostPagerSource
+    decorationAttributes.backgroundColor = pageStripBackgroundColor
+    decorationAttributes.selectionClosure = { [weak self] in
+      self?.select(item: $0, minJumpDistance: 2)
+    }
+    decorationAttributes.frame = decorationFrame
+    return decorationAttributes
+  }
+}
+
+// MARK: - Jumping
+
+private extension CollectionViewLayout {
+
+  func select(item: Int, minJumpDistance: Int ) {
+    guard let currentIndex = self.currentIndex(),
+      abs(currentIndex - item) >= minJumpDistance else {
+        hostPagerSource?.selectedItem.onNext(item)
+        return
+    }
+    jump(from: currentIndex, to: item)
+  }
+
+  func currentIndex() -> Int? {
+    guard let source = hostPagerSource,
+      let containerView = source.containerView,
+      containerView.bounds.size.width > 0.0 else {
+        return nil
+    }
+
+    let index = Int(containerView.contentOffset.x / containerView.bounds.size.width)
+    let pagesCount = source.sections.first?.cells.count ?? 0
+    let result = max(0, min(index, pagesCount - 1))
+    return result
+  }
+
+  func jump(from source: Int, to target: Int) {
+    if jumpTargetLayoutAttribute != nil || jumpSourceLayoutAttribute != nil {
+      return
+    }
+
+    let sourceIndex = IndexPath(item: source, section: 0)
+    let targetIndex = IndexPath(item: target, section: 0)
+    guard let sourceLayoutAttributes = layoutAttributesForItem(at: sourceIndex)?.copy() as? UICollectionViewLayoutAttributes,
+      let targetLayoutAttributes = layoutAttributesForItem(at: targetIndex)?.copy() as? UICollectionViewLayoutAttributes else {
+        return
+    }
+
+    jumpTargetLayoutAttribute = targetLayoutAttributes
+    jumpSourceLayoutAttribute = sourceLayoutAttributes
+
+    invalidateLayout()
+    hostPagerSource?.containerView?.isUserInteractionEnabled = false
+    hostPagerSource?.containerView?.layoutIfNeeded()
+    hostPagerSource?.selectedItem.onNext(target)
+  }
+
+  func addJumpAttributes(to attributes: inout [UICollectionViewLayoutAttributes]) {
+    guard attributes.count > 0 else { return }
+    guard let containerView = hostPagerSource?.containerView else { return }
+    guard let source = jumpSourceLayoutAttribute?.copy() as? UICollectionViewLayoutAttributes,
+      let target = jumpTargetLayoutAttribute?.copy() as? UICollectionViewLayoutAttributes else {
+        return
+    }
+
+    let sourceStartFrame = source.frame
+    let targetEndFrame = target.frame
+    let width = containerView.frame.size.width
+    let offet = containerView.contentOffset.x
+    let midPoint = offet + width * 0.5
+    let distanceLeft = abs(targetEndFrame.midX - midPoint)
+    let totalDistance = abs(targetEndFrame.midX - sourceStartFrame.midX)
+    guard totalDistance > 0.0, distanceLeft > 0.0, target.indexPath.item != source.indexPath.item else {
+      finalizeJumpTransition()
+      return
+    }
+
+    let pagesDistance = CGFloat(abs(target.indexPath.item - source.indexPath.item))
+    let perPageDistance = max(pagesDistance - 1.0, 0.0)
+    let progress = 1.0 - (distanceLeft / totalDistance)
+
+    let sourceEndProgress = 1.0 - perPageDistance / pagesDistance
+    let sourceEndFrame = sourceStartFrame
+      .linearInterpolation(with: targetEndFrame, value: sourceEndProgress)
+    let sourceFrame = sourceStartFrame
+      .linearInterpolation(with: sourceEndFrame, value: progress)
+    source.frame = sourceFrame
+
+    let targetStartProgress = perPageDistance / pagesDistance
+    let targetStartFrame = sourceStartFrame
+      .linearInterpolation(with: targetEndFrame, value: targetStartProgress)
+    let targetFrame = targetStartFrame
+      .linearInterpolation(with: targetEndFrame, value: progress)
+    target.frame = targetFrame
+
+    attributes = attributes.filter { $0.representedElementCategory != .cell }
+    attributes.append(contentsOf: [source, target])
+  }
+
+  func finalizeJumpTransition() {
+    jumpTargetLayoutAttribute = nil
+    jumpSourceLayoutAttribute = nil
+    hostPagerSource?.containerView?.isUserInteractionEnabled = true
+  }
+}
+
+fileprivate extension CGRect {
+
+  func linearInterpolation(with rect: CGRect, value: CGFloat) -> CGRect {
+    let vec = CGRect(x: rect.origin.x - origin.x,
+                     y: rect.origin.y - origin.y,
+                     width: rect.size.width - size.width,
+                     height: rect.size.height - size.height)
+    return CGRect(x: origin.x + vec.origin.x * value,
+                  y: origin.y + vec.origin.y * value,
+                  width: size.width + vec.size.width * value,
+                  height: size.height + vec.size.height * value)
   }
 }
