@@ -162,8 +162,9 @@ class CollapsingHeaderHandler {
       collapsingItem.scrollView.scrollIndicatorInsets = UIEdgeInsets(top: topOffset, left: 0, bottom: 0, right: 0)
     }).disposed(by: disposeBag)
 
-    Observable.combineLatest(headerHeight.asObservable(), maxHeaderHeight.asObservable()) { $0 == $1 }
-      .bind(to: expanded).disposed(by: disposeBag)
+    Observable.combineLatest(headerHeight.asObservable(), maxHeaderHeight.asObservable()) {
+      Double($0) == Double($1)
+    }.bind(to: expanded).disposed(by: disposeBag)
   }
 
   func connect() {
