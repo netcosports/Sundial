@@ -86,5 +86,18 @@ extension UIEdgeInsets {
     let rect = CGRect(origin: .zero, size: size)
     return UIEdgeInsetsInsetRect(rect, self).size
   }
+}
 
+extension CGRect {
+
+    func linearInterpolation(with rect: CGRect, value: CGFloat) -> CGRect {
+        let vec = CGRect(x: rect.origin.x - origin.x,
+                         y: rect.origin.y - origin.y,
+                         width: rect.size.width - size.width,
+                         height: rect.size.height - size.height)
+        return CGRect(x: origin.x + vec.origin.x * value,
+                      y: origin.y + vec.origin.y * value,
+                      width: size.width + vec.size.width * value,
+                      height: size.height + vec.size.height * value)
+    }
 }

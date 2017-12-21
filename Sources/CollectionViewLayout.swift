@@ -72,14 +72,11 @@ where T: Selectable, TitleCell: Reusable, TitleCell.Data: ViewModelable {
     return attributes
   }
 
-//  open override func layoutAttributesForItem(at indexPath: IndexPath) -> UICollectionViewLayoutAttributes? {
-//    if let jumpAttribute = [jumpSourceLayoutAttribute, jumpTargetLayoutAttribute]
-//      .flatMap({ $0 })
-//      .first(where: { $0.indexPath == indexPath }) {
-//      return jumpAttribute
-//    }
-//    return super.layoutAttributesForItem(at: indexPath)
-//  }
+  open override func layoutAttributesForItem(at indexPath: IndexPath) -> UICollectionViewLayoutAttributes? {
+    return layoutAttributesForElements(in: .infinite)?
+      .filter { $0.representedElementCategory == .cell }
+      .first(where: { $0.indexPath == indexPath })
+  }
 
   open var decorationFrame: CGRect {
     guard let collectionView = collectionView else { return .zero }
@@ -141,7 +138,9 @@ private extension CollectionViewLayout {
     decorationAttributes.hostPagerSource = hostPagerSource
     decorationAttributes.backgroundColor = pageStripBackgroundColor
     decorationAttributes.selectionClosure = { [weak self] in
-      self?.select(item: $0, minJumpDistance: 2)
+      guard let `self` = self else { return }
+
+      self.select(item: $0, jumpingPolicy: self.settings.jumpingPolicy)
     }
     decorationAttributes.frame = decorationFrame
     return decorationAttributes
@@ -152,9 +151,14 @@ private extension CollectionViewLayout {
 
 private extension CollectionViewLayout {
 
-  func select(item: Int, minJumpDistance: Int ) {
+  func select(item: Int, jumpingPolicy: JumpingPolicy) {
+    let threashold: Int
+    switch jumpingPolicy {
+    case .disabled: threashold = .max
+    case .skip(let pages): threashold = max(pages, 2)
+    }
     guard let currentIndex = self.currentIndex(),
-      abs(currentIndex - item) >= minJumpDistance else {
+      abs(currentIndex - item) >= threashold else {
         hostPagerSource?.selectedItem.onNext(item)
         return
     }
@@ -216,17 +220,17 @@ private extension CollectionViewLayout {
     }
 
     let pagesDistance = CGFloat(abs(target.indexPath.item - source.indexPath.item))
-    let perPageDistance = max(pagesDistance - 1.0, 0.0)
+    let progressPerPage = 1.0 / pagesDistance
     let progress = 1.0 - (distanceLeft / totalDistance)
 
-    let sourceEndProgress = 1.0 - perPageDistance / pagesDistance
+    let sourceEndProgress = 1.0 - progressPerPage
     let sourceEndFrame = sourceStartFrame
       .linearInterpolation(with: targetEndFrame, value: sourceEndProgress)
     let sourceFrame = sourceStartFrame
       .linearInterpolation(with: sourceEndFrame, value: progress)
     source.frame = sourceFrame
 
-    let targetStartProgress = perPageDistance / pagesDistance
+    let targetStartProgress = progressPerPage
     let targetStartFrame = sourceStartFrame
       .linearInterpolation(with: targetEndFrame, value: targetStartProgress)
     let targetFrame = targetStartFrame
@@ -241,19 +245,5 @@ private extension CollectionViewLayout {
     jumpTargetLayoutAttribute = nil
     jumpSourceLayoutAttribute = nil
     hostPagerSource?.containerView?.isUserInteractionEnabled = true
-  }
-}
-
-fileprivate extension CGRect {
-
-  func linearInterpolation(with rect: CGRect, value: CGFloat) -> CGRect {
-    let vec = CGRect(x: rect.origin.x - origin.x,
-                     y: rect.origin.y - origin.y,
-                     width: rect.size.width - size.width,
-                     height: rect.size.height - size.height)
-    return CGRect(x: origin.x + vec.origin.x * value,
-                  y: origin.y + vec.origin.y * value,
-                  width: size.width + vec.size.width * value,
-                  height: size.height + vec.size.height * value)
   }
 }
