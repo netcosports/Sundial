@@ -89,7 +89,7 @@ public struct Settings {
               inset: UIEdgeInsets = .zero,
               alignment: DecorationAlignment = .top,
               pagesOnScreen: Int = 1,
-              jumpingPolicy: JumpingPolicy = .skip(pages: 2)) {
+              jumpingPolicy: JumpingPolicy = .disabled) {
     self.stripHeight = stripHeight
     self.markerHeight = markerHeight
     self.itemMargin = itemMargin
