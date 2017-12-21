@@ -140,6 +140,7 @@ extension DecorationViewCollectionViewLayout {
     let progress = progressVariable.value
     let decorationAttributes = MarkerAttributes(forDecorationViewOfKind: MarkerDecorationViewId, with: IndexPath(item: 0, section: 0))
 
+    decorationAttributes.zIndex = -1
     decorationAttributes.apply(currentTitle: titles[safe: currentPages[0].indexPath.item],
                                nextTitle: titles[safe: currentPages[0].indexPath.item + 1],
                                progress: progress.progress)
@@ -203,26 +204,32 @@ extension DecorationViewCollectionViewLayout {
                                        currentPage: [TitleAttributes],
                                        nextPage: [TitleAttributes]?) {
 
-    if decorationAttributes.frame.minX < collectionView.contentOffset.x && !isScrolling {
-      isScrolling = true
+    // NOTE: to avoid previous items attributes calculation
+    // we can set additional visible gap to previous item at
+    // half of current decoration view width
+    let gap = decorationAttributes.frame.width / 2.0
+
+    var point: CGPoint?
+    if (decorationAttributes.frame.minX - minimumInteritemSpacing) < collectionView.contentOffset.x && !isScrolling {
       if currentPage[0].indexPath.item == 0 {
-        collectionView.setContentOffset(.zero, animated: true)
+        point = .zero
       } else {
-        let point = CGPoint(x: currentPage[0].frame.minX - minimumInteritemSpacing, y: 0)
-        collectionView.setContentOffset(point, animated: true)
+        point = CGPoint(x: currentPage[0].frame.minX - minimumInteritemSpacing - gap, y: 0)
       }
     }
 
-    if decorationAttributes.frame.maxX > collectionView.contentOffset.x + collectionView.frame.width && !isScrolling,
+    if (decorationAttributes.frame.maxX + minimumInteritemSpacing) > collectionView.contentOffset.x + collectionView.frame.width && !isScrolling,
       let nextPage = nextPage {
-      isScrolling = true
       if nextPage[0].indexPath.item == collectionView.numberOfItems(inSection: 0) - 1 {
-        let target = CGPoint(x: collectionView.contentSize.width - collectionView.frame.width, y: 0)
-        collectionView.setContentOffset(target, animated: true)
+        point = CGPoint(x: collectionView.contentSize.width - collectionView.frame.width, y: 0)
       } else {
-        let point = CGPoint(x: nextPage[0].frame.maxX + minimumInteritemSpacing - collectionView.frame.width, y: 0)
-        collectionView.setContentOffset(point, animated: true)
+        point = CGPoint(x: nextPage[0].frame.maxX + minimumInteritemSpacing - collectionView.frame.width + gap, y: 0)
       }
+    }
+
+    if let targetPoint = point, targetPoint.x != collectionView.contentOffset.x {
+      isScrolling = true
+      collectionView.setContentOffset(targetPoint, animated: true)
     }
   }
 

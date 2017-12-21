@@ -40,10 +40,10 @@ class ViewControllerInner: UIViewController {
     collectionView.source.pager = self
     let settings = Settings(stripHeight: 80.0,
                             markerHeight: 5.5,
-                            itemMargin: 12.0,
+                            itemMargin: 80.0,
                             bottomStripSpacing: 0.0,
                             anchor: anchor,
-                            inset: .zero)
+                            inset: UIEdgeInsets(top: 0, left: 80, bottom: 0, right: 80))
 
     collectionView.collectionViewLayout = Layout(hostPagerSource: collectionView.source, settings: settings) { [weak self] in
       return self?.titles ?? []
