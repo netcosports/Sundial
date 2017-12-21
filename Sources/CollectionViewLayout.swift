@@ -130,6 +130,8 @@ private extension CollectionViewLayout {
       return nil
     }
 
+    let settings = self.settings
+    let validPagesRange = 0...(titles.count - settings.pagesOnScreen)
     let decorationIndexPath = IndexPath(item: 0, section: 0)
     let decorationAttributes = DecorationViewAttributes<ViewModel>(forDecorationViewOfKind: DecorationViewId, with: decorationIndexPath)
     decorationAttributes.zIndex = 1024
@@ -140,7 +142,8 @@ private extension CollectionViewLayout {
     decorationAttributes.selectionClosure = { [weak self] in
       guard let `self` = self else { return }
 
-      self.select(item: $0, jumpingPolicy: self.settings.jumpingPolicy)
+      let item = $0.clamp(to: validPagesRange)
+      self.select(item: item, jumpingPolicy: settings.jumpingPolicy)
     }
     decorationAttributes.frame = decorationFrame
     return decorationAttributes

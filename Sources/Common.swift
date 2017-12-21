@@ -57,9 +57,17 @@ public enum DecorationAlignment {
   case topOffset(variable: Variable<CGFloat>)
 }
 
-public enum JumpingPolicy {
+public enum JumpingPolicy: Equatable {
   case disabled
   case skip(pages: Int)
+
+  public static func == (lhs: JumpingPolicy, rhs: JumpingPolicy) -> Bool {
+    switch (lhs, rhs) {
+    case (.disabled, .disabled): return true
+    case (.skip(let lhs), .skip(let rhs)): return lhs == rhs
+    default: return false
+    }
+  }
 }
 
 public struct Settings {
@@ -80,8 +88,8 @@ public struct Settings {
               anchor: Anchor = .centered,
               inset: UIEdgeInsets = .zero,
               alignment: DecorationAlignment = .top,
-              jumpingPolicy: JumpingPolicy = .skip(pages: 2),
-              pagesOnScreen: Int = 1) {
+              pagesOnScreen: Int = 1,
+              jumpingPolicy: JumpingPolicy = .skip(pages: 2)) {
     self.stripHeight = stripHeight
     self.markerHeight = markerHeight
     self.itemMargin = itemMargin
@@ -89,8 +97,9 @@ public struct Settings {
     self.anchor = anchor
     self.inset = inset
     self.alignment = alignment
-    self.jumpingPolicy = jumpingPolicy
     assert(pagesOnScreen > 0, "number of pages on screen should be greater than 0")
     self.pagesOnScreen = pagesOnScreen
+    assert(jumpingPolicy != .disabled || pagesOnScreen == 1, "")
+    self.jumpingPolicy = jumpingPolicy
   }
 }
