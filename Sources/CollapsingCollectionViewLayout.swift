@@ -12,37 +12,37 @@ import RxCocoa
 
 public protocol CollapsingItem: class {
   var scrollView: UIScrollView { get }
-  var extraInset: CGFloat { get }
   var visible: Variable<Bool> { get }
+  var extraInset: UIEdgeInsets { get }
 }
 
-extension CollapsingItem {
+public extension CollapsingItem {
 
-  var extraInset: CGFloat {
-    return 0
+  var extraInset: UIEdgeInsets {
+    return .zero
   }
 }
 
-public protocol Progressable: class {
-  var progress: CGFloat { get }
-}
-
-let CollapsingHeaderViewId = "CollapsingHeaderViewId"
-
-open class CollapsingCollectionViewLayout<Source: CollectionViewSource, HeaderCell: CollectionViewCell, TitleCell: CollectionViewCell, MarkerCell: CollectionViewCell>: CollectionViewLayout<Source, TitleCell, MarkerCell>
+open class CollapsingCollectionViewLayout<
+  Source: CollectionViewSource,
+  TitleCell: CollectionViewCell,
+  MarkerCell: CollectionViewCell>: CollectionViewLayout<Source, TitleCell, MarkerCell>
   where Source: Selectable, TitleCell: Reusable, TitleCell.Data: ViewModelable {
 
   public let minHeaderHeight = Variable<CGFloat>(0)
   public let maxHeaderHeight = Variable<CGFloat>(240)
   public let headerInset = Variable<CGFloat>(0)
   public let headerHeight = Variable<CGFloat>(120)
-  private let expandedSubject = BehaviorSubject<Bool>(value: true)
   public var expanded: Observable<Bool> { return expandedSubject.asObservable() }
 
-  var handlers: [CollapsingHeaderHandler] = []
+  open class var headerZIndex: Int { return 1024 }
 
-  fileprivate weak var connectedItem: CollapsingItem?
+  fileprivate let expandedSubject = BehaviorSubject<Bool>(value: true)
+
   fileprivate var items: [CollapsingItem] = []
+  fileprivate var handlers: [CollapsingHeaderHandler] = []
+  fileprivate weak var connectedItem: CollapsingItem?
+  fileprivate var updateMaxHeightDisposeBag: DisposeBag?
 
   public init(items: [CollapsingItem], hostPagerSource: Source, settings: Settings? = nil, pager: PagerClosure?) {
     super.init(hostPagerSource: hostPagerSource, settings: settings, pager: pager)
@@ -52,8 +52,7 @@ open class CollapsingCollectionViewLayout<Source: CollectionViewSource, HeaderCe
                                             min: minHeaderHeight,
                                             max: maxHeaderHeight,
                                             headerInset: headerInset,
-                                            headerHeight: headerHeight,
-                                            expanded: expandedSubject)
+                                            headerHeight: headerHeight)
 
       item.visible.asDriver().drive(onNext: { [weak handler, weak self] visible in
         if visible {
@@ -77,14 +76,16 @@ open class CollapsingCollectionViewLayout<Source: CollectionViewSource, HeaderCe
       self?.invalidateLayout()
     }).disposed(by: disposeBag)
 
+    Observable.combineLatest(headerHeight.asObservable(), maxHeaderHeight.asObservable()) {
+      Double($0) == Double($1)
+    }.distinctUntilChanged().bind(to: expandedSubject).disposed(by: disposeBag)
+
     headerInset.value = self.settings.stripHeight
   }
 
   public required init?(coder aDecoder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
   }
-
-  open class var headerZIndex: Int { return 1024 }
 
   open override func layoutAttributesForElements(in rect: CGRect) -> [UICollectionViewLayoutAttributes]? {
     guard var layoutAttributes = super.layoutAttributesForElements(in: rect) else { return nil }
@@ -104,16 +105,6 @@ open class CollapsingCollectionViewLayout<Source: CollectionViewSource, HeaderCe
     return layoutAttributes
   }
 
-  private func crashIfHeaderPresent(in items: [UICollectionViewLayoutAttributes]) {
-    for attributes in items {
-      if attributes.representedElementCategory == .supplementaryView && attributes.representedElementKind == UICollectionElementKindSectionHeader {
-        if attributes.size != .zero {
-          fatalError("collapsing header size(for:, containerSize:) -> CGSize should return .zero")
-        }
-      }
-    }
-  }
-
   open override var decorationFrame: CGRect {
     guard let collectionView = collectionView else { return .zero }
 
@@ -127,8 +118,7 @@ open class CollapsingCollectionViewLayout<Source: CollectionViewSource, HeaderCe
     return frame
   }
 
-  fileprivate var updateMaxHeightDisposeBag: DisposeBag?
-  public func update(maxHeight: CGFloat, animated: Bool = true) {
+  open func update(maxHeight: CGFloat, animated: Bool = true) {
     guard let connectedItem = connectedItem else { return }
     guard connectedItem.scrollView.contentOffset.y < 0 else { return }
 
@@ -146,6 +136,16 @@ open class CollapsingCollectionViewLayout<Source: CollectionViewSource, HeaderCe
       self.maxHeaderHeight.value = maxHeight
     }
   }
+
+  private func crashIfHeaderPresent(in items: [UICollectionViewLayoutAttributes]) {
+    for attributes in items {
+      if attributes.representedElementCategory == .supplementaryView && attributes.representedElementKind == UICollectionElementKindSectionHeader {
+        if attributes.size != .zero {
+          fatalError("collapsing header size(for:, containerSize:) -> CGSize should return .zero")
+        }
+      }
+    }
+  }
 }
 
 class CollapsingHeaderHandler {
@@ -154,7 +154,6 @@ class CollapsingHeaderHandler {
   let minHeaderHeight: Variable<CGFloat>
   let maxHeaderHeight: Variable<CGFloat>
   let headerInset: Variable<CGFloat>
-  let expanded: BehaviorSubject<Bool>
 
   fileprivate weak var collapsingItem: CollapsingItem?
 
@@ -167,16 +166,13 @@ class CollapsingHeaderHandler {
        min: Variable<CGFloat>,
        max: Variable<CGFloat>,
        headerInset: Variable<CGFloat>,
-       headerHeight: Variable<CGFloat>,
-       expanded: BehaviorSubject<Bool>) {
+       headerHeight: Variable<CGFloat>) {
 
     self.collapsingItem = collapsingItem
     self.minHeaderHeight = min
     self.maxHeaderHeight = max
     self.headerHeight = headerHeight
     self.headerInset = headerInset
-    self.expanded = expanded
-
 
     let contentSizeDriver = collapsingItem.scrollView.rx
       .observe(CGSize.self, #keyPath(UICollectionView.contentSize))
@@ -189,18 +185,16 @@ class CollapsingHeaderHandler {
       guard let sself = self else { return }
       guard let collapsingItem = collapsingItem else { return }
 
-      let topOffset = maxHeight + sself.headerInset.value + collapsingItem.extraInset
-      var bottomInset: CGFloat = collapsingItem.scrollView.frame.height - (contentSize.height + sself.minHeaderHeight.value + sself.headerInset.value) + 1.0
+      let extraInset = collapsingItem.extraInset
+      let topInset = maxHeight + sself.headerInset.value + extraInset.top
+      var bottomInset: CGFloat = collapsingItem.scrollView.frame.height - (contentSize.height + sself.minHeaderHeight.value + sself.headerInset.value + extraInset.bottom)
       if bottomInset < 0.0  {
-        bottomInset = 0.0
+        bottomInset = extraInset.bottom
       }
-      collapsingItem.scrollView.contentInset = UIEdgeInsets(top: topOffset, left: 0, bottom: bottomInset, right: 0)
-      collapsingItem.scrollView.scrollIndicatorInsets = UIEdgeInsets(top: topOffset, left: 0, bottom: bottomInset, right: 0)
+      let contentInset = UIEdgeInsets(top: topInset, left: 0, bottom: bottomInset, right: 0)
+      collapsingItem.scrollView.contentInset = contentInset
+      collapsingItem.scrollView.scrollIndicatorInsets = contentInset
     }).disposed(by: disposeBag)
-
-    Observable.combineLatest(headerHeight.asObservable(), maxHeaderHeight.asObservable()) {
-      Double($0) == Double($1)
-    }.bind(to: expanded).disposed(by: disposeBag)
   }
 
   func connect() {
@@ -243,34 +237,5 @@ class CollapsingHeaderHandler {
   deinit {
     activeDispose?.dispose()
     nonActiveDispose?.dispose()
-  }
-}
-
-class CollapsingHeaderViewAttributes: UICollectionViewLayoutAttributes, Progressable {
-
-  var progress: CGFloat = 0.0
-
-  override func copy(with zone: NSZone? = nil) -> Any {
-    let copy = super.copy(with: zone)
-    guard let typedCopy = copy as? CollapsingHeaderViewAttributes else {
-      return copy
-    }
-
-    typedCopy.progress = self.progress
-    return typedCopy
-  }
-
-  override func isEqual(_ object: Any?) -> Bool {
-    if super.isEqual(object) == false {
-      return false
-    }
-
-    if let other = object as? CollapsingHeaderViewAttributes {
-      if self.progress != other.progress {
-        return false
-      }
-    }
-
-    return true
   }
 }

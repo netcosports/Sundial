@@ -54,7 +54,7 @@ class CollapsingHeaderViewController: UIViewController {
 
   let collectionView = CollectionView<CollectionViewPagerSource>()
 
-  typealias Layout = CollapsingCollectionViewLayout<CollectionViewPagerSource, Header, TitleCollectionViewCell, MarkerDecorationView<TitleCollectionViewCell.TitleViewModel>>
+  typealias Layout = CollapsingCollectionViewLayout<CollectionViewPagerSource, TitleCollectionViewCell, MarkerDecorationView<TitleCollectionViewCell.TitleViewModel>>
 
   override func viewDidLoad() {
     super.viewDidLoad()

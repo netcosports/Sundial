@@ -46,11 +46,12 @@ class TestViewController: UIViewController, Accessor, CollapsingItem {
   let containerView = CollectionView<CollectionViewSource>()
 
   let visible = Variable<Bool>(false)
-  var extraInset: CGFloat = 0.0
   var scrollView: UIScrollView {
     return containerView
   }
-
+  var extraInset: UIEdgeInsets {
+    return UIEdgeInsets(top: 100, left: 0.0, bottom: 50, right: 0.0)
+  }
   let color: UIColor
 
   init(_ color: UIColor) {
@@ -65,7 +66,7 @@ class TestViewController: UIViewController, Accessor, CollapsingItem {
   override func viewDidLoad() {
     super.viewDidLoad()
 
-    let cells: [Cellable] = (1...100).map { _ in Cell(data: color) }
+    let cells: [Cellable] = (1...3).map { _ in Cell(data: color) }
     sections = [ Section(cells: cells) ]
 
     view.addSubview(containerView)
@@ -92,7 +93,6 @@ class TestPagerViewControllerInner: UIViewController {
   let controller5 = TestViewController(.black)
 
   let offsetVariable = Variable<CGFloat>(0.0)
-
   let collectionView = CollectionView<CollectionViewPagerSource>()
 
   typealias Layout = CollectionViewLayout<CollectionViewPagerSource, TitleCollectionViewCell, MarkerDecorationView<TitleCollectionViewCell.TitleViewModel>>
@@ -109,20 +109,16 @@ class TestPagerViewControllerInner: UIViewController {
                             inset: .zero,
                             alignment: .topOffset(variable: offsetVariable))
 
-    collectionView.collectionViewLayout = Layout(hostPagerSource: collectionView.source, settings: settings) { [weak self] in
+    let layout = Layout(hostPagerSource: collectionView.source, settings: settings) { [weak self] in
       return self?.titles ?? []
     }
+    layout.pageStripBackgroundColor = .red
+    collectionView.collectionViewLayout = layout
 
     view.addSubview(collectionView)
     collectionView.snp.remakeConstraints {
       $0.edges.equalToSuperview()
     }
-
-    controller1.extraInset = 80.0
-    controller2.extraInset = 80.0
-    controller3.extraInset = 80.0
-    controller4.extraInset = 80.0
-    controller5.extraInset = 80.0
 
     collectionView.source.reloadData()
   }
