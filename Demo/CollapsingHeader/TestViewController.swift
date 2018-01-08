@@ -97,6 +97,8 @@ class TestPagerViewControllerInner: UIViewController {
 
   typealias Layout = CollectionViewLayout<CollectionViewPagerSource, TitleCollectionViewCell, MarkerDecorationView<TitleCollectionViewCell.TitleViewModel>>
 
+  let collasingItemsSubject = PublishSubject<[CollapsingItem]>()
+
   override func viewDidLoad() {
     super.viewDidLoad()
 
@@ -114,13 +116,21 @@ class TestPagerViewControllerInner: UIViewController {
     }
     layout.pageStripBackgroundColor = .red
     collectionView.collectionViewLayout = layout
-
     view.addSubview(collectionView)
     collectionView.snp.remakeConstraints {
       $0.edges.equalToSuperview()
     }
-
     collectionView.source.reloadData()
+  }
+
+  override func viewDidAppear(_ animated: Bool) {
+    super.viewDidAppear(animated)
+
+    DispatchQueue.main.async {
+      self.collasingItemsSubject.onNext([
+        self.controller1, self.controller2, self.controller3, self.controller4, self.controller5
+      ])
+    }
   }
 }
 

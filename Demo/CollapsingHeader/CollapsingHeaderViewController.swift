@@ -56,30 +56,19 @@ class CollapsingHeaderViewController: UIViewController {
 
   typealias Layout = CollapsingCollectionViewLayout<CollectionViewPagerSource, TitleCollectionViewCell, MarkerDecorationView<TitleCollectionViewCell.TitleViewModel>>
 
+  let collasingItemsSubject = PublishSubject<[CollapsingItem]>()
+
   override func viewDidLoad() {
     super.viewDidLoad()
 
     view.backgroundColor = .white
 
-    collectionView.source.hostViewController = self
-    collectionView.source.pager = self
     let settings = Settings(stripHeight: 80.0,
                             markerHeight: 5.5,
                             itemMargin: 12.0,
                             bottomStripSpacing: 0.0,
                             inset: .zero)
-
-    var items: [CollapsingItem] = [controller1, controller2]
-    let innerControllers: [CollapsingItem] = [controller3.controller1,
-                            controller3.controller2,
-                            controller3.controller3,
-                            controller3.controller4,
-                            controller3.controller5]
-
-    items.append(contentsOf: innerControllers)
-    items.append(contentsOf: [controller4, controller5])
-
-    let layout = Layout(items: items, hostPagerSource: collectionView.source, settings: settings) { [weak self] in
+    let layout = Layout(items: [], hostPagerSource: collectionView.source, settings: settings) { [weak self] in
       return self?.titles ?? []
     }
     layout.headerHeight.asDriver()
@@ -87,12 +76,20 @@ class CollapsingHeaderViewController: UIViewController {
       .drive(controller3.offsetVariable)
       .disposed(by: disposeBag)
 
-    collectionView.collectionViewLayout = layout
+    collasingItemsSubject.asDriver(onErrorJustReturn: []).drive(onNext: { [weak layout] collasingItems in
+      layout?.apped(collapsingItems: collasingItems)
+    }).disposed(by: disposeBag)
 
+    collectionView.source.hostViewController = self
+    collectionView.source.pager = self
+    collectionView.collectionViewLayout = layout
     view.addSubview(collectionView)
     collectionView.snp.remakeConstraints {
       $0.edges.equalToSuperview()
     }
+
+    collasingItemsSubject.onNext([controller1, controller2, controller4, controller5])
+    controller3.collasingItemsSubject.bind(to: collasingItemsSubject).disposed(by: disposeBag)
 
     controller1.view.backgroundColor = .clear
     controller2.view.backgroundColor = .clear

@@ -38,31 +38,14 @@ open class CollapsingCollectionViewLayout<
   open class var headerZIndex: Int { return 1024 }
 
   fileprivate let expandedSubject = BehaviorSubject<Bool>(value: true)
-
-  fileprivate var items: [CollapsingItem] = []
   fileprivate var handlers: [CollapsingHeaderHandler] = []
   fileprivate weak var connectedItem: CollapsingItem?
   fileprivate var updateMaxHeightDisposeBag: DisposeBag?
 
   public init(items: [CollapsingItem], hostPagerSource: Source, settings: Settings? = nil, pager: PagerClosure?) {
     super.init(hostPagerSource: hostPagerSource, settings: settings, pager: pager)
-    self.items = items
-    self.handlers = items.map { item in
-      let handler = CollapsingHeaderHandler(with: item,
-                                            min: minHeaderHeight,
-                                            max: maxHeaderHeight,
-                                            headerInset: headerInset,
-                                            headerHeight: headerHeight)
-
-      item.visible.asDriver().drive(onNext: { [weak handler, weak self] visible in
-        if visible {
-          handler?.connect()
-          self?.connectedItem = item
-        } else {
-          handler?.disconnect()
-        }
-      }).disposed(by: self.disposeBag)
-      return handler
+    self.handlers = items.flatMap { [weak self] item in
+      return self?.handler(for: item)
     }
 
     let observable: Observable<Void> = Observable.from([
@@ -137,7 +120,36 @@ open class CollapsingCollectionViewLayout<
     }
   }
 
-  private func crashIfHeaderPresent(in items: [UICollectionViewLayoutAttributes]) {
+  open func apped(collapsingItems: [CollapsingItem]) {
+    let handlers: [CollapsingHeaderHandler] = collapsingItems.flatMap { item in
+      guard !self.handlers.contains(where: { $0.collapsingItem === item }) else {
+        return nil
+      }
+      return self.handler(for: item)
+    }
+
+    self.handlers = self.handlers + handlers
+  }
+
+  fileprivate func handler(for collapsingItem: CollapsingItem) -> CollapsingHeaderHandler {
+    let handler = CollapsingHeaderHandler(with: collapsingItem,
+                                          min: minHeaderHeight,
+                                          max: maxHeaderHeight,
+                                          headerInset: headerInset,
+                                          headerHeight: headerHeight)
+
+    collapsingItem.visible.asDriver().drive(onNext: { [weak handler, weak self] visible in
+      if visible {
+        handler?.connect()
+        self?.connectedItem = collapsingItem
+      } else {
+        handler?.disconnect()
+      }
+    }).disposed(by: self.disposeBag)
+    return handler
+  }
+
+  fileprivate func crashIfHeaderPresent(in items: [UICollectionViewLayoutAttributes]) {
     for attributes in items {
       if attributes.representedElementCategory == .supplementaryView && attributes.representedElementKind == UICollectionElementKindSectionHeader {
         if attributes.size != .zero {
