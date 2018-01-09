@@ -99,7 +99,7 @@ public struct Settings {
     self.alignment = alignment
     assert(pagesOnScreen > 0, "number of pages on screen should be greater than 0")
     self.pagesOnScreen = pagesOnScreen
-    assert(jumpingPolicy != .disabled || pagesOnScreen == 1, "")
+    assert(jumpingPolicy == .disabled || pagesOnScreen == 1, "jumping policy doesn't support 2+ pages currently")
     self.jumpingPolicy = jumpingPolicy
   }
 }
