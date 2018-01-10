@@ -73,6 +73,7 @@ open class CollapsingCollectionViewLayout<
   open override func layoutAttributesForElements(in rect: CGRect) -> [UICollectionViewLayoutAttributes]? {
     guard var layoutAttributes = super.layoutAttributesForElements(in: rect) else { return nil }
     guard let collectionView = collectionView else { return layoutAttributes }
+    guard collectionView.numberOfSections > 0 else { return layoutAttributes }
 
     crashIfHeaderPresent(in: layoutAttributes)
 
@@ -191,6 +192,7 @@ class CollapsingHeaderHandler {
       .asDriver(onErrorJustReturn: nil)
       .distinctUntilChanged { $0?.height == $1?.height }
 
+    // FIXME: empty content size managing
     Driver.combineLatest(contentSizeDriver, maxHeaderHeight.asDriver())
       .drive(onNext: { [weak collapsingItem = self.collapsingItem, weak self] contentSize, maxHeight in
       guard let contentSize = contentSize else { return }
