@@ -243,7 +243,7 @@ class CollapsingHeaderHandler {
     activeDispose?.dispose()
     nonActiveDispose?.dispose()
     if let collapsingItem = collapsingItem {
-      nonActiveDispose = headerHeight.asDriver().distinctUntilChanged()
+      nonActiveDispose = headerHeight.asDriver().distinctUntilChanged().skip(1)
         .map { CGPoint(x: 0, y: -$0) }.drive(collapsingItem.scrollView.rx.contentOffset)
     }
   }
