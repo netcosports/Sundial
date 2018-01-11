@@ -170,7 +170,13 @@ class CollapsingHeaderHandler {
 
   fileprivate weak var collapsingItem: CollapsingItem?
 
-  private var connected = false
+  enum ConnectionStatus: Int {
+    case none
+    case connected
+    case disconnected
+  }
+
+  private var connection: ConnectionStatus = .none
   private var activeDispose: Disposable?
   private var nonActiveDispose: Disposable?
   private let disposeBag = DisposeBag()
@@ -190,6 +196,7 @@ class CollapsingHeaderHandler {
     let contentSizeDriver = collapsingItem.scrollView.rx
       .observe(CGSize.self, #keyPath(UICollectionView.contentSize))
       .asDriver(onErrorJustReturn: nil)
+      .filter { $0?.width != 0.0 && $0?.height != 0.0 }
       .distinctUntilChanged { $0?.height == $1?.height }
 
     // FIXME: empty content size managing
@@ -206,45 +213,62 @@ class CollapsingHeaderHandler {
         bottomInset = extraInset.bottom
       }
       let contentInset = UIEdgeInsets(top: topInset, left: 0, bottom: bottomInset, right: 0)
+      let contentOffset = collapsingItem.scrollView.contentOffset
+
+      let y = -(sself.headerHeight.value + sself.headerInset.value)
       collapsingItem.scrollView.contentInset = contentInset
       collapsingItem.scrollView.scrollIndicatorInsets = contentInset
+      collapsingItem.scrollView.contentOffset = CGPoint(x: contentOffset.x, y: y)
     }).disposed(by: disposeBag)
   }
 
   func connect() {
-    guard !connected else { return }
-    connected = true
+    guard connection != .connected else { return }
+    connection = .connected
 
-    collapsingItem?.scrollView.contentOffset = CGPoint(x: 0, y: -headerHeight.value - headerInset.value) // -40
+    guard let collapsingItem = collapsingItem else { return }
+    collapsingItem.scrollView.contentOffset = CGPoint(x: 0, y: -headerHeight.value - headerInset.value)
     activeDispose?.dispose()
     nonActiveDispose?.dispose()
 
-    let headerHeightDispose = collapsingItem?.scrollView.rx.contentOffset.asObservable().skip(1).distinctUntilChanged()
+    let headerHeightDispose = collapsingItem.scrollView.rx.contentOffset
+      .asObservable()
+      .skip(1)
+      .distinctUntilChanged()
+      .filter { _ in collapsingItem.scrollView.contentSize.height > 0.0 }
       .map { [unowned self] in
         return min(max(self.minHeaderHeight.value, -$0.y - self.headerInset.value), self.maxHeaderHeight.value)
-      }.asDriver(onErrorJustReturn: maxHeaderHeight.value).distinctUntilChanged().drive(headerHeight)
+      }.asDriver(onErrorJustReturn: maxHeaderHeight.value)
+      .distinctUntilChanged()
+      .drive(headerHeight)
 
-    let maxHeaderHeightDispose = maxHeaderHeight.asDriver().skip(1)
+    let maxHeaderHeightDispose = maxHeaderHeight
+      .asDriver()
+      .skip(1)
       .withLatestFrom(headerHeight.asDriver()) { ($0, $1) }
       .drive(onNext: { [weak collapsingItem = self.collapsingItem] maxHeight, height in
         if maxHeight == height {
-          collapsingItem?.scrollView.contentOffset = CGPoint(x: 0, y: -maxHeight - self.headerInset.value) // -40
+          collapsingItem?.scrollView.contentOffset = CGPoint(x: 0, y: -maxHeight - self.headerInset.value)
         }
       })
-    if let headerHeightDispose = headerHeightDispose {
-      activeDispose = Disposables.create(headerHeightDispose, maxHeaderHeightDispose)
-    }
+
+    activeDispose = Disposables.create(headerHeightDispose, maxHeaderHeightDispose)
   }
 
   func disconnect() {
-    guard connected else { return }
-    connected = false
+    guard connection != .disconnected else { return }
+    connection = .disconnected
 
     activeDispose?.dispose()
     nonActiveDispose?.dispose()
     if let collapsingItem = collapsingItem {
-      nonActiveDispose = headerHeight.asDriver().distinctUntilChanged().skip(1)
-        .map { CGPoint(x: 0, y: -$0) }.drive(collapsingItem.scrollView.rx.contentOffset)
+      nonActiveDispose = headerHeight
+        .asDriver()
+        .distinctUntilChanged()
+        .skip(1)
+        .map {
+          return CGPoint(x: 0, y: -$0 - self.headerInset.value)
+        }.drive(collapsingItem.scrollView.rx.contentOffset)
     }
   }
 

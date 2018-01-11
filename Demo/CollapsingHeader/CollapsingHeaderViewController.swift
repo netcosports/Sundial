@@ -71,6 +71,7 @@ class CollapsingHeaderViewController: UIViewController {
     let layout = Layout(items: [], hostPagerSource: collectionView.source, settings: settings) { [weak self] in
       return self?.titles ?? []
     }
+    layout.headerHeight.value = layout.maxHeaderHeight.value
     layout.headerHeight.asDriver()
       .map { $0 + 80.0 }
       .drive(controller3.offsetVariable)

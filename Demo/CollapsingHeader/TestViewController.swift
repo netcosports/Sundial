@@ -49,13 +49,14 @@ class TestViewController: UIViewController, Accessor, CollapsingItem {
   var scrollView: UIScrollView {
     return containerView
   }
-  var extraInset: UIEdgeInsets {
-    return UIEdgeInsets(top: 100, left: 0.0, bottom: 50, right: 0.0)
-  }
+//  var extraInset: UIEdgeInsets {
+//    return UIEdgeInsets(top: 100, left: 0.0, bottom: 50, right: 0.0)
+//  }
   let color: UIColor
-
-  init(_ color: UIColor) {
+  let numberOfItems: Int
+  init(_ color: UIColor, numberOfItems: Int = 3) {
     self.color = color
+    self.numberOfItems = numberOfItems
     super.init(nibName: nil, bundle: nil)
   }
 
@@ -66,15 +67,16 @@ class TestViewController: UIViewController, Accessor, CollapsingItem {
   override func viewDidLoad() {
     super.viewDidLoad()
 
-    let cells: [Cellable] = (1...3).map { _ in Cell(data: color) }
-    sections = [ Section(cells: cells) ]
-
+    if numberOfItems > 1 {
+      let cells: [Cellable] = (1...numberOfItems).map { _ in Cell(data: color) }
+      sections = [ Section(cells: cells) ]
+    }
     view.addSubview(containerView)
     containerView.snp.remakeConstraints { $0.edges.equalToSuperview() }
   }
 
-  override func viewDidAppear(_ animated: Bool) {
-    super.viewDidAppear(animated)
+  override func viewWillAppear(_ animated: Bool) {
+    super.viewWillAppear(animated)
     visible.value = true
   }
 
@@ -87,7 +89,7 @@ class TestViewController: UIViewController, Accessor, CollapsingItem {
 class TestPagerViewControllerInner: UIViewController {
 
   let controller1 = TestViewController(.red)
-  let controller2 = TestViewController(.blue)
+  let controller2 = TestViewController(.blue, numberOfItems: 0)
   let controller3 = TestViewController(.green)
   let controller4 = TestViewController(.lightGray)
   let controller5 = TestViewController(.black)
