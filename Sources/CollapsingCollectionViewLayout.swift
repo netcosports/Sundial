@@ -34,6 +34,7 @@ open class CollapsingCollectionViewLayout<
   public let headerInset = Variable<CGFloat>(0)
   public let headerHeight = Variable<CGFloat>(120)
   public var expanded: Observable<Bool> { return expandedSubject.asObservable() }
+  public let followOffsetChanges = Variable<Bool>(false)
 
   open class var headerZIndex: Int { return 1024 }
 
@@ -109,16 +110,21 @@ open class CollapsingCollectionViewLayout<
     let point = CGPoint(x: 0.0, y: -(maxHeight + settings.stripHeight))
     connectedItem.scrollView.setContentOffset(point, animated: true)
 
-    if self.maxHeaderHeight.value > maxHeight {
-      let updateMaxHeightDisposeBag = DisposeBag()
-      connectedItem.scrollView.rx.didEndScrollingAnimation.asDriver().drive(onNext: {
-        self.maxHeaderHeight.value = maxHeight
-        self.updateMaxHeightDisposeBag = nil
-      }).disposed(by: updateMaxHeightDisposeBag)
-      self.updateMaxHeightDisposeBag = updateMaxHeightDisposeBag
-    } else {
-      self.maxHeaderHeight.value = maxHeight
+    followOffsetChanges.value = true
+    if self.maxHeaderHeight.value < maxHeight {
+      maxHeaderHeight.value = maxHeight
     }
+
+    let updateMaxHeightDisposeBag = DisposeBag()
+    connectedItem.scrollView.rx.didEndScrollingAnimation.asDriver().drive(onNext: { [weak self] in
+      guard let sself = self else { return }
+      if sself.maxHeaderHeight.value > maxHeight {
+        sself.maxHeaderHeight.value = maxHeight
+      }
+      sself.updateMaxHeightDisposeBag = nil
+      sself.followOffsetChanges.value = false
+    }).disposed(by: updateMaxHeightDisposeBag)
+    self.updateMaxHeightDisposeBag = updateMaxHeightDisposeBag
   }
 
   open func apped(collapsingItems: [CollapsingItem]) {
@@ -137,7 +143,8 @@ open class CollapsingCollectionViewLayout<
                                           min: minHeaderHeight,
                                           max: maxHeaderHeight,
                                           headerInset: headerInset,
-                                          headerHeight: headerHeight)
+                                          headerHeight: headerHeight,
+                                          followOffsetChanges: followOffsetChanges)
 
     collapsingItem.visible.asDriver().drive(onNext: { [weak handler, weak self] visible in
       if visible {
@@ -167,6 +174,7 @@ class CollapsingHeaderHandler {
   let minHeaderHeight: Variable<CGFloat>
   let maxHeaderHeight: Variable<CGFloat>
   let headerInset: Variable<CGFloat>
+  let followOffsetChanges: Variable<Bool>
 
   fileprivate weak var collapsingItem: CollapsingItem?
 
@@ -185,13 +193,15 @@ class CollapsingHeaderHandler {
        min: Variable<CGFloat>,
        max: Variable<CGFloat>,
        headerInset: Variable<CGFloat>,
-       headerHeight: Variable<CGFloat>) {
+       headerHeight: Variable<CGFloat>,
+       followOffsetChanges: Variable<Bool>) {
 
     self.collapsingItem = collapsingItem
     self.minHeaderHeight = min
     self.maxHeaderHeight = max
     self.headerHeight = headerHeight
     self.headerInset = headerInset
+    self.followOffsetChanges = followOffsetChanges
 
     let contentSizeDriver = collapsingItem.scrollView.rx
       .observe(CGSize.self, #keyPath(UICollectionView.contentSize))
@@ -199,7 +209,6 @@ class CollapsingHeaderHandler {
       .filter { $0?.width != 0.0 && $0?.height != 0.0 }
       .distinctUntilChanged { $0?.height == $1?.height }
 
-    // FIXME: empty content size managing
     Driver.combineLatest(contentSizeDriver, maxHeaderHeight.asDriver())
       .drive(onNext: { [weak collapsingItem = self.collapsingItem, weak self] contentSize, maxHeight in
       guard let contentSize = contentSize else { return }
@@ -212,13 +221,15 @@ class CollapsingHeaderHandler {
       if bottomInset < 0.0  {
         bottomInset = extraInset.bottom
       }
-      let contentInset = UIEdgeInsets(top: topInset, left: 0, bottom: bottomInset, right: 0)
-      let contentOffset = collapsingItem.scrollView.contentOffset
 
-      let y = -(sself.headerHeight.value + sself.headerInset.value)
+      let contentInset = UIEdgeInsets(top: topInset, left: 0, bottom: bottomInset, right: 0)
+      let contentOffsetOriginal = collapsingItem.scrollView.contentOffset
+      let adjustedY = -(sself.headerHeight.value + sself.headerInset.value)
+      let contentOffset = CGPoint(x: contentOffsetOriginal.x, y: adjustedY)
+
       collapsingItem.scrollView.contentInset = contentInset
       collapsingItem.scrollView.scrollIndicatorInsets = contentInset
-      collapsingItem.scrollView.contentOffset = CGPoint(x: contentOffset.x, y: y)
+      collapsingItem.scrollView.contentOffset = contentOffset
     }).disposed(by: disposeBag)
   }
 
@@ -235,7 +246,14 @@ class CollapsingHeaderHandler {
       .asObservable()
       .skip(1)
       .distinctUntilChanged()
-      .filter { _ in collapsingItem.scrollView.contentSize.height > 0.0 }
+      .filter { [weak self] _ in
+        let scrollView = collapsingItem.scrollView
+        return scrollView.panGestureRecognizer.state != .possible
+          || scrollView.isDecelerating
+          || scrollView.isDragging
+          || scrollView.isTracking
+          || self?.followOffsetChanges.value != false
+      }
       .map { [unowned self] in
         return min(max(self.minHeaderHeight.value, -$0.y - self.headerInset.value), self.maxHeaderHeight.value)
       }.asDriver(onErrorJustReturn: maxHeaderHeight.value)

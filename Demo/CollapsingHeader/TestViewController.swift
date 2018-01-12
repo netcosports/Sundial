@@ -40,6 +40,61 @@ class TestCell: CollectionViewCell, Reusable {
   }
 }
 
+class TestLoaderViewController: UIViewController, Accessor, CollapsingItem, Loader {
+
+  typealias Cell = CollectionCell<TestCell>
+  let containerView = CollectionView<LoaderDecoratorSource<CollectionViewSource>>()
+
+  let visible = Variable<Bool>(false)
+  var scrollView: UIScrollView {
+    return containerView
+  }
+
+  let color: UIColor
+  let numberOfItems: Int
+  init(_ color: UIColor, numberOfItems: Int = 3) {
+    self.color = color
+    self.numberOfItems = numberOfItems
+    super.init(nibName: nil, bundle: nil)
+  }
+
+  required init?(coder aDecoder: NSCoder) {
+    fatalError("init(coder:) has not been implemented")
+  }
+
+  override func viewDidLoad() {
+    super.viewDidLoad()
+
+    source.loader = self
+    source.hostViewController = self
+
+    view.addSubview(containerView)
+    containerView.snp.remakeConstraints { $0.edges.equalToSuperview() }
+  }
+
+  func performLoading(intent: LoaderIntent) -> SectionObservable? {
+    if numberOfItems > 1 {
+      let cells: [Cellable] = (1...numberOfItems).map { _ in Cell(data: color) }
+      let sections = [ Section(cells: cells) ]
+      return Observable.just(sections).delay(1.0, scheduler: MainScheduler.instance)
+    }
+
+    return nil
+  }
+
+  override func viewWillAppear(_ animated: Bool) {
+    super.viewWillAppear(animated)
+    visible.value = true
+    source.appear()
+  }
+
+  override func viewDidDisappear(_ animated: Bool) {
+    super.viewDidDisappear(animated)
+    visible.value = false
+    source.disappear()
+  }
+}
+
 class TestViewController: UIViewController, Accessor, CollapsingItem {
 
   typealias Cell = CollectionCell<TestCell>
@@ -49,9 +104,7 @@ class TestViewController: UIViewController, Accessor, CollapsingItem {
   var scrollView: UIScrollView {
     return containerView
   }
-//  var extraInset: UIEdgeInsets {
-//    return UIEdgeInsets(top: 100, left: 0.0, bottom: 50, right: 0.0)
-//  }
+
   let color: UIColor
   let numberOfItems: Int
   init(_ color: UIColor, numberOfItems: Int = 3) {
@@ -89,9 +142,9 @@ class TestViewController: UIViewController, Accessor, CollapsingItem {
 class TestPagerViewControllerInner: UIViewController {
 
   let controller1 = TestViewController(.red)
-  let controller2 = TestViewController(.blue, numberOfItems: 0)
-  let controller3 = TestViewController(.green)
-  let controller4 = TestViewController(.lightGray)
+  let controller2 = TestLoaderViewController(.lightGray)
+  let controller3 = TestLoaderViewController(.green)
+  let controller4 = TestViewController(.blue, numberOfItems: 0)
   let controller5 = TestViewController(.black)
 
   let offsetVariable = Variable<CGFloat>(0.0)

@@ -48,9 +48,10 @@ class CollapsingHeaderViewController: UIViewController {
 
   let controller1 = TestViewController(.red)
   let controller2 = TestViewController(.blue)
+  let controllerLoader = TestLoaderViewController(.orange, numberOfItems: 20)
   let controller3 = TestPagerViewControllerInner()
   let controller4 = TestViewController(.lightGray)
-  let controller5 = TestViewController(.black)
+  let controller5 = TestLoaderViewController(.black)
 
   let collectionView = CollectionView<CollectionViewPagerSource>()
 
@@ -71,6 +72,8 @@ class CollapsingHeaderViewController: UIViewController {
     let layout = Layout(items: [], hostPagerSource: collectionView.source, settings: settings) { [weak self] in
       return self?.titles ?? []
     }
+    layout.maxHeaderHeight.value = 300
+    layout.minHeaderHeight.value = 100
     layout.headerHeight.value = layout.maxHeaderHeight.value
     layout.headerHeight.asDriver()
       .map { $0 + 80.0 }
@@ -89,11 +92,12 @@ class CollapsingHeaderViewController: UIViewController {
       $0.edges.equalToSuperview()
     }
 
-    collasingItemsSubject.onNext([controller1, controller2, controller4, controller5])
+    collasingItemsSubject.onNext([controller1, controller2, controllerLoader, controller4, controller5])
     controller3.collasingItemsSubject.bind(to: collasingItemsSubject).disposed(by: disposeBag)
 
     controller1.view.backgroundColor = .clear
     controller2.view.backgroundColor = .clear
+    controllerLoader.view.backgroundColor = .clear
     controller3.view.backgroundColor = .clear
     controller4.view.backgroundColor = .clear
     controller5.view.backgroundColor = .clear
@@ -109,6 +113,7 @@ extension CollapsingHeaderViewController: CollectionViewPager {
     return [
       Page(controller: controller1, id: "Title 1"),
       Page(controller: controller2, id: "Title 2"),
+      Page(controller: controllerLoader, id: "Loader"),
       Page(controller: controller3, id: "Title 3"),
       Page(controller: controller4, id: "Title 4"),
       Page(controller: controller5, id: "Title 5")
@@ -127,6 +132,7 @@ extension CollapsingHeaderViewController {
     return [
       TitleCollectionViewCell.TitleViewModel(title: "Blue", indicatorColor: .blue),
       TitleCollectionViewCell.TitleViewModel(title: "Black", indicatorColor: .black),
+      TitleCollectionViewCell.TitleViewModel(title: "Loader", indicatorColor: .orange),
       TitleCollectionViewCell.TitleViewModel(title: "Green", indicatorColor: .green),
       TitleCollectionViewCell.TitleViewModel(title: "Gray", indicatorColor: .gray),
       TitleCollectionViewCell.TitleViewModel(title: "Orange", indicatorColor: .orange)
