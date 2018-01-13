@@ -49,9 +49,11 @@ class DecorationView<TitleCell: CollectionViewCell, MarkerCell: CollectionViewCe
     contentView.addSubview(decorationContainerView)
     decorationContainerView.isScrollEnabled = false
     decorationContainerView.showsHorizontalScrollIndicator = false
-    decorationContainerView.snp.remakeConstraints { make in
-      make.edges.equalToSuperview()
-    }
+    decorationContainerView.translatesAutoresizingMaskIntoConstraints = false
+    contentView.addConstraints(NSLayoutConstraint.constraints(withVisualFormat: "V:|[content]|", metrics: nil,
+                                                              views: ["content": decorationContainerView]))
+    contentView.addConstraints(NSLayoutConstraint.constraints(withVisualFormat: "H:|[content]|", metrics: nil,
+                                                              views: ["content": decorationContainerView]))
     backgroundColor = UIColor.clear
   }
 

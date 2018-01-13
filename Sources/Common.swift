@@ -78,8 +78,16 @@ public struct Settings {
   public var anchor: Anchor
   public var inset: UIEdgeInsets
   public var alignment: DecorationAlignment
-  public var jumpingPolicy: JumpingPolicy
-  public var pagesOnScreen: Int
+  public var pagesOnScreen: Int {
+    willSet {
+      assert(newValue > 0, "number of pages on screen should be greater than 0")
+    }
+  }
+  public var jumpingPolicy: JumpingPolicy {
+    willSet {
+      assert(newValue == .disabled || pagesOnScreen == 1, "jumping policy doesn't support 2+ pages currently")
+    }
+  }
 
   public init(stripHeight: CGFloat = 80.0,
               markerHeight: CGFloat = 5.5,
@@ -102,4 +110,5 @@ public struct Settings {
     assert(jumpingPolicy == .disabled || pagesOnScreen == 1, "jumping policy doesn't support 2+ pages currently")
     self.jumpingPolicy = jumpingPolicy
   }
+
 }
