@@ -1,6 +1,6 @@
 //
 //  CollectionViewLayout.swift
-//  PSGOneApp
+//  Sundial
 //
 //  Created by Eugen Filipkov on 4/17/17.
 //  Copyright © 2017 Netcosports. All rights reserved.
@@ -78,6 +78,12 @@ where T: Selectable, TitleCell: Reusable, TitleCell.Data: ViewModelable {
       .first(where: { $0.indexPath == indexPath })
   }
 
+  open override func layoutAttributesForDecorationView(ofKind elementKind: String,
+                                                       at indexPath: IndexPath) -> UICollectionViewLayoutAttributes? {
+    guard elementKind == DecorationViewId, indexPath == IndexPath(item: 0, section: 0) else { return nil }
+    return decorationAttributes(with: pager?())
+  }
+
   open var decorationFrame: CGRect {
     guard let collectionView = collectionView else { return .zero }
     let topOffset: CGFloat
@@ -107,6 +113,32 @@ where T: Selectable, TitleCell: Reusable, TitleCell.Data: ViewModelable {
   open override func shouldInvalidateLayout(forBoundsChange newBounds: CGRect) -> Bool {
     return true
   }
+
+  public func decorationAttributes(with titles: [ViewModel]?) -> UICollectionViewLayoutAttributes? {
+    guard let titles = titles, titles.count > 0 else {
+      return nil
+    }
+
+    let settings = self.settings
+    let validPagesRange = 0...(titles.count - settings.pagesOnScreen)
+    let decorationIndexPath = IndexPath(item: 0, section: 0)
+    let decorationAttributes = DecorationViewAttributes<ViewModel>(forDecorationViewOfKind: DecorationViewId,
+                                                                   with: decorationIndexPath)
+    decorationAttributes.zIndex = 1024
+    decorationAttributes.settings = settings
+    decorationAttributes.titles = titles
+    decorationAttributes.hostPagerSource = hostPagerSource
+    decorationAttributes.backgroundColor = pageStripBackgroundColor
+    decorationAttributes.selectionClosure = { [weak self] in
+      guard let `self` = self else { return }
+
+      let item = $0.clamp(to: validPagesRange)
+      self.select(item: item, jumpingPolicy: settings.jumpingPolicy)
+    }
+    decorationAttributes.frame = decorationFrame
+    return decorationAttributes
+  }
+
 }
 
 // MARK: - Private
@@ -125,29 +157,6 @@ private extension CollectionViewLayout {
     attributes.append(decorationAttributes)
   }
 
-  func decorationAttributes(with titles: [ViewModel]?) -> UICollectionViewLayoutAttributes? {
-    guard let titles = titles, titles.count > 0 else {
-      return nil
-    }
-
-    let settings = self.settings
-    let validPagesRange = 0...(titles.count - settings.pagesOnScreen)
-    let decorationIndexPath = IndexPath(item: 0, section: 0)
-    let decorationAttributes = DecorationViewAttributes<ViewModel>(forDecorationViewOfKind: DecorationViewId, with: decorationIndexPath)
-    decorationAttributes.zIndex = 1024
-    decorationAttributes.settings = settings
-    decorationAttributes.titles = titles
-    decorationAttributes.hostPagerSource = hostPagerSource
-    decorationAttributes.backgroundColor = pageStripBackgroundColor
-    decorationAttributes.selectionClosure = { [weak self] in
-      guard let `self` = self else { return }
-
-      let item = $0.clamp(to: validPagesRange)
-      self.select(item: item, jumpingPolicy: settings.jumpingPolicy)
-    }
-    decorationAttributes.frame = decorationFrame
-    return decorationAttributes
-  }
 }
 
 // MARK: - Jumping
@@ -155,27 +164,23 @@ private extension CollectionViewLayout {
 private extension CollectionViewLayout {
 
   func select(item: Int, jumpingPolicy: JumpingPolicy) {
-    let threashold: Int
+    let threshold: Int
     switch jumpingPolicy {
-    case .disabled: threashold = .max
-    case .skip(let pages): threashold = max(pages, 2)
+    case .disabled: threshold = .max
+    case .skip(let pages): threshold = max(pages, 2)
     }
-    guard let currentIndex = self.currentIndex(),
-      abs(currentIndex - item) >= threashold else {
-        hostPagerSource?.selectedItem.onNext(item)
-        return
+    guard let currentIndex = currentIndex, abs(currentIndex - item) >= threshold else {
+      hostPagerSource?.selectedItem.onNext(item)
+      return
     }
     jump(from: currentIndex, to: item)
   }
 
-  func currentIndex() -> Int? {
-    guard let source = hostPagerSource,
-      let containerView = source.containerView,
-      containerView.bounds.size.width > 0.0 else {
-        return nil
-    }
+  var currentIndex: Int? {
+    guard let source = hostPagerSource, let collectionView = collectionView,
+      collectionView.bounds.size.width > 0.0 else { return nil }
 
-    let index = Int(containerView.contentOffset.x / containerView.bounds.size.width)
+    let index = Int(collectionView.contentOffset.x / collectionView.bounds.size.width)
     let pagesCount = source.sections.first?.cells.count ?? 0
     let result = max(0, min(index, pagesCount - 1))
     return result
