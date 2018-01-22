@@ -92,7 +92,7 @@ class DecorationView<TitleCell: CollectionViewCell, MarkerCell: CollectionViewCe
 
       let cells: [Cellable] = newTitles.map { title in
         let item = Item(data: title) { [weak self] in
-          if let index = self?.titles.index(where: { $0.title == title.title }) {
+          if let index = self?.titles.index(where: { $0.id == title.id }) {
             self?.currentLayoutAttributes?.selectionClosure?(index)
           }
         }

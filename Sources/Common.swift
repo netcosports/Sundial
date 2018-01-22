@@ -13,6 +13,7 @@ import RxCocoa
 
 public protocol Titleable {
   var title: String { get }
+  var id: String { get }
 }
 
 public protocol Indicatorable {
