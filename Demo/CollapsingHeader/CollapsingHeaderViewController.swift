@@ -81,7 +81,7 @@ class CollapsingHeaderViewController: UIViewController {
       .disposed(by: disposeBag)
 
     collasingItemsSubject.asDriver(onErrorJustReturn: []).drive(onNext: { [weak layout] collasingItems in
-      layout?.apped(collapsingItems: collasingItems)
+      layout?.append(collapsingItems: collasingItems)
     }).disposed(by: disposeBag)
 
     collectionView.source.hostViewController = self
