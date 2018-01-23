@@ -49,9 +49,6 @@ class DecorationViewCollectionViewLayout<TitleViewModel: ViewModelable, MarkerCe
 
     size = .zero
 
-    let currentRange = progressVariable.value.pages
-    var focus = CGPoint.zero
-
     for itemIndex in stride(from: 0, to: collectionView.numberOfItems(inSection: 0), by: 1) {
       let indexPath = IndexPath(item: itemIndex, section: 0)
       var size = delegate.collectionView!(collectionView, layout: self, sizeForItemAt: indexPath)
@@ -71,10 +68,6 @@ class DecorationViewCollectionViewLayout<TitleViewModel: ViewModelable, MarkerCe
         origin.x = lastFrame.maxX + minimumLineSpacing
       } else {
         origin.x = sectionInset.left
-      }
-
-      if itemIndex == currentRange.lowerBound {
-        focus = origin
       }
 
       // TODO: should we count here vertical sectionInsets?
@@ -101,10 +94,6 @@ class DecorationViewCollectionViewLayout<TitleViewModel: ViewModelable, MarkerCe
         self?.isScrolling = false
       }).disposed(by: disposeBag)
       self.disposeBag = disposeBag
-
-      if collectionView.contentOffset != focus {
-        collectionView.contentOffset = focus
-      }
     }
   }
 
