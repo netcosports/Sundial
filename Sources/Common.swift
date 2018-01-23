@@ -16,6 +16,10 @@ public protocol Titleable {
   var id: String { get }
 }
 
+public extension Titleable {
+  var id: String { return title }
+}
+
 public protocol Indicatorable {
   var indicatorColor: UIColor { get }
 }
