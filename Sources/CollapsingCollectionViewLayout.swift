@@ -127,7 +127,7 @@ open class CollapsingCollectionViewLayout<
     self.updateMaxHeightDisposeBag = updateMaxHeightDisposeBag
   }
 
-  open func apped(collapsingItems: [CollapsingItem]) {
+  open func append(collapsingItems: [CollapsingItem]) {
     let handlers: [CollapsingHeaderHandler] = collapsingItems.flatMap { item in
       guard !self.handlers.contains(where: { $0.collapsingItem === item }) else {
         return nil

@@ -16,6 +16,10 @@ public protocol Titleable {
   var id: String { get }
 }
 
+public extension Titleable {
+  var id: String { return title }
+}
+
 public protocol Indicatorable {
   var indicatorColor: UIColor { get }
 }
@@ -34,11 +38,18 @@ extension CollectionViewReusedPagerSource: Selectable {
   public var selectedItem: ControlProperty<Int> { return rx.selectedItem }
 }
 
-public typealias Progress = (pages: ClosedRange<Int>, progress: CGFloat)
+public struct Progress: Equatable {
+  public let pages: CountableClosedRange<Int>
+  public let progress: CGFloat
 
-extension ClosedRange where Bound == Int {
+  public static func == (lhs: Progress, rhs: Progress) -> Bool {
+    return lhs.pages == rhs.pages && lhs.progress == rhs.progress
+  }
+}
 
-  var next: ClosedRange<Int> {
+extension CountableClosedRange where Bound == Int {
+
+  var next: CountableClosedRange<Int> {
     return lowerBound.advanced(by: 1)...upperBound.advanced(by: 1)
   }
 
