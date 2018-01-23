@@ -12,7 +12,7 @@ import Astrolabe
 
 class DecorationViewCollectionViewLayout<TitleViewModel: ViewModelable, MarkerCell: CollectionViewCell>: UICollectionViewFlowLayout {
 
-  let progressVariable = Variable<Progress>((0...0, 0))
+  let progressVariable = Variable<Progress>(.init(pages: 0...0, progress: 0))
   var anchor: Anchor = .content
   var markerHeight: CGFloat = 15
   var titles: [TitleViewModel] = []
@@ -23,63 +23,103 @@ class DecorationViewCollectionViewLayout<TitleViewModel: ViewModelable, MarkerCe
   fileprivate typealias TitleAttributes = TitleCollectionViewLayoutAttributes
   fileprivate typealias MarkerAttributes = MarkerDecorationAttributes<TitleViewModel, MarkerCell>
 
+  private var cellFrames = [CGRect]()
+  private var size = CGSize.zero
+
+  private var setupFrames = true
+
   override func prepare() {
     super.prepare()
 
+    guard let collectionView = collectionView else { return }
+    guard let delegate = collectionView.delegate as? UICollectionViewDelegateFlowLayout else { return }
+
     register(MarkerCell.self, forDecorationViewOfKind: MarkerDecorationViewId)
 
+    guard collectionView.numberOfSections == 1 else { return }
+
+    let itemsCount = collectionView.numberOfItems(inSection: 0)
+    guard itemsCount > 0 else { return }
+
+    guard setupFrames else { return }
+    setupFrames = false
+
+    cellFrames = [CGRect]()
+    cellFrames.reserveCapacity(itemsCount)
+
+    size = .zero
+
+    let currentRange = progressVariable.value.pages
+    var focus = CGPoint.zero
+
+    for itemIndex in stride(from: 0, to: collectionView.numberOfItems(inSection: 0), by: 1) {
+      let indexPath = IndexPath(item: itemIndex, section: 0)
+      var size = delegate.collectionView!(collectionView, layout: self, sizeForItemAt: indexPath)
+
+      switch anchor {
+      case .fillEqual:
+        size.width = (collectionView.frame.width - (sectionInset.left + sectionInset.right)
+          - CGFloat(itemsCount - 1) * minimumInteritemSpacing) / CGFloat(itemsCount)
+      case let .equal(width):
+        size.width = width
+      default: break
+      }
+
+      var origin = CGPoint.zero
+
+      if let lastFrame = cellFrames.last {
+        origin.x = lastFrame.maxX + minimumLineSpacing
+      } else {
+        origin.x = sectionInset.left
+      }
+
+      if itemIndex == currentRange.lowerBound {
+        focus = origin
+      }
+
+      // TODO: should we count here vertical sectionInsets?
+      origin.y = (collectionView.frame.height - size.height) / 2
+
+      cellFrames.append(CGRect(origin: origin, size: size))
+    }
+
+    if let last = cellFrames.last {
+      size.width = last.maxX + sectionInset.right
+    }
+
+    size.height = collectionView.frame.height
+
     if disposeBag == nil {
-      guard let collectionView = collectionView else { return }
       let disposeBag = DisposeBag()
-      progressVariable.asDriver().drive(onNext: { [weak self] _ in
-        self?.invalidateLayout()
+      progressVariable.asDriver().distinctUntilChanged().drive(onNext: { [weak self] _ in
+        let context = UICollectionViewFlowLayoutInvalidationContext()
+        context.invalidateFlowLayoutAttributes = false
+        context.invalidateFlowLayoutDelegateMetrics = false
+        self?.invalidateLayout(with: context)
       }).disposed(by: disposeBag)
       collectionView.rx.didEndScrollingAnimation.asDriver().drive(onNext: { [weak self] _ in
         self?.isScrolling = false
       }).disposed(by: disposeBag)
       self.disposeBag = disposeBag
+
+      if collectionView.contentOffset != focus {
+        collectionView.contentOffset = focus
+      }
     }
   }
 
   override func layoutAttributesForElements(in rect: CGRect) -> [UICollectionViewLayoutAttributes]? {
-    let oldAttributes = super.layoutAttributesForElements(in: rect)
-
-    guard let attributes = oldAttributes?.flatMap({ $0.copy() as? TitleAttributes }) else {
-      return nil
+    let attributes: [TitleAttributes] = cellFrames.enumerated().filter { $0.element.intersects(rect) }.map {
+      let indexPath = IndexPath(item: $0.offset, section: 0)
+      let attributes = TitleAttributes(forCellWith: indexPath)
+      attributes.frame = $0.element
+      return attributes
     }
 
     let progress = progressVariable.value
 
     var currentPages = [TitleAttributes]()
     var nextPages = [TitleAttributes]()
-
-    switch anchor {
-    case .fillEqual, .equal:
-      guard let collectionView = collectionView else { return nil }
-      guard collectionView.numberOfSections > 0 else { return nil }
-
-      let count = collectionView.numberOfItems(inSection: 0)
-      let width: CGFloat
-
-      switch anchor {
-      case .fillEqual:
-        width = (collectionView.frame.width - (sectionInset.left + sectionInset.right) - CGFloat(count - 1) * minimumInteritemSpacing) / CGFloat(count)
-      case .equal(let size):
-        width = size
-      default: width = 0
-      }
-
-      var x = sectionInset.left
-      attributes.forEach { itemAttributes in
-        var frame = itemAttributes.frame
-        frame.origin.x = x
-        frame.size.width = width
-        itemAttributes.frame = frame
-
-        x = x + width + minimumInteritemSpacing
-      }
-    default: break
-    }
 
     let currentRange = progress.pages
     let nextRange = progress.pages.next
@@ -101,33 +141,45 @@ class DecorationViewCollectionViewLayout<TitleViewModel: ViewModelable, MarkerCe
       }
     }
 
+    if currentPages.isEmpty {
+      currentPages.append(contentsOf: currentRange.flatMap { index in
+        guard cellFrames.indices.contains(index) else { return nil }
+        let indexPath = IndexPath(item: index, section: 0)
+        let attributes = TitleAttributes(forCellWith: indexPath)
+        attributes.frame = cellFrames[index]
+        return attributes
+      })
+    }
+
     let markerAttributes = decorationAttributes(for: currentPages, nextPages: nextPages.count > 0 ? nextPages : nil)
     let results: [UICollectionViewLayoutAttributes] = [markerAttributes].flatMap { $0 } + attributes
 
     return results
   }
 
+  override func layoutAttributesForItem(at indexPath: IndexPath) -> UICollectionViewLayoutAttributes? {
+    guard indexPath.section == 0, cellFrames.indices.contains(indexPath.item) else { return nil }
+    let attributes = TitleAttributes(forCellWith: indexPath)
+    attributes.frame = cellFrames[indexPath.item]
+    return attributes
+  }
+
   override var collectionViewContentSize: CGSize {
-    let contentSize = super.collectionViewContentSize
-    guard let collectionView = collectionView else { return contentSize }
-
-    switch anchor {
-    case .fillEqual:
-      return CGSize(width: collectionView.frame.width, height: contentSize.height)
-    case .equal(let size):
-      guard collectionView.numberOfSections > 0 else { return contentSize }
-
-      let count = CGFloat(collectionView.numberOfItems(inSection: 0))
-      let width = sectionInset.left + sectionInset.right + (count - 1.0) * minimumInteritemSpacing + count * size
-      return CGSize(width: width, height: contentSize.height)
-    default:
-      return contentSize
-    }
+    return size
   }
 
   override class var layoutAttributesClass: AnyClass {
     return TitleAttributes.self
   }
+
+  override func invalidateLayout(with context: UICollectionViewLayoutInvalidationContext) {
+    super.invalidateLayout(with: context)
+
+    if let context = context as? UICollectionViewFlowLayoutInvalidationContext {
+      setupFrames = context.invalidateFlowLayoutDelegateMetrics
+    }
+  }
+
 }
 
 extension DecorationViewCollectionViewLayout {

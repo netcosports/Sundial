@@ -84,11 +84,8 @@ class DecorationView<TitleCell: CollectionViewCell, MarkerCell: CollectionViewCe
 
   fileprivate var titles: [ViewModel] = [] {
     willSet(newTitles) {
-      if let layout = layout {
-        layout.titles = newTitles
-      }
 
-      if newTitles.map({ $0.title }) == titles.map({ $0.title }) { return }
+      if newTitles.map({ $0.id }) == titles.map({ $0.id }) { return }
 
       let cells: [Cellable] = newTitles.map { title in
         let item = Item(data: title) { [weak self] in
@@ -99,7 +96,16 @@ class DecorationView<TitleCell: CollectionViewCell, MarkerCell: CollectionViewCe
         item.id = title.title
         return item
       }
-      contentView.layoutIfNeeded()
+
+      if let layout = layout {
+        layout.titles = newTitles
+
+        let context = UICollectionViewFlowLayoutInvalidationContext()
+        context.invalidateFlowLayoutAttributes = true
+        context.invalidateFlowLayoutDelegateMetrics = true
+        layout.invalidateLayout(with: context)
+      }
+
       decorationContainerView.source.sections = [Section(cells: cells)]
       decorationContainerView.reloadData()
     }
@@ -141,10 +147,10 @@ extension DecorationView {
             if width > 0.0 {
               let page = Int(offset.x / width)
               let progress = (offset.x - (width * CGFloat(page))) / width
-              return (pages: page...(page + settings.pagesOnScreen - 1), progress: progress)
+              return .init(pages: page...(page + settings.pagesOnScreen - 1), progress: progress)
             }
           }
-          return (pages: 0...0, progress: 0.0)
+          return .init(pages: 0...0, progress: 0.0)
         }.bind(to: layout.progressVariable).disposed(by: disposeBag)
     }
   }
