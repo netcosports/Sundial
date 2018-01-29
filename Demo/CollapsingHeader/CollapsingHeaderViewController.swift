@@ -55,7 +55,7 @@ class CollapsingHeaderViewController: UIViewController {
 
   let collectionView = CollectionView<CollectionViewPagerSource>()
 
-  typealias Layout = CollapsingCollectionViewLayout<CollectionViewPagerSource, TitleCollectionViewCell, MarkerDecorationView<TitleCollectionViewCell.TitleViewModel>>
+  typealias Layout = CollapsingCollectionViewLayout<CollectionViewPagerSource, DecorationView<TitleCollectionViewCell, MarkerDecorationView<TitleCollectionViewCell.TitleViewModel>>>
 
   let collasingItemsSubject = PublishSubject<[CollapsingItem]>()
 

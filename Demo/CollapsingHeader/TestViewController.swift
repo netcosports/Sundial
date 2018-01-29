@@ -150,7 +150,7 @@ class TestPagerViewControllerInner: UIViewController {
   let offsetVariable = Variable<CGFloat>(0.0)
   let collectionView = CollectionView<CollectionViewPagerSource>()
 
-  typealias Layout = CollectionViewLayout<CollectionViewPagerSource, TitleCollectionViewCell, MarkerDecorationView<TitleCollectionViewCell.TitleViewModel>>
+  typealias Layout = CollectionViewLayout<CollectionViewPagerSource, DecorationView<TitleCollectionViewCell, MarkerDecorationView<TitleCollectionViewCell.TitleViewModel>>>
 
   let collasingItemsSubject = PublishSubject<[CollapsingItem]>()
 
