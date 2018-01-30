@@ -16,7 +16,7 @@ open class DecorationViewAttributes<TitleViewModel: Titleable>: UICollectionView
   public var settings: Settings?
   public weak var hostPagerSource: CollectionViewSource?
 
-  public override func copy(with zone: NSZone? = nil) -> Any {
+  open override func copy(with zone: NSZone? = nil) -> Any {
     let copy = super.copy(with: zone)
     guard let typedCopy = copy as? DecorationViewAttributes else {
       return copy
@@ -29,7 +29,7 @@ open class DecorationViewAttributes<TitleViewModel: Titleable>: UICollectionView
     return typedCopy
   }
 
-  public override func isEqual(_ object: Any?) -> Bool {
+  open override func isEqual(_ object: Any?) -> Bool {
     if super.isEqual(object) == false {
       return false
     }
