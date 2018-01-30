@@ -23,10 +23,8 @@ public extension CollapsingItem {
   }
 }
 
-open class CollapsingCollectionViewLayout<
-  Source: CollectionViewSource,
-  DecorationView: CollectionViewCell>: CollectionViewLayout<Source, DecorationView>
-where Source: Selectable, DecorationView: DecorationViewPageable, DecorationView.TitleCell.Data: ViewModelable {
+open class CollapsingCollectionViewLayout<DecorationView: CollectionViewCell>: CollectionViewLayout<DecorationView>
+where DecorationView: DecorationViewPageable, DecorationView.TitleCell.Data: ViewModelable {
 
   public let minHeaderHeight = Variable<CGFloat>(0)
   public let maxHeaderHeight = Variable<CGFloat>(240)

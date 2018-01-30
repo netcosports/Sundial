@@ -11,10 +11,8 @@ import Astrolabe
 import RxSwift
 import RxCocoa
 
-open class CollectionViewLayout<
-  Source: CollectionViewSource,
-  DecorationView: CollectionViewCell>: UICollectionViewFlowLayout
-where Source: Selectable, DecorationView: DecorationViewPageable, DecorationView.TitleCell.Data: ViewModelable {
+open class CollectionViewLayout<DecorationView: CollectionViewCell>: UICollectionViewFlowLayout
+where DecorationView: DecorationViewPageable, DecorationView.TitleCell.Data: ViewModelable {
 
   public typealias ViewModel = DecorationView.TitleCell.Data
 
@@ -24,6 +22,7 @@ where Source: Selectable, DecorationView: DecorationViewPageable, DecorationView
   }
 
   public typealias PagerClosure = ()->[ViewModel]
+  public typealias Source = CollectionViewSource & Selectable
 
   open weak var hostPagerSource: Source?
   open var pager: PagerClosure?
