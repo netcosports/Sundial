@@ -111,7 +111,7 @@ open class GenericCollectionViewLayout<DecorationView: CollectionViewCell & Deco
     return true
   }
 
-  public func decorationAttributes(with titles: [ViewModel]?) -> DecorationView.Attributes? {
+  open func decorationAttributes(with titles: [ViewModel]?) -> DecorationView.Attributes? {
     guard let titles = titles, titles.count > 0 else {
       return nil
     }
