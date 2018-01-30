@@ -11,21 +11,21 @@ import Astrolabe
 import RxSwift
 import RxCocoa
 
-open class CollectionViewLayout<T: CollectionViewSource,
-  TitleCell: CollectionViewCell,
-  MarkerCell: CollectionViewCell>: UICollectionViewFlowLayout
-where T: Selectable, TitleCell: Reusable, TitleCell.Data: ViewModelable {
+open class CollectionViewLayout<
+  Source: CollectionViewSource,
+  DecorationView: CollectionViewCell>: UICollectionViewFlowLayout
+where Source: Selectable, DecorationView: DecorationViewPageable, DecorationView.TitleCell.Data: ViewModelable {
 
-  public typealias ViewModel = TitleCell.Data
+  public typealias ViewModel = DecorationView.TitleCell.Data
 
   open override func prepare() {
     super.prepare()
-    register(DecorationView<TitleCell, MarkerCell>.self, forDecorationViewOfKind: DecorationViewId)
+    register(DecorationView.self, forDecorationViewOfKind: DecorationViewId)
   }
 
   public typealias PagerClosure = ()->[ViewModel]
 
-  open weak var hostPagerSource: T?
+  open weak var hostPagerSource: Source?
   open var pager: PagerClosure?
   open var pageStripBackgroundColor = UIColor.clear
   open var settings: Settings = Settings()
@@ -34,7 +34,7 @@ where T: Selectable, TitleCell: Reusable, TitleCell.Data: ViewModelable {
   private var jumpSourceLayoutAttribute: UICollectionViewLayoutAttributes?
   private var jumpTargetLayoutAttribute: UICollectionViewLayoutAttributes?
 
-  public init(hostPagerSource: T, settings: Settings? = nil, pager: PagerClosure?) {
+  public init(hostPagerSource: Source, settings: Settings? = nil, pager: PagerClosure?) {
     super.init()
 
     sectionInset = .zero

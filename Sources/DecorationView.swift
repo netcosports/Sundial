@@ -13,8 +13,17 @@ import RxCocoa
 
 public let DecorationViewId = "DecorationView"
 
-class DecorationView<TitleCell: CollectionViewCell, MarkerCell: CollectionViewCell>: CollectionViewCell
-      where TitleCell: Reusable, TitleCell.Data: ViewModelable {
+public protocol DecorationViewPageable {
+
+  associatedtype TitleCell: CollectionViewCell, Reusable
+  associatedtype MarkerCell: CollectionViewCell
+}
+
+open class DecorationView<T: CollectionViewCell, M: CollectionViewCell>: CollectionViewCell, DecorationViewPageable
+where T: Reusable, T.Data: ViewModelable {
+
+  public typealias TitleCell = T
+  public typealias MarkerCell = M
 
   typealias Item                  = CollectionCell<TitleCell>
 
@@ -23,7 +32,7 @@ class DecorationView<TitleCell: CollectionViewCell, MarkerCell: CollectionViewCe
   typealias DecorationLayout      = DecorationViewCollectionViewLayout<ViewModel, MarkerCell>
 
   fileprivate let disposeBag = DisposeBag()
-  fileprivate let decorationContainerView = CollectionView<CollectionViewSource>()
+  open let decorationContainerView = CollectionView<CollectionViewSource>()
   fileprivate var layout: DecorationLayout?
 
   fileprivate weak var hostPagerSource: CollectionViewSource?
@@ -39,7 +48,9 @@ class DecorationView<TitleCell: CollectionViewCell, MarkerCell: CollectionViewCe
     }
   }
 
-  override func setup() {
+  override open func setup() {
+    super.setup()
+
     let layout = collectionViewLayout()
     self.layout = layout
     decorationContainerView.collectionViewLayout = layout
@@ -50,14 +61,16 @@ class DecorationView<TitleCell: CollectionViewCell, MarkerCell: CollectionViewCe
     decorationContainerView.isScrollEnabled = false
     decorationContainerView.showsHorizontalScrollIndicator = false
     decorationContainerView.translatesAutoresizingMaskIntoConstraints = false
+
+    let views =  ["content": decorationContainerView]
     contentView.addConstraints(NSLayoutConstraint.constraints(withVisualFormat: "V:|[content]|", metrics: nil,
-                                                              views: ["content": decorationContainerView]))
+                                                              views: views))
     contentView.addConstraints(NSLayoutConstraint.constraints(withVisualFormat: "H:|[content]|", metrics: nil,
-                                                              views: ["content": decorationContainerView]))
+                                                              views: views))
     backgroundColor = UIColor.clear
   }
 
-  override func apply(_ layoutAttributes: UICollectionViewLayoutAttributes) {
+  override open func apply(_ layoutAttributes: UICollectionViewLayoutAttributes) {
     super.apply(layoutAttributes)
 
     if let decorationViewAttributes: DecorationViewAttributes<ViewModel> = convert(from: layoutAttributes) {
