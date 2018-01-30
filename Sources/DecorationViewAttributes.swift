@@ -9,7 +9,7 @@
 import UIKit
 import Astrolabe
 
-public class DecorationViewAttributes<TitleViewModel: Titleable>: UICollectionViewLayoutAttributes, Attributable {
+open class DecorationViewAttributes<TitleViewModel: Titleable>: UICollectionViewLayoutAttributes, Attributable {
 
   public var titles: [TitleViewModel] = []
   public var selectionClosure: ((Int) -> Void)?
