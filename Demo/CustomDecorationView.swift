@@ -10,7 +10,7 @@ import UIKit
 import Astrolabe
 import Sundial
 
-class CustomDecorationView<TitleCell: CollectionViewCell, MarkerCell: CollectionViewCell>: DecorationView<TitleCell, MarkerCell>
+class CustomDecorationView<TitleCell: CollectionViewCell, MarkerCell: CollectionViewCell>: GenericDecorationView<TitleCell, MarkerCell, DecorationViewAttributes<TitleCell.Data>>
 where TitleCell: Reusable, TitleCell.Data: ViewModelable {
 
   let decorationLabel = UILabel()

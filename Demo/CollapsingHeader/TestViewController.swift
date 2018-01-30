@@ -150,7 +150,7 @@ class TestPagerViewControllerInner: UIViewController {
   let offsetVariable = Variable<CGFloat>(0.0)
   let collectionView = CollectionView<CollectionViewPagerSource>()
 
-  typealias Layout = CollectionViewLayout<DecorationView<TitleCollectionViewCell, MarkerDecorationView<TitleCollectionViewCell.TitleViewModel>>>
+  typealias Layout = CollectionViewLayout
 
   let collasingItemsSubject = PublishSubject<[CollapsingItem]>()
 
@@ -163,13 +163,13 @@ class TestPagerViewControllerInner: UIViewController {
                             markerHeight: 5.5,
                             itemMargin: 12.0,
                             bottomStripSpacing: 0.0,
+                            backgroundColor: .red,
                             inset: .zero,
                             alignment: .topOffset(variable: offsetVariable))
 
     let layout = Layout(hostPagerSource: collectionView.source, settings: settings) { [weak self] in
       return self?.titles ?? []
     }
-    layout.pageStripBackgroundColor = .red
     collectionView.collectionViewLayout = layout
     view.addSubview(collectionView)
     collectionView.snp.remakeConstraints {

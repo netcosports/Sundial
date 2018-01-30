@@ -31,7 +31,7 @@ class ViewControllerInner: UIViewController {
 
   let collectionView = CollectionView<CollectionViewPagerSource>()
 
-  typealias Layout = CollectionViewLayout<CustomDecorationView<TitleCollectionViewCell, MarkerDecorationView<TitleCollectionViewCell.TitleViewModel>>>
+  typealias Layout = GenericCollectionViewLayout<CustomDecorationView<TitleCollectionViewCell, MarkerDecorationView<TitleCollectionViewCell.TitleViewModel>>>
 
   override func viewDidLoad() {
     super.viewDidLoad()

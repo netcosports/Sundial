@@ -10,21 +10,8 @@ import Astrolabe
 import RxSwift
 import RxCocoa
 
-public protocol CollapsingItem: class {
-  var scrollView: UIScrollView { get }
-  var visible: Variable<Bool> { get }
-  var extraInset: UIEdgeInsets { get }
-}
-
-public extension CollapsingItem {
-
-  var extraInset: UIEdgeInsets {
-    return .zero
-  }
-}
-
-open class CollapsingCollectionViewLayout<DecorationView: CollectionViewCell>: CollectionViewLayout<DecorationView>
-where DecorationView: DecorationViewPageable, DecorationView.TitleCell.Data: ViewModelable {
+open class GenericCollapsingCollectionViewLayout<DecorationView: CollectionViewCell>: GenericCollectionViewLayout<DecorationView>
+where DecorationView: DecorationViewPageable, DecorationView.TitleCell.Data: Indicatorable {
 
   public let minHeaderHeight = Variable<CGFloat>(0)
   public let maxHeaderHeight = Variable<CGFloat>(240)

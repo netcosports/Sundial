@@ -11,8 +11,7 @@ import Astrolabe
 import RxSwift
 import RxCocoa
 
-open class CollectionViewLayout<DecorationView: CollectionViewCell>: UICollectionViewFlowLayout
-where DecorationView: DecorationViewPageable, DecorationView.TitleCell.Data: ViewModelable {
+open class GenericCollectionViewLayout<DecorationView: CollectionViewCell & DecorationViewPageable>: UICollectionViewFlowLayout {
 
   public typealias ViewModel = DecorationView.TitleCell.Data
 
@@ -26,7 +25,6 @@ where DecorationView: DecorationViewPageable, DecorationView.TitleCell.Data: Vie
 
   open weak var hostPagerSource: Source?
   open var pager: PagerClosure?
-  open var pageStripBackgroundColor = UIColor.clear
   open var settings: Settings = Settings()
 
   let disposeBag = DisposeBag()
@@ -113,7 +111,7 @@ where DecorationView: DecorationViewPageable, DecorationView.TitleCell.Data: Vie
     return true
   }
 
-  public func decorationAttributes(with titles: [ViewModel]?) -> UICollectionViewLayoutAttributes? {
+  public func decorationAttributes(with titles: [ViewModel]?) -> DecorationView.Attributes? {
     guard let titles = titles, titles.count > 0 else {
       return nil
     }
@@ -121,13 +119,11 @@ where DecorationView: DecorationViewPageable, DecorationView.TitleCell.Data: Vie
     let settings = self.settings
     let validPagesRange = 0...(titles.count - settings.pagesOnScreen)
     let decorationIndexPath = IndexPath(item: 0, section: 0)
-    let decorationAttributes = DecorationViewAttributes<ViewModel>(forDecorationViewOfKind: DecorationViewId,
-                                                                   with: decorationIndexPath)
+    let decorationAttributes = DecorationView.Attributes(forDecorationViewOfKind: DecorationViewId, with: decorationIndexPath)
     decorationAttributes.zIndex = 1024
     decorationAttributes.settings = settings
     decorationAttributes.titles = titles
     decorationAttributes.hostPagerSource = hostPagerSource
-    decorationAttributes.backgroundColor = pageStripBackgroundColor
     decorationAttributes.selectionClosure = { [weak self] in
       guard let `self` = self else { return }
 
@@ -137,12 +133,6 @@ where DecorationView: DecorationViewPageable, DecorationView.TitleCell.Data: Vie
     decorationAttributes.frame = decorationFrame
     return decorationAttributes
   }
-
-}
-
-// MARK: - Private
-
-private extension CollectionViewLayout {
 
   func addDecorationAttributes(to attributes: inout [UICollectionViewLayoutAttributes]) {
     guard attributes.count > 0 else { return }
@@ -155,12 +145,6 @@ private extension CollectionViewLayout {
     }
     attributes.append(decorationAttributes)
   }
-
-}
-
-// MARK: - Jumping
-
-private extension CollectionViewLayout {
 
   func select(item: Int, jumpingPolicy: JumpingPolicy) {
     let threshold: Int

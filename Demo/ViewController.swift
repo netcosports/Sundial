@@ -23,14 +23,12 @@ class ViewController: UIViewController {
 
   let collectionView = CollectionView<CollectionViewPagerSource>()
 
-  typealias Layout = CollectionViewLayout<DecorationView<TitleCollectionViewCell, MarkerDecorationView<TitleCollectionViewCell.TitleViewModel>>>
-
   override func viewDidLoad() {
     super.viewDidLoad()
 
     collectionView.source.hostViewController = self
     collectionView.source.pager = self
-    collectionView.collectionViewLayout = Layout(hostPagerSource: collectionView.source) { [weak self] in
+    collectionView.collectionViewLayout = CollectionViewLayout(hostPagerSource: collectionView.source) { [weak self] in
       return self?.titles ?? []
     }
 

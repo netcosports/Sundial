@@ -11,24 +11,15 @@ import Astrolabe
 import RxSwift
 import RxCocoa
 
-public let DecorationViewId = "DecorationView"
-
-public protocol DecorationViewPageable {
-
-  associatedtype TitleCell: CollectionViewCell, Reusable
-  associatedtype MarkerCell: CollectionViewCell
-}
-
-open class DecorationView<T: CollectionViewCell, M: CollectionViewCell>: CollectionViewCell, DecorationViewPageable
-where T: Reusable, T.Data: ViewModelable {
+open class GenericDecorationView<T: CollectionViewCell, M: CollectionViewCell, A: UICollectionViewLayoutAttributes & Attributable>:
+  CollectionViewCell, DecorationViewPageable where T: Reusable, T.Data == A.TitleViewModel, T.Data: Indicatorable {
 
   public typealias TitleCell = T
   public typealias MarkerCell = M
+  public typealias Attributes = A
 
   typealias Item                  = CollectionCell<TitleCell>
-
   typealias ViewModel             = TitleCell.Data
-  typealias DecorationAttributes  = DecorationViewAttributes<ViewModel>
   typealias DecorationLayout      = DecorationViewCollectionViewLayout<ViewModel, MarkerCell>
 
   fileprivate let disposeBag = DisposeBag()
@@ -36,7 +27,7 @@ where T: Reusable, T.Data: ViewModelable {
   fileprivate var layout: DecorationLayout?
 
   fileprivate weak var hostPagerSource: CollectionViewSource?
-  fileprivate var currentLayoutAttributes: DecorationAttributes? {
+  fileprivate var currentLayoutAttributes: Attributes? {
     didSet {
       if let settings = currentLayoutAttributes?.settings, let layout = layout {
         layout.minimumLineSpacing = settings.itemMargin
@@ -73,7 +64,7 @@ where T: Reusable, T.Data: ViewModelable {
   override open func apply(_ layoutAttributes: UICollectionViewLayoutAttributes) {
     super.apply(layoutAttributes)
 
-    if let decorationViewAttributes: DecorationViewAttributes<ViewModel> = convert(from: layoutAttributes) {
+    if let decorationViewAttributes: Attributes = convert(from: layoutAttributes) {
       guard let hostViewController = decorationViewAttributes.hostPagerSource?.hostViewController else {
         return
       }
@@ -86,7 +77,7 @@ where T: Reusable, T.Data: ViewModelable {
       }) {
         titles = decorationViewAttributes.titles
       }
-      backgroundColor = decorationViewAttributes.backgroundColor
+      backgroundColor = decorationViewAttributes.settings?.backgroundColor
       self.currentLayoutAttributes = decorationViewAttributes
     }
   }
@@ -130,11 +121,8 @@ where T: Reusable, T.Data: ViewModelable {
     layout.scrollDirection = .horizontal
     return layout
   }
-}
 
-extension DecorationView {
-
-  fileprivate func setupSource(for layoutAttributes: DecorationAttributes,
+  fileprivate func setupSource(for layoutAttributes: Attributes,
                                in hostViewController: UIViewController) {
     self.hostPagerSource = layoutAttributes.hostPagerSource
     self.containerViewController = hostViewController

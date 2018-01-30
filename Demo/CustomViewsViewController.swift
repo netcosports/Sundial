@@ -20,7 +20,7 @@ class CustomViewsViewController: UIViewController {
 
   let collectionView = CollectionView<CollectionViewPagerSource>()
 
-  typealias Layout = CollectionViewLayout<DecorationView<CustomTitleCollectionViewCell, CustomMarkerDecorationView>>
+  typealias Layout = GenericCollectionViewLayout<GenericDecorationView<CustomTitleCollectionViewCell, CustomMarkerDecorationView, DecorationViewAttributes<CustomTitleCollectionViewCell.Data>>>
 
   override func viewDidLoad() {
     super.viewDidLoad()
