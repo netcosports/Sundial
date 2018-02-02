@@ -79,29 +79,11 @@ public enum Anchor {
 }
 ```
 
-#### Content based titles alignmet:
-
-<p align="center">
-  <img src="docs/content.gif" width="320"/>
-</p>
-
-#### Centred alignmet:
-
-<p align="center">
-  <img src="docs/center.gif" width="320"/>
-</p>
-
-#### Left alignmet:
-
-<p align="center">
-  <img src="docs/left.gif" width="320"/>
-</p>
-
-#### Fill with equal size:
-
-<p align="center">
-  <img src="docs/fillEqual.gif" width="320"/>
-</p>
+| Content | Centered |
+| --- | --- |
+| <p align="center"><img src="docs/content.gif" width="320"/></p> | <p align="center"><img src="docs/center.gif" width="320"/></p> |
+| Left | Fill equal |
+| <p align="center"><img src="docs/left.gif" width="320"/></p> | <p align="center"><img src="docs/fillEqual.gif" width="320"/></p> |
 
 ### 1.3 Custom decoration views
 
@@ -126,13 +108,7 @@ As you can see here is possible to configure default decoration view itself prov
 
 ## 2. Collapsing Header
 
-Sundial also has layout for collapsing header: 
-
-<p align="center">
-  <img src="docs/collapsing.gif" width="320"/>
-</p>
-
-```CollapsingCollectionViewLayout``` creation is almost the same with ```CollectionViewLayout```. The only difference, that you need to provide implemenetations of ```CollapsingItem``` protocol.
+Sundial also has layout for collapsing header - ```CollapsingCollectionViewLayout```. Creation is almost the same with ```CollectionViewLayout```. The only difference, that you need to provide implemenetations of ```CollapsingItem``` protocol.
 
 ```swift
   let collectionView = CollectionView<CollectionViewPagerSource>()
@@ -153,6 +129,12 @@ class TestViewController: UIViewController, Accessor, CollapsingItem {
     return containerView
   }
 ```
+
+Here is the result:
+
+<p align="center">
+  <img src="docs/collapsing.gif" width="320"/>
+</p>
 
 ## 0. Missing points 
 
