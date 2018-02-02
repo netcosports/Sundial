@@ -206,13 +206,12 @@ class CollapsingHeaderHandler {
         bottomInset = extraInset.bottom
       }
 
-      let contentInset = UIEdgeInsets(top: topInset, left: 0, bottom: bottomInset, right: 0)
       let contentOffsetOriginal = collapsingItem.scrollView.contentOffset
       let adjustedY = -(sself.headerHeight.value + sself.headerInset.value)
       let contentOffset = CGPoint(x: contentOffsetOriginal.x, y: adjustedY)
 
-      collapsingItem.scrollView.contentInset = contentInset
-      collapsingItem.scrollView.scrollIndicatorInsets = contentInset
+      collapsingItem.scrollView.contentInset = UIEdgeInsets(top: topInset, left: 0, bottom: bottomInset, right: 0)
+      collapsingItem.scrollView.scrollIndicatorInsets = UIEdgeInsets(top: topInset, left: 0, bottom: 0, right: 0)
       collapsingItem.scrollView.contentOffset = contentOffset
     }).disposed(by: disposeBag)
   }
