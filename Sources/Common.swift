@@ -42,6 +42,9 @@ public protocol CollapsingItem: class {
   var scrollView: UIScrollView { get }
   var visible: Variable<Bool> { get }
   var extraInset: UIEdgeInsets { get }
+
+  func headerHeightDidChange(_ height: CGFloat)
+
 }
 
 public extension CollapsingItem {
@@ -49,4 +52,8 @@ public extension CollapsingItem {
   var extraInset: UIEdgeInsets {
     return .zero
   }
+
+  func headerHeightDidChange(_ height: CGFloat) {
+  }
+
 }

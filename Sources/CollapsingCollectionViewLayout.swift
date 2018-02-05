@@ -187,6 +187,10 @@ class CollapsingHeaderHandler {
     self.headerInset = headerInset
     self.followOffsetChanges = followOffsetChanges
 
+    headerHeight.asDriver().drive(onNext: { [weak collapsingItem] height in
+      collapsingItem?.headerHeightDidChange(height)
+    }).disposed(by: disposeBag)
+
     let contentSizeDriver = collapsingItem.scrollView.rx
       .observe(CGSize.self, #keyPath(UICollectionView.contentSize))
       .asDriver(onErrorJustReturn: nil)
