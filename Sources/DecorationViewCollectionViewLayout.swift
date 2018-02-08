@@ -84,7 +84,7 @@ class DecorationViewCollectionViewLayout<TitleViewModel: ViewModelable, MarkerCe
 
     if disposeBag == nil {
       let disposeBag = DisposeBag()
-      progressVariable.asDriver().distinctUntilChanged().drive(onNext: { [weak self] _ in
+      progressVariable.asDriver().drive(onNext: { [weak self] _ in
         let context = UICollectionViewFlowLayoutInvalidationContext()
         context.invalidateFlowLayoutAttributes = false
         context.invalidateFlowLayoutDelegateMetrics = false
