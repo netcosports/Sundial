@@ -18,13 +18,16 @@ open class GenericDecorationView<T: CollectionViewCell, M: CollectionViewCell, A
   public typealias MarkerCell = M
   public typealias Attributes = A
 
-  typealias Item                  = CollectionCell<TitleCell>
-  typealias ViewModel             = TitleCell.Data
-  typealias DecorationLayout      = DecorationViewCollectionViewLayout<ViewModel, MarkerCell>
+  typealias Item                         = CollectionCell<TitleCell>
+  public typealias ViewModel             = TitleCell.Data
+  public typealias DecorationLayout      = DecorationViewCollectionViewLayout<ViewModel, MarkerCell>
 
   fileprivate let disposeBag = DisposeBag()
   open let decorationContainerView = CollectionView<CollectionViewSource>()
-  fileprivate var layout: DecorationLayout?
+
+  public private(set) var layout: DecorationLayout?
+
+  open class var layoutType: DecorationLayout.Type { return DecorationLayout.self }
 
   fileprivate weak var hostPagerSource: CollectionViewSource?
   fileprivate var currentLayoutAttributes: Attributes? {
@@ -53,7 +56,7 @@ open class GenericDecorationView<T: CollectionViewCell, M: CollectionViewCell, A
     decorationContainerView.showsHorizontalScrollIndicator = false
     decorationContainerView.translatesAutoresizingMaskIntoConstraints = false
 
-    let views =  ["content": decorationContainerView]
+    let views = ["content": decorationContainerView]
     contentView.addConstraints(NSLayoutConstraint.constraints(withVisualFormat: "V:|[content]|", metrics: nil,
                                                               views: views))
     contentView.addConstraints(NSLayoutConstraint.constraints(withVisualFormat: "H:|[content]|", metrics: nil,
@@ -116,7 +119,7 @@ open class GenericDecorationView<T: CollectionViewCell, M: CollectionViewCell, A
   }
 
   fileprivate func collectionViewLayout() -> DecorationLayout {
-    let layout = DecorationLayout()
+    let layout = type(of: self).layoutType.init()
     layout.titles = titles
     layout.scrollDirection = .horizontal
     return layout

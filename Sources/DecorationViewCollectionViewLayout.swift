@@ -10,12 +10,12 @@ import UIKit
 import RxSwift
 import Astrolabe
 
-class DecorationViewCollectionViewLayout<TitleViewModel: ViewModelable, MarkerCell: CollectionViewCell>: UICollectionViewFlowLayout {
+open class DecorationViewCollectionViewLayout<TitleViewModel: ViewModelable, MarkerCell: CollectionViewCell>: UICollectionViewFlowLayout {
 
-  let progressVariable = Variable<Progress>(.init(pages: 0...0, progress: 0))
-  var anchor: Anchor = .content
-  var markerHeight: CGFloat = 15
-  var titles: [TitleViewModel] = []
+  public let progressVariable = Variable<Progress>(.init(pages: 0...0, progress: 0))
+  public internal(set) var anchor: Anchor = .content
+  public internal(set) var markerHeight: CGFloat = 15
+  public internal(set) var titles: [TitleViewModel] = []
 
   fileprivate var disposeBag: DisposeBag?
   fileprivate var isScrolling = false
@@ -28,7 +28,13 @@ class DecorationViewCollectionViewLayout<TitleViewModel: ViewModelable, MarkerCe
 
   private var setupFrames = true
 
-  override func prepare() {
+  required override public init() {
+    super.init()
+  }
+
+  required public init?(coder aDecoder: NSCoder) { fatalError() }
+
+  override open func prepare() {
     super.prepare()
 
     guard let collectionView = collectionView else { return }
@@ -97,7 +103,7 @@ class DecorationViewCollectionViewLayout<TitleViewModel: ViewModelable, MarkerCe
     }
   }
 
-  override func layoutAttributesForElements(in rect: CGRect) -> [UICollectionViewLayoutAttributes]? {
+  override open func layoutAttributesForElements(in rect: CGRect) -> [UICollectionViewLayoutAttributes]? {
     let attributes: [TitleAttributes] = cellFrames.enumerated().filter { $0.element.intersects(rect) }.map {
       let indexPath = IndexPath(item: $0.offset, section: 0)
       let attributes = TitleAttributes(forCellWith: indexPath)
@@ -146,22 +152,22 @@ class DecorationViewCollectionViewLayout<TitleViewModel: ViewModelable, MarkerCe
     return results
   }
 
-  override func layoutAttributesForItem(at indexPath: IndexPath) -> UICollectionViewLayoutAttributes? {
+  override open func layoutAttributesForItem(at indexPath: IndexPath) -> UICollectionViewLayoutAttributes? {
     guard indexPath.section == 0, cellFrames.indices.contains(indexPath.item) else { return nil }
     let attributes = TitleAttributes(forCellWith: indexPath)
     attributes.frame = cellFrames[indexPath.item]
     return attributes
   }
 
-  override var collectionViewContentSize: CGSize {
+  override open var collectionViewContentSize: CGSize {
     return size
   }
 
-  override class var layoutAttributesClass: AnyClass {
+  override open class var layoutAttributesClass: AnyClass {
     return TitleAttributes.self
   }
 
-  override func invalidateLayout(with context: UICollectionViewLayoutInvalidationContext) {
+  override open func invalidateLayout(with context: UICollectionViewLayoutInvalidationContext) {
     super.invalidateLayout(with: context)
 
     if let context = context as? UICollectionViewFlowLayoutInvalidationContext {
