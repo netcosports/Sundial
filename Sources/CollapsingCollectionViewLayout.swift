@@ -62,16 +62,25 @@ where DecorationView: DecorationViewPageable, DecorationView.TitleCell.Data: Ind
 
     crashIfHeaderPresent(in: layoutAttributes)
 
-    let headerIndexPath = IndexPath(item: 0, section: 0)
-    let сollapsingHeaderViewAttributes = CollapsingHeaderViewAttributes(forSupplementaryViewOfKind: UICollectionElementKindSectionHeader,
-                                                                         with: headerIndexPath)
-    сollapsingHeaderViewAttributes.zIndex = type(of: self).headerZIndex
-    сollapsingHeaderViewAttributes.frame = CGRect(x: collectionView.contentOffset.x, y: 0.0,
-                                                  width: collectionView.frame.width, height: headerHeight.value)
-
-    layoutAttributes.append(сollapsingHeaderViewAttributes)
+    let attributes = collapsingHeaderAttributes()
+    layoutAttributes.append(attributes)
 
     return layoutAttributes
+  }
+
+  open func collapsingHeaderAttributes() -> CollapsingHeaderViewAttributes {
+    let headerIndexPath = IndexPath(item: 0, section: 0)
+    let сollapsingHeaderViewAttributes = CollapsingHeaderViewAttributes(forSupplementaryViewOfKind: UICollectionElementKindSectionHeader, with: headerIndexPath)
+    сollapsingHeaderViewAttributes.zIndex = type(of: self).headerZIndex
+
+    guard let collectionView = collectionView else { return сollapsingHeaderViewAttributes }
+
+    сollapsingHeaderViewAttributes.frame = CGRect(x: collectionView.contentOffset.x,
+                                                  y: 0.0,
+                                                  width: collectionView.frame.width,
+                                                  height: headerHeight.value)
+
+    return сollapsingHeaderViewAttributes
   }
 
   open override var decorationFrame: CGRect {
