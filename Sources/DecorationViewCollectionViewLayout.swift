@@ -146,6 +146,16 @@ open class DecorationViewCollectionViewLayout<TitleViewModel: ViewModelable, Mar
       })
     }
 
+    if nextPages.isEmpty {
+      nextPages.append(contentsOf: nextRange.flatMap { index in
+        guard cellFrames.indices.contains(index) else { return nil }
+        let indexPath = IndexPath(item: index, section: 0)
+        let attributes = TitleAttributes(forCellWith: indexPath)
+        attributes.frame = cellFrames[index]
+        return attributes
+      })
+    }
+
     let markerAttributes = decorationAttributes(for: currentPages, nextPages: nextPages.count > 0 ? nextPages : nil)
     let results: [UICollectionViewLayoutAttributes] = [markerAttributes].flatMap { $0 } + attributes
 
