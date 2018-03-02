@@ -234,7 +234,10 @@ class CollapsingHeaderHandler {
     connection = .connected
 
     guard let collapsingItem = collapsingItem else { return }
-    collapsingItem.scrollView.contentOffset = CGPoint(x: 0, y: -headerHeight.value - headerInset.value)
+    let targetContentOffset = -headerHeight.value - headerInset.value
+    if collapsingItem.scrollView.contentOffset.y < targetContentOffset {
+      collapsingItem.scrollView.contentOffset = CGPoint(x: 0, y: targetContentOffset)
+    }
     activeDispose?.dispose()
     nonActiveDispose?.dispose()
 
