@@ -11,13 +11,24 @@ import Astrolabe
 import RxSwift
 import RxCocoa
 
-open class GenericCollectionViewLayout<DecorationView: CollectionViewCell & DecorationViewPageable>: UICollectionViewFlowLayout {
+public protocol PreparedLayout {
+  var readyObservable: Observable<Void> { get }
+}
+
+open class GenericCollectionViewLayout<DecorationView: CollectionViewCell & DecorationViewPageable>: UICollectionViewFlowLayout, PreparedLayout {
 
   public typealias ViewModel = DecorationView.TitleCell.Data
+
+  public var ready: (() -> Void)?
+  private let readySubject = PublishSubject<Void>()
+  public var readyObservable: Observable<Void> { return readySubject }
 
   open override func prepare() {
     super.prepare()
     register(DecorationView.self, forDecorationViewOfKind: DecorationViewId)
+
+    ready?()
+    readySubject.onNext(())
   }
 
   public typealias PagerClosure = ()->[ViewModel]
@@ -237,4 +248,12 @@ open class GenericCollectionViewLayout<DecorationView: CollectionViewCell & Deco
     jumpSourceLayoutAttribute = nil
     hostPagerSource?.containerView?.isUserInteractionEnabled = true
   }
+}
+
+public extension Reactive where Base: PreparedLayout {
+
+  var ready: ControlEvent<Void> {
+    return ControlEvent(events: base.readyObservable)
+  }
+
 }

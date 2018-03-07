@@ -10,6 +10,7 @@ import UIKit
 import Astrolabe
 import Sundial
 import SnapKit
+import RxSwift
 
 class ViewController: UIViewController {
 
@@ -23,15 +24,27 @@ class ViewController: UIViewController {
   let controller7 = CustomViewsViewController()
 
   let collectionView = CollectionView<CollectionViewPagerSource>()
+  private let disposeBag = DisposeBag()
 
   override func viewDidLoad() {
     super.viewDidLoad()
 
     collectionView.source.hostViewController = self
     collectionView.source.pager = self
-    collectionView.collectionViewLayout = CollectionViewLayout(hostPagerSource: collectionView.source) { [weak self] in
+
+    let layout = CollectionViewLayout(hostPagerSource: collectionView.source) { [weak self] in
       return self?.titles ?? []
     }
+
+    layout.rx.ready.subscribe(onNext: {
+      print("Rx: layout is ready")
+    }).disposed(by: disposeBag)
+
+    layout.ready = {
+      print("Callback: layout is ready")
+    }
+
+    collectionView.collectionViewLayout = layout
 
     view.addSubview(collectionView)
     collectionView.snp.remakeConstraints {
