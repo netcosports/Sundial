@@ -55,14 +55,21 @@ open class DecorationViewCollectionViewLayout<TitleViewModel: ViewModelable, Mar
 
     size = .zero
 
-    for itemIndex in stride(from: 0, to: collectionView.numberOfItems(inSection: 0), by: 1) {
+    let equalWidth = (collectionView.frame.width - (sectionInset.left + sectionInset.right)
+      - CGFloat(itemsCount - 1) * minimumInteritemSpacing) / CGFloat(itemsCount)
+    var notFitted: [CGFloat] = []
+
+    for itemIndex in 0 ..< collectionView.numberOfItems(inSection: 0) {
       let indexPath = IndexPath(item: itemIndex, section: 0)
       var size = delegate.collectionView!(collectionView, layout: self, sizeForItemAt: indexPath)
 
       switch anchor {
       case .fillEqual:
-        size.width = (collectionView.frame.width - (sectionInset.left + sectionInset.right)
-          - CGFloat(itemsCount - 1) * minimumInteritemSpacing) / CGFloat(itemsCount)
+        size.width = equalWidth
+      case .contentOrFill:
+        if size.width > equalWidth {
+          notFitted.append(size.width)
+        }
       case let .equal(width):
         size.width = width
       default: break
@@ -84,6 +91,34 @@ open class DecorationViewCollectionViewLayout<TitleViewModel: ViewModelable, Mar
 
     if let last = cellFrames.last {
       size.width = last.maxX + sectionInset.right
+    }
+
+    if case .contentOrFill = anchor, size.width < collectionView.frame.width {
+      var lastFrame: CGRect?
+
+      let equalWidth = (collectionView.frame.width - (sectionInset.left + sectionInset.right)
+        - CGFloat(itemsCount - 1) * minimumInteritemSpacing - notFitted.reduce(0, +))
+        / CGFloat(itemsCount - notFitted.count)
+
+      cellFrames = cellFrames.map { frame -> CGRect in
+        var frame = frame
+
+        if frame.width < equalWidth {
+          frame.size.width = equalWidth
+        }
+
+        if let lastFrame = lastFrame {
+          frame.origin.x = lastFrame.maxX + minimumLineSpacing
+        } else {
+          frame.origin.x = sectionInset.left
+        }
+        lastFrame = frame
+        return frame
+      }
+
+      if let last = cellFrames.last {
+        size.width = last.maxX + sectionInset.right
+      }
     }
 
     size.height = collectionView.frame.height
@@ -235,7 +270,7 @@ extension DecorationViewCollectionViewLayout {
     }()
 
     switch anchor {
-    case .content, .equal:
+    case .content, .equal, .contentOrFill:
       adjustContentOffset(for: decorationAttributes,
                           collectionView: collectionView,
                           currentPage: currentPages, nextPage: nextPages)

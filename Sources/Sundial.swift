@@ -56,6 +56,7 @@ extension CountableClosedRange where Bound == Int {
 
 public enum Anchor {
   case content
+  case contentOrFill
   case centered
   case fillEqual
   case equal(size: CGFloat)
