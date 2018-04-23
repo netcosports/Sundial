@@ -246,12 +246,19 @@ class CollapsingHeaderHandler {
       .skip(1)
       .distinctUntilChanged()
       .filter { [weak self] _ in
+        guard let `self` = self else { return false }
         let scrollView = collapsingItem.scrollView
+
+        let isScrollingToTop = scrollView.responds(to: NSSelectorFromString("_isScrollingToTop"))
+          ? scrollView._isScrollingToTop
+          : false
+
         return scrollView.panGestureRecognizer.state != .possible
           || scrollView.isDecelerating
           || scrollView.isDragging
           || scrollView.isTracking
-          || self?.followOffsetChanges.value != false
+          || isScrollingToTop
+          || self.followOffsetChanges.value != false
       }
       .map { [unowned self] in
         return min(max(self.minHeaderHeight.value, -$0.y - self.headerInset.value), self.maxHeaderHeight.value)
