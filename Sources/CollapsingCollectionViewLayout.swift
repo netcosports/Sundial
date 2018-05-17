@@ -202,19 +202,32 @@ class CollapsingHeaderHandler {
 
     let contentSizeDriver = collapsingItem.scrollView.rx
       .observe(CGSize.self, #keyPath(UICollectionView.contentSize))
-      .asDriver(onErrorJustReturn: nil)
-      .filter { $0?.width != 0.0 && $0?.height != 0.0 }
-      .distinctUntilChanged { $0?.height == $1?.height }
+      .flatMap { size -> Observable<CGSize> in
+        guard let size = size else { return .empty() }
+        return .just(size)
+      }
+      .asDriver(onErrorJustReturn: .zero)
+      .filter { $0.width != 0.0 && $0.height != 0.0 }
+      .distinctUntilChanged { $0.height == $1.height }
 
-    Driver.combineLatest(contentSizeDriver, maxHeaderHeight.asDriver())
-      .drive(onNext: { [weak collapsingItem = self.collapsingItem, weak self] contentSize, maxHeight in
-      guard let contentSize = contentSize else { return }
+    let scrollViewHeightDriver = collapsingItem.scrollView.rx
+      .observe(CGRect.self, #keyPath(UICollectionView.bounds))
+      .flatMap { rect -> Observable<CGFloat> in
+        guard let rect = rect else { return .empty() }
+        return .just(rect.height)
+      }
+      .asDriver(onErrorJustReturn: 0)
+      .filter { $0 != 0 }
+      .distinctUntilChanged()
+
+    Driver.combineLatest(contentSizeDriver, scrollViewHeightDriver, maxHeaderHeight.asDriver())
+      .drive(onNext: { [weak collapsingItem = self.collapsingItem, weak self] contentSize, height, maxHeight in
       guard let sself = self else { return }
       guard let collapsingItem = collapsingItem else { return }
 
       let extraInset = collapsingItem.extraInset
       let topInset = maxHeight + sself.headerInset.value + extraInset.top
-      var bottomInset: CGFloat = collapsingItem.scrollView.frame.height - (contentSize.height + sself.minHeaderHeight.value + sself.headerInset.value + extraInset.bottom)
+      var bottomInset: CGFloat = height - (contentSize.height + sself.minHeaderHeight.value + sself.headerInset.value + extraInset.bottom)
       if bottomInset < 0.0  {
         bottomInset = extraInset.bottom
       }
