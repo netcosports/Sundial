@@ -18,7 +18,6 @@ open class DecorationViewCollectionViewLayout<TitleViewModel: ViewModelable, Mar
   public internal(set) var titles: [TitleViewModel] = []
 
   fileprivate var disposeBag: DisposeBag?
-  fileprivate var isScrolling = false
 
   fileprivate typealias TitleAttributes = TitleCollectionViewLayoutAttributes
   fileprivate typealias MarkerAttributes = MarkerDecorationAttributes<TitleViewModel, MarkerCell>
@@ -130,9 +129,6 @@ open class DecorationViewCollectionViewLayout<TitleViewModel: ViewModelable, Mar
         context.invalidateFlowLayoutAttributes = false
         context.invalidateFlowLayoutDelegateMetrics = false
         self?.invalidateLayout(with: context)
-      }).disposed(by: disposeBag)
-      collectionView.rx.didEndScrollingAnimation.asDriver().drive(onNext: { [weak self] _ in
-        self?.isScrolling = false
       }).disposed(by: disposeBag)
       self.disposeBag = disposeBag
     }
@@ -271,58 +267,23 @@ extension DecorationViewCollectionViewLayout {
 
     switch anchor {
     case .content, .equal, .contentOrFill:
-      adjustContentOffset(for: decorationAttributes,
-                          collectionView: collectionView,
-                          currentPage: currentPages, nextPage: nextPages)
+      adjustContentOffset(for: decorationAttributes, collectionView: collectionView)
     case .centered:
-      adjustCenteredContentOffset(for: decorationAttributes,
-                                  collectionView: collectionView)
+      adjustCenteredContentOffset(for: decorationAttributes, collectionView: collectionView)
     case .left(let offset):
-      adjustLeftContentOffset(for: decorationAttributes,
-                              collectionView: collectionView,
-                              offset: offset)
+      adjustLeftContentOffset(for: decorationAttributes, collectionView: collectionView, offset: offset)
     case .right(let offset):
-      adjustRightContentOffset(for: decorationAttributes,
-                              collectionView: collectionView,
-                              offset: offset)
+      adjustRightContentOffset(for: decorationAttributes, collectionView: collectionView, offset: offset)
     default: break
     }
 
     return decorationAttributes
   }
 
-  fileprivate func adjustContentOffset(for decorationAttributes: MarkerDecorationAttributes<TitleViewModel, MarkerCell>,
-                                       collectionView: UICollectionView,
-                                       currentPage: [TitleAttributes],
-                                       nextPage: [TitleAttributes]?) {
-
-    // NOTE: to avoid previous items attributes calculation
-    // we can set additional visible gap to previous item at
-    // half of current decoration view width
-    let gap = decorationAttributes.frame.width / 2.0
-
-    var point: CGPoint?
-    if (decorationAttributes.frame.minX - minimumInteritemSpacing) < collectionView.contentOffset.x && !isScrolling {
-      if currentPage[0].indexPath.item == 0 {
-        point = .zero
-      } else {
-        point = CGPoint(x: currentPage[0].frame.minX - minimumInteritemSpacing - gap, y: 0)
-      }
-    }
-
-    if (decorationAttributes.frame.maxX + minimumInteritemSpacing) > collectionView.contentOffset.x + collectionView.frame.width && !isScrolling,
-      let nextPage = nextPage {
-      if nextPage[0].indexPath.item == collectionView.numberOfItems(inSection: 0) - 1 {
-        point = CGPoint(x: collectionView.contentSize.width - collectionView.frame.width, y: 0)
-      } else {
-        point = CGPoint(x: nextPage[0].frame.maxX + minimumInteritemSpacing - collectionView.frame.width + gap, y: 0)
-      }
-    }
-
-    if let targetPoint = point, targetPoint.x != collectionView.contentOffset.x {
-      isScrolling = true
-      collectionView.setContentOffset(targetPoint, animated: true)
-    }
+  fileprivate func adjustContentOffset(for decorationAttributes: MarkerAttributes, collectionView: UICollectionView) {
+    var target = max(0, decorationAttributes.frame.midX - (collectionView.frame.width) * 0.5)
+    target = min(target, collectionView.contentSize.width - collectionView.frame.width)
+    collectionView.setContentOffset(CGPoint(x: target, y: 0), animated: false)
   }
 
   fileprivate func adjustCenteredContentOffset(for decorationAttributes: MarkerAttributes,
