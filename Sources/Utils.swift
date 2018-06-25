@@ -10,7 +10,7 @@ import UIKit
 
 extension UIColor {
 
-  func blended(with color: UIColor, progress: CGFloat) -> UIColor {
+  public func blended(with color: UIColor, progress: CGFloat) -> UIColor {
     var red: CGFloat = 0
     var green: CGFloat = 0
     var blue: CGFloat = 0
