@@ -283,6 +283,7 @@ extension DecorationViewCollectionViewLayout {
   fileprivate func adjustContentOffset(for decorationAttributes: MarkerAttributes, collectionView: UICollectionView) {
     var target = max(0, decorationAttributes.frame.midX - (collectionView.frame.width) * 0.5)
     target = min(target, collectionView.contentSize.width - collectionView.frame.width)
+    guard target > 0 else { return }
     collectionView.setContentOffset(CGPoint(x: target, y: 0), animated: false)
   }
 
