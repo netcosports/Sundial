@@ -13,7 +13,7 @@ import Astrolabe
 open class DecorationViewCollectionViewLayout<TitleViewModel: ViewModelable, MarkerCell: CollectionViewCell>: UICollectionViewFlowLayout {
 
   public let progressVariable = Variable<Progress>(.init(pages: 0...0, progress: 0))
-  public internal(set) var anchor: Anchor = .content
+  public internal(set) var anchor: Anchor = .content(.left)
   public internal(set) var markerHeight: CGFloat = 15
   public internal(set) var titles: [TitleViewModel] = []
 
@@ -56,7 +56,6 @@ open class DecorationViewCollectionViewLayout<TitleViewModel: ViewModelable, Mar
 
     let equalWidth = (collectionView.frame.width - (sectionInset.left + sectionInset.right)
       - CGFloat(itemsCount - 1) * minimumInteritemSpacing) / CGFloat(itemsCount)
-    var notFitted: [CGFloat] = []
 
     for itemIndex in 0 ..< collectionView.numberOfItems(inSection: 0) {
       let indexPath = IndexPath(item: itemIndex, section: 0)
@@ -65,10 +64,6 @@ open class DecorationViewCollectionViewLayout<TitleViewModel: ViewModelable, Mar
       switch anchor {
       case .fillEqual:
         size.width = equalWidth
-      case .contentOrFill:
-        if size.width > equalWidth {
-          notFitted.append(size.width)
-        }
       case let .equal(width):
         size.width = width
       default: break
@@ -92,31 +87,54 @@ open class DecorationViewCollectionViewLayout<TitleViewModel: ViewModelable, Mar
       size.width = last.maxX + sectionInset.right
     }
 
-    if case .contentOrFill = anchor, size.width < collectionView.frame.width {
-      var lastFrame: CGRect?
+    if case let .content(alignment) = anchor, size.width < collectionView.frame.width {
+      switch alignment {
+      case .left:
+        size.width = collectionView.frame.width
+      case .right:
+        let offset = collectionView.frame.width - size.width
 
-      let equalWidth = (collectionView.frame.width - (sectionInset.left + sectionInset.right)
-        - CGFloat(itemsCount - 1) * minimumInteritemSpacing - notFitted.reduce(0, +))
-        / CGFloat(itemsCount - notFitted.count)
-
-      cellFrames = cellFrames.map { frame -> CGRect in
-        var frame = frame
-
-        if frame.width < equalWidth {
-          frame.size.width = equalWidth
+        cellFrames = cellFrames.map { frame -> CGRect in
+          var frame = frame
+          frame.origin.x += offset
+          return frame
         }
 
-        if let lastFrame = lastFrame {
-          frame.origin.x = lastFrame.maxX + minimumLineSpacing
-        } else {
-          frame.origin.x = sectionInset.left
-        }
-        lastFrame = frame
-        return frame
-      }
+        size.width = collectionView.frame.width
+      case .center:
+        let offset = (collectionView.frame.width - size.width) / 2
 
-      if let last = cellFrames.last {
-        size.width = last.maxX + sectionInset.right
+        cellFrames = cellFrames.map { frame -> CGRect in
+          var frame = frame
+          frame.origin.x += offset
+          return frame
+        }
+
+        size.width = collectionView.frame.width
+      case .fill:
+        let diff = collectionView.frame.width - size.width
+        let proportion = diff / cellFrames.map { 1 / $0.width }.reduce(0, +)
+
+        var lastFrame: CGRect?
+
+        cellFrames = cellFrames.map { frame -> CGRect in
+          var frame = frame
+
+          frame.size.width += proportion / frame.width
+
+          if let lastFrame = lastFrame {
+            frame.origin.x = lastFrame.maxX + minimumLineSpacing
+          } else {
+            frame.origin.x = sectionInset.left
+          }
+
+          lastFrame = frame
+          return frame
+        }
+
+        if let last = cellFrames.last {
+          size.width = last.maxX + sectionInset.right
+        }
       }
     }
 
@@ -135,7 +153,7 @@ open class DecorationViewCollectionViewLayout<TitleViewModel: ViewModelable, Mar
   }
 
   override open func layoutAttributesForElements(in rect: CGRect) -> [UICollectionViewLayoutAttributes]? {
-    let attributes: [TitleAttributes] = cellFrames.enumerated().filter { $0.element.intersects(rect) }.map {
+    let titleAttributes: [TitleAttributes] = cellFrames.enumerated().filter { $0.element.intersects(rect) }.map {
       let indexPath = IndexPath(item: $0.offset, section: 0)
       let attributes = TitleAttributes(forCellWith: indexPath)
       attributes.frame = $0.element
@@ -150,7 +168,7 @@ open class DecorationViewCollectionViewLayout<TitleViewModel: ViewModelable, Mar
     let currentRange = progress.pages
     let nextRange = progress.pages.next
 
-    attributes.forEach { itemAttributes in
+    titleAttributes.forEach { itemAttributes in
       let index = itemAttributes.indexPath.item
       if currentRange ~= index && nextRange ~= index {
         itemAttributes.fade = 1.0
@@ -168,7 +186,7 @@ open class DecorationViewCollectionViewLayout<TitleViewModel: ViewModelable, Mar
     }
 
     if currentPages.isEmpty {
-      currentPages.append(contentsOf: currentRange.flatMap { index in
+      currentPages.append(contentsOf: currentRange.compactMap { index in
         guard cellFrames.indices.contains(index) else { return nil }
         let indexPath = IndexPath(item: index, section: 0)
         let attributes = TitleAttributes(forCellWith: indexPath)
@@ -178,7 +196,7 @@ open class DecorationViewCollectionViewLayout<TitleViewModel: ViewModelable, Mar
     }
 
     if nextPages.isEmpty {
-      nextPages.append(contentsOf: nextRange.flatMap { index in
+      nextPages.append(contentsOf: nextRange.compactMap { index in
         guard cellFrames.indices.contains(index) else { return nil }
         let indexPath = IndexPath(item: index, section: 0)
         let attributes = TitleAttributes(forCellWith: indexPath)
@@ -187,10 +205,13 @@ open class DecorationViewCollectionViewLayout<TitleViewModel: ViewModelable, Mar
       })
     }
 
-    let markerAttributes = decorationAttributes(for: currentPages, nextPages: nextPages.count > 0 ? nextPages : nil)
-    let results: [UICollectionViewLayoutAttributes] = [markerAttributes].flatMap { $0 } + attributes
+    var attributes = titleAttributes as [UICollectionViewLayoutAttributes]
 
-    return results
+    if let markerAttributes = decorationAttributes(for: currentPages, nextPages: !nextPages.isEmpty ? nextPages : nil) {
+      attributes.append(markerAttributes)
+    }
+
+    return attributes
   }
 
   override open func layoutAttributesForItem(at indexPath: IndexPath) -> UICollectionViewLayoutAttributes? {
@@ -266,7 +287,7 @@ extension DecorationViewCollectionViewLayout {
     }()
 
     switch anchor {
-    case .content, .equal, .contentOrFill:
+    case .content, .equal:
       adjustContentOffset(for: decorationAttributes, collectionView: collectionView)
     case .centered:
       adjustCenteredContentOffset(for: decorationAttributes, collectionView: collectionView)

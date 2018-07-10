@@ -54,9 +54,12 @@ extension CountableClosedRange where Bound == Int {
   }
 }
 
+public enum Alignment {
+  case left, right, center, fill
+}
+
 public enum Anchor {
-  case content
-  case contentOrFill
+  case content(Alignment)
   case centered
   case fillEqual
   case equal(size: CGFloat)
