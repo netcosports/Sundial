@@ -54,12 +54,12 @@ extension CountableClosedRange where Bound == Int {
   }
 }
 
-public enum Alignment {
-  case left, right, center, fill
+public enum Distribution {
+  case left, right, center, proportional, inverseProportional, equalSpacing
 }
 
 public enum Anchor {
-  case content(Alignment)
+  case content(Distribution)
   case centered
   case fillEqual
   case equal(size: CGFloat)

@@ -12,7 +12,7 @@ import Astrolabe
 
 open class DecorationViewCollectionViewLayout<TitleViewModel: ViewModelable, MarkerCell: CollectionViewCell>: UICollectionViewFlowLayout {
 
-  public let progressVariable = Variable<Progress>(.init(pages: 0...0, progress: 0))
+  public let progressVariable = Variable<Progress>(.init(pages: 0 ... 0, progress: 0))
   public internal(set) var anchor: Anchor = .content(.left)
   public internal(set) var markerHeight: CGFloat = 15
   public internal(set) var titles: [TitleViewModel] = []
@@ -87,8 +87,8 @@ open class DecorationViewCollectionViewLayout<TitleViewModel: ViewModelable, Mar
       size.width = last.maxX + sectionInset.right
     }
 
-    if case let .content(alignment) = anchor, size.width < collectionView.frame.width {
-      switch alignment {
+    if case let .content(distribution) = anchor, size.width < collectionView.frame.width {
+      switch distribution {
       case .left:
         size.width = collectionView.frame.width
       case .right:
@@ -111,16 +111,22 @@ open class DecorationViewCollectionViewLayout<TitleViewModel: ViewModelable, Mar
         }
 
         size.width = collectionView.frame.width
-      case .fill:
+      case .proportional, .inverseProportional:
+
+        func inverseIfNeeded(_ value: CGFloat) -> CGFloat {
+          guard distribution == .inverseProportional else { return value }
+          return 1 / value
+        }
+
         let diff = collectionView.frame.width - size.width
-        let proportion = diff / cellFrames.map { 1 / $0.width }.reduce(0, +)
+        let proportion = diff / cellFrames.map { inverseIfNeeded($0.width) }.reduce(0, +)
 
         var lastFrame: CGRect?
 
         cellFrames = cellFrames.map { frame -> CGRect in
           var frame = frame
 
-          frame.size.width += proportion / frame.width
+          frame.size.width += proportion * inverseIfNeeded(frame.width)
 
           if let lastFrame = lastFrame {
             frame.origin.x = lastFrame.maxX + minimumLineSpacing
@@ -134,6 +140,54 @@ open class DecorationViewCollectionViewLayout<TitleViewModel: ViewModelable, Mar
 
         if let last = cellFrames.last {
           size.width = last.maxX + sectionInset.right
+        }
+      case .equalSpacing:
+        var availableSpace = collectionView.frame.width - size.width + sectionInset.left + sectionInset.right
+          + (CGFloat(cellFrames.count) - 1) * minimumLineSpacing
+        var count = CGFloat(cellFrames.count) + 1
+        var spacing = availableSpace / count
+
+        let leftInset, rightInset: CGFloat
+
+        if sectionInset.left > spacing {
+          leftInset = sectionInset.left
+
+          availableSpace -= leftInset
+          count -= 1
+          spacing = availableSpace / count
+        } else {
+          leftInset = spacing
+        }
+
+        if sectionInset.right > spacing {
+          rightInset = sectionInset.right
+
+          availableSpace -= rightInset
+          count -= 1
+          spacing = availableSpace / count
+        } else {
+          rightInset = spacing
+        }
+
+        guard minimumLineSpacing <= spacing else { break }
+
+        var lastFrame: CGRect?
+
+        cellFrames = cellFrames.map { frame -> CGRect in
+          var frame = frame
+
+          if let lastFrame = lastFrame {
+            frame.origin.x = lastFrame.maxX + spacing
+          } else {
+            frame.origin.x = leftInset
+          }
+
+          lastFrame = frame
+          return frame
+        }
+
+        if let last = cellFrames.last {
+          size.width = last.maxX + rightInset
         }
       }
     }
@@ -247,7 +301,8 @@ extension DecorationViewCollectionViewLayout {
     guard let collectionView = collectionView, currentPages.count > 0 else { return nil }
 
     let progress = progressVariable.value
-    let decorationAttributes = MarkerAttributes(forDecorationViewOfKind: MarkerDecorationViewId, with: IndexPath(item: 0, section: 0))
+    let decorationAttributes = MarkerAttributes(forDecorationViewOfKind: MarkerDecorationViewId,
+                                                with: IndexPath(item: 0, section: 0))
 
     decorationAttributes.zIndex = -1
     decorationAttributes.apply(currentTitle: titles[safe: currentPages[0].indexPath.item],
@@ -321,7 +376,7 @@ extension DecorationViewCollectionViewLayout {
   }
 
   fileprivate func adjustRightContentOffset(for decorationAttributes: MarkerAttributes,
-                                           collectionView: UICollectionView, offset: CGFloat) {
+                                            collectionView: UICollectionView, offset: CGFloat) {
     let target = CGPoint(x: decorationAttributes.frame.maxX + offset - collectionView.frame.width, y: 0)
     collectionView.setContentOffset(target, animated: false)
   }
