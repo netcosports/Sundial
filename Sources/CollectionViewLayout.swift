@@ -142,6 +142,12 @@ open class GenericCollectionViewLayout<DecorationView: CollectionViewCell & Deco
       self.select(item: item, jumpingPolicy: settings.jumpingPolicy)
     }
     decorationAttributes.frame = decorationFrame
+
+    if invalidateTabFrames {
+      decorationAttributes.invalidateTabFrames = invalidateTabFrames
+      decorationAttributes.newCollectionViewWidth = newCollectionViewWidth
+    }
+
     return decorationAttributes
   }
 
@@ -248,6 +254,16 @@ open class GenericCollectionViewLayout<DecorationView: CollectionViewCell & Deco
     jumpSourceLayoutAttribute = nil
     hostPagerSource?.containerView?.isUserInteractionEnabled = true
   }
+
+  public var invalidateTabFrames = false
+  public var newCollectionViewWidth: CGFloat?
+
+  public var target: CGPoint?
+
+  open override func targetContentOffset(forProposedContentOffset proposedContentOffset: CGPoint) -> CGPoint {
+    return target ?? proposedContentOffset
+  }
+
 }
 
 public extension Reactive where Base: PreparedLayout {

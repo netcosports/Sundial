@@ -25,7 +25,10 @@ public protocol Attributable: class {
   var titles: [TitleViewModel] { get set }
   var selectionClosure: ((Int) -> Void)?  { get set }
   var settings: Settings?  { get set }
-  weak var hostPagerSource: CollectionViewSource?  { get set }
+  var hostPagerSource: CollectionViewSource?  { get set }
+  var invalidateTabFrames: Bool { get set }
+  var newCollectionViewWidth: CGFloat? { get set }
+
 }
 
 public let DecorationViewId = "DecorationView"

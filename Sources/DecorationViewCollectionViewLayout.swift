@@ -12,6 +12,10 @@ import Astrolabe
 
 open class DecorationViewCollectionViewLayout<TitleViewModel: ViewModelable, MarkerCell: CollectionViewCell>: UICollectionViewFlowLayout {
 
+  open class InvalidationContext: UICollectionViewFlowLayoutInvalidationContext {
+    public var newCollectionViewWidth: CGFloat?
+  }
+
   public let progressVariable = Variable<Progress>(.init(pages: 0 ... 0, progress: 0))
   public internal(set) var anchor: Anchor = .content(.left)
   public internal(set) var markerHeight: CGFloat = 15
@@ -26,6 +30,7 @@ open class DecorationViewCollectionViewLayout<TitleViewModel: ViewModelable, Mar
   private var size = CGSize.zero
 
   private var setupFrames = true
+  private var newCollectionViewWidth: CGFloat?
 
   required override public init() {
     super.init()
@@ -54,7 +59,8 @@ open class DecorationViewCollectionViewLayout<TitleViewModel: ViewModelable, Mar
 
     size = .zero
 
-    let equalWidth = (collectionView.frame.width - (sectionInset.left + sectionInset.right)
+    let collectionViewWidth = newCollectionViewWidth ?? collectionView.frame.width
+    let equalWidth = (collectionViewWidth - (sectionInset.left + sectionInset.right)
       - CGFloat(itemsCount - 1) * minimumInteritemSpacing) / CGFloat(itemsCount)
 
     for itemIndex in 0 ..< collectionView.numberOfItems(inSection: 0) {
@@ -87,12 +93,12 @@ open class DecorationViewCollectionViewLayout<TitleViewModel: ViewModelable, Mar
       size.width = last.maxX + sectionInset.right
     }
 
-    if case let .content(distribution) = anchor, size.width < collectionView.frame.width {
+    if case let .content(distribution) = anchor, size.width < collectionViewWidth {
       switch distribution {
       case .left:
-        size.width = collectionView.frame.width
+        size.width = collectionViewWidth
       case .right:
-        let offset = collectionView.frame.width - size.width
+        let offset = collectionViewWidth - size.width
 
         cellFrames = cellFrames.map { frame -> CGRect in
           var frame = frame
@@ -100,9 +106,9 @@ open class DecorationViewCollectionViewLayout<TitleViewModel: ViewModelable, Mar
           return frame
         }
 
-        size.width = collectionView.frame.width
+        size.width = collectionViewWidth
       case .center:
-        let offset = (collectionView.frame.width - size.width) / 2
+        let offset = (collectionViewWidth - size.width) / 2
 
         cellFrames = cellFrames.map { frame -> CGRect in
           var frame = frame
@@ -110,7 +116,7 @@ open class DecorationViewCollectionViewLayout<TitleViewModel: ViewModelable, Mar
           return frame
         }
 
-        size.width = collectionView.frame.width
+        size.width = collectionViewWidth
       case .proportional, .inverseProportional:
 
         func inverseIfNeeded(_ value: CGFloat) -> CGFloat {
@@ -118,7 +124,7 @@ open class DecorationViewCollectionViewLayout<TitleViewModel: ViewModelable, Mar
           return 1 / value
         }
 
-        let diff = collectionView.frame.width - size.width
+        let diff = collectionViewWidth - size.width
         let proportion = diff / cellFrames.map { inverseIfNeeded($0.width) }.reduce(0, +)
 
         var lastFrame: CGRect?
@@ -142,7 +148,7 @@ open class DecorationViewCollectionViewLayout<TitleViewModel: ViewModelable, Mar
           size.width = last.maxX + sectionInset.right
         }
       case .equalSpacing:
-        var availableSpace = collectionView.frame.width - size.width + sectionInset.left + sectionInset.right
+        var availableSpace = collectionViewWidth - size.width + sectionInset.left + sectionInset.right
           + (CGFloat(cellFrames.count) - 1) * minimumLineSpacing
         var count = CGFloat(cellFrames.count) + 1
         var spacing = availableSpace / count
@@ -286,8 +292,9 @@ open class DecorationViewCollectionViewLayout<TitleViewModel: ViewModelable, Mar
   override open func invalidateLayout(with context: UICollectionViewLayoutInvalidationContext) {
     super.invalidateLayout(with: context)
 
-    if let context = context as? UICollectionViewFlowLayoutInvalidationContext {
+    if let context = context as? InvalidationContext {
       setupFrames = context.invalidateFlowLayoutDelegateMetrics
+      newCollectionViewWidth = context.newCollectionViewWidth
     }
   }
 
