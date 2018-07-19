@@ -13,12 +13,12 @@ import RxCocoa
 open class GenericCollapsingCollectionViewLayout<DecorationView: CollectionViewCell>: GenericCollectionViewLayout<DecorationView>
 where DecorationView: DecorationViewPageable, DecorationView.TitleCell.Data: Indicatorable {
 
-  public let minHeaderHeight = Variable<CGFloat>(0)
-  public let maxHeaderHeight = Variable<CGFloat>(240)
-  public let headerInset = Variable<CGFloat>(0)
-  public let headerHeight = Variable<CGFloat>(120)
+  public let minHeaderHeight = BehaviorRelay<CGFloat>(value: 0)
+  public let maxHeaderHeight = BehaviorRelay<CGFloat>(value: 240)
+  public let headerInset = BehaviorRelay<CGFloat>(value: 0)
+  public let headerHeight = BehaviorRelay<CGFloat>(value: 120)
   public var expanded: Observable<Bool> { return expandedSubject.asObservable() }
-  public let followOffsetChanges = Variable<Bool>(false)
+  public let followOffsetChanges = BehaviorRelay<Bool>(value: false)
 
   open class var headerZIndex: Int { return 1024 }
 
@@ -29,7 +29,7 @@ where DecorationView: DecorationViewPageable, DecorationView.TitleCell.Data: Ind
 
   public init(items: [CollapsingItem], hostPagerSource: Source, settings: Settings? = nil, pager: PagerClosure?) {
     super.init(hostPagerSource: hostPagerSource, settings: settings, pager: pager)
-    self.handlers = items.flatMap { [weak self] item in
+    self.handlers = items.compactMap { [weak self] item in
       return self?.handler(for: item)
     }
 
@@ -48,7 +48,7 @@ where DecorationView: DecorationViewPageable, DecorationView.TitleCell.Data: Ind
       Double($0) == Double($1)
     }.distinctUntilChanged().bind(to: expandedSubject).disposed(by: disposeBag)
 
-    headerInset.value = self.settings.stripHeight
+    headerInset.accept(self.settings.stripHeight)
   }
 
   public required init?(coder aDecoder: NSCoder) {
@@ -103,25 +103,25 @@ where DecorationView: DecorationViewPageable, DecorationView.TitleCell.Data: Ind
     let point = CGPoint(x: 0.0, y: -(maxHeight + settings.stripHeight))
     connectedItem.scrollView.setContentOffset(point, animated: true)
 
-    followOffsetChanges.value = true
+    followOffsetChanges.accept(true)
     if self.maxHeaderHeight.value < maxHeight {
-      maxHeaderHeight.value = maxHeight
+      maxHeaderHeight.accept(maxHeight)
     }
 
     let updateMaxHeightDisposeBag = DisposeBag()
     connectedItem.scrollView.rx.didEndScrollingAnimation.asDriver().drive(onNext: { [weak self] in
       guard let sself = self else { return }
       if sself.maxHeaderHeight.value > maxHeight {
-        sself.maxHeaderHeight.value = maxHeight
+        sself.maxHeaderHeight.accept(maxHeight)
       }
       sself.updateMaxHeightDisposeBag = nil
-      sself.followOffsetChanges.value = false
+      sself.followOffsetChanges.accept(false)
     }).disposed(by: updateMaxHeightDisposeBag)
     self.updateMaxHeightDisposeBag = updateMaxHeightDisposeBag
   }
 
   open func append(collapsingItems: [CollapsingItem]) {
-    let handlers: [CollapsingHeaderHandler] = collapsingItems.flatMap { item in
+    let handlers: [CollapsingHeaderHandler] = collapsingItems.compactMap { item in
       guard !self.handlers.contains(where: { $0.collapsingItem === item }) else {
         return nil
       }
@@ -163,11 +163,11 @@ where DecorationView: DecorationViewPageable, DecorationView.TitleCell.Data: Ind
 
 class CollapsingHeaderHandler {
 
-  let headerHeight: Variable<CGFloat>
-  let minHeaderHeight: Variable<CGFloat>
-  let maxHeaderHeight: Variable<CGFloat>
-  let headerInset: Variable<CGFloat>
-  let followOffsetChanges: Variable<Bool>
+  let headerHeight: BehaviorRelay<CGFloat>
+  let minHeaderHeight: BehaviorRelay<CGFloat>
+  let maxHeaderHeight: BehaviorRelay<CGFloat>
+  let headerInset: BehaviorRelay<CGFloat>
+  let followOffsetChanges: BehaviorRelay<Bool>
 
   fileprivate weak var collapsingItem: CollapsingItem?
 
@@ -183,11 +183,11 @@ class CollapsingHeaderHandler {
   private let disposeBag = DisposeBag()
 
   init(with collapsingItem: CollapsingItem,
-       min: Variable<CGFloat>,
-       max: Variable<CGFloat>,
-       headerInset: Variable<CGFloat>,
-       headerHeight: Variable<CGFloat>,
-       followOffsetChanges: Variable<Bool>) {
+       min: BehaviorRelay<CGFloat>,
+       max: BehaviorRelay<CGFloat>,
+       headerInset: BehaviorRelay<CGFloat>,
+       headerHeight: BehaviorRelay<CGFloat>,
+       followOffsetChanges: BehaviorRelay<Bool>) {
 
     self.collapsingItem = collapsingItem
     self.minHeaderHeight = min

@@ -71,7 +71,7 @@ open class GenericCollectionViewLayout<DecorationView: CollectionViewCell & Deco
 
   open override func layoutAttributesForElements(in rect: CGRect) -> [UICollectionViewLayoutAttributes]? {
     let oldAttributes = super.layoutAttributesForElements(in: rect)
-    guard var attributes = oldAttributes?.flatMap({ $0.copy() as? UICollectionViewLayoutAttributes }) else {
+    guard var attributes = oldAttributes?.compactMap({ $0.copy() as? UICollectionViewLayoutAttributes }) else {
       return oldAttributes
     }
 

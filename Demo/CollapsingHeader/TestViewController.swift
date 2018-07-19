@@ -8,6 +8,7 @@
 
 import UIKit
 import RxSwift
+import RxCocoa
 import Astrolabe
 import Sundial
 
@@ -45,7 +46,7 @@ class TestLoaderViewController: UIViewController, Accessor, CollapsingItem, Load
   typealias Cell = CollectionCell<TestCell>
   let containerView = CollectionView<LoaderDecoratorSource<CollectionViewSource>>()
 
-  let visible = Variable<Bool>(false)
+  let visible = BehaviorRelay<Bool>(value: false)
   var scrollView: UIScrollView {
     return containerView
   }
@@ -84,13 +85,13 @@ class TestLoaderViewController: UIViewController, Accessor, CollapsingItem, Load
 
   override func viewWillAppear(_ animated: Bool) {
     super.viewWillAppear(animated)
-    visible.value = true
+    visible.accept(true)
     source.appear()
   }
 
   override func viewDidDisappear(_ animated: Bool) {
     super.viewDidDisappear(animated)
-    visible.value = false
+    visible.accept(false)
     source.disappear()
   }
 }
@@ -100,7 +101,7 @@ class TestViewController: UIViewController, Accessor, CollapsingItem {
   typealias Cell = CollectionCell<TestCell>
   let containerView = CollectionView<CollectionViewSource>()
 
-  let visible = Variable<Bool>(false)
+  let visible = BehaviorRelay<Bool>(value: false)
   var scrollView: UIScrollView {
     return containerView
   }
@@ -130,12 +131,12 @@ class TestViewController: UIViewController, Accessor, CollapsingItem {
 
   override func viewWillAppear(_ animated: Bool) {
     super.viewWillAppear(animated)
-    visible.value = true
+    visible.accept(true)
   }
 
   override func viewDidDisappear(_ animated: Bool) {
     super.viewDidDisappear(animated)
-    visible.value = false
+    visible.accept(false)
   }
 }
 
@@ -147,7 +148,7 @@ class TestPagerViewControllerInner: UIViewController {
   let controller4 = TestViewController(.blue, numberOfItems: 0)
   let controller5 = TestViewController(.black)
 
-  let offsetVariable = Variable<CGFloat>(0.0)
+  let offsetBehaviorRelay = BehaviorRelay<CGFloat>(value: 0.0)
   let collectionView = CollectionView<CollectionViewPagerSource>()
 
   typealias Layout = CollectionViewLayout
@@ -165,7 +166,7 @@ class TestPagerViewControllerInner: UIViewController {
                             bottomStripSpacing: 0.0,
                             backgroundColor: .red,
                             inset: .zero,
-                            alignment: .topOffset(variable: offsetVariable))
+                            alignment: .topOffset(behaviorRelay: offsetBehaviorRelay))
 
     let layout = Layout(hostPagerSource: collectionView.source, settings: settings) { [weak self] in
       return self?.titles ?? []
