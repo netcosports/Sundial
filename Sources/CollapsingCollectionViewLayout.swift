@@ -238,7 +238,10 @@ class CollapsingHeaderHandler {
 
       collapsingItem.scrollView.contentInset = UIEdgeInsets(top: topInset, left: 0, bottom: bottomInset, right: 0)
       collapsingItem.scrollView.scrollIndicatorInsets = UIEdgeInsets(top: topInset, left: 0, bottom: 0, right: 0)
-      collapsingItem.scrollView.contentOffset = contentOffset
+      // FIXME: we need to avoid unnecessary content offset change when content size changed
+      if collapsingItem.scrollView.contentOffset.y <= 0.0 {
+        collapsingItem.scrollView.contentOffset = contentOffset
+      }
     }).disposed(by: disposeBag)
   }
 
