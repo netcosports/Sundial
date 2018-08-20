@@ -48,6 +48,7 @@ open class TitleCollectionViewCell: CollectionViewCell, Reusable {
   public struct TitleViewModel: Titleable, Indicatorable {
 
     public let title: String
+    public let id: String
     public let textColor: UIColor
     public let fadeTextColor: UIColor
     public let indicatorColor: UIColor
@@ -56,14 +57,16 @@ open class TitleCollectionViewCell: CollectionViewCell, Reusable {
     public let padding: UIEdgeInsets
 
     public init(title: String,
-         textColor: UIColor = .black,
-         fadeTextColor: UIColor = .green,
-         indicatorColor: UIColor = .red,
-         textFont: UIFont = UIFont.systemFont(ofSize: 15),
-         fadeTextFont: UIFont? = nil,
-         padding: UIEdgeInsets = .zero) {
+                id: String? = nil,
+                textColor: UIColor = .black,
+                fadeTextColor: UIColor = .green,
+                indicatorColor: UIColor = .red,
+                textFont: UIFont = UIFont.systemFont(ofSize: 15),
+                fadeTextFont: UIFont? = nil,
+                padding: UIEdgeInsets = .zero) {
 
       self.title = title
+      self.id = id ?? title
       self.textColor = textColor
       self.fadeTextColor = fadeTextColor
       self.indicatorColor = indicatorColor

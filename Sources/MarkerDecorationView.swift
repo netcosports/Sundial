@@ -9,11 +9,6 @@
 import UIKit
 import Astrolabe
 
-public protocol Markerable {
-  associatedtype ViewModel: ViewModelable
-  func apply(currentTitle: ViewModel?, nextTitle: ViewModel?, progress: CGFloat)
-}
-
 open class MarkerDecorationAttributes<TitleViewModel: ViewModelable, MarkerCell: CollectionViewCell>: UICollectionViewLayoutAttributes, Markerable {
 
   public typealias ViewModel = TitleViewModel

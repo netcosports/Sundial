@@ -19,9 +19,14 @@ class ViewControllerInner: UIViewController {
   let controller5 = UIViewController()
 
   let anchor: Anchor
+  let count: Int
+  let margin: CGFloat
 
-  init(_ anchor: Anchor) {
+  init(_ anchor: Anchor, count: Int = 5, margin: CGFloat = 80) {
     self.anchor = anchor
+    self.count = count
+    self.margin = margin
+    guard (1 ... 5).contains(count) else { fatalError() }
     super.init(nibName: nil, bundle: nil)
   }
 
@@ -31,19 +36,28 @@ class ViewControllerInner: UIViewController {
 
   let collectionView = CollectionView<CollectionViewPagerSource>()
 
-  typealias Layout = CollectionViewLayout<CollectionViewPagerSource, TitleCollectionViewCell, MarkerDecorationView<TitleCollectionViewCell.TitleViewModel>>
+  typealias Layout = GenericCollectionViewLayout<CustomDecorationView<TitleCollectionViewCell, MarkerDecorationView<TitleCollectionViewCell.TitleViewModel>>>
 
   override func viewDidLoad() {
     super.viewDidLoad()
 
     collectionView.source.hostViewController = self
     collectionView.source.pager = self
+
+    let margin: CGFloat
+    switch anchor {
+    case .fillEqual:
+      margin = 0.0
+    default:
+      margin = self.margin
+    }
+
     let settings = Settings(stripHeight: 80.0,
                             markerHeight: 5.5,
-                            itemMargin: 80.0,
+                            itemMargin: margin,
                             bottomStripSpacing: 0.0,
                             anchor: anchor,
-                            inset: UIEdgeInsets(top: 0, left: 80, bottom: 0, right: 80))
+                            inset: UIEdgeInsets(top: 0, left: margin, bottom: 0, right: margin))
 
     collectionView.collectionViewLayout = Layout(hostPagerSource: collectionView.source, settings: settings) { [weak self] in
       return self?.titles ?? []
@@ -67,25 +81,25 @@ class ViewControllerInner: UIViewController {
 extension ViewControllerInner: CollectionViewPager {
 
   var pages: [Page] {
-    return [
+    return Array([
       Page(controller: controller1, id: "Title 1"),
       Page(controller: controller2, id: "Title 2"),
       Page(controller: controller3, id: "Title 3"),
       Page(controller: controller4, id: "Title 4"),
       Page(controller: controller5, id: "Title 5")
-    ]
+    ].prefix(count))
   }
 }
 
 extension ViewControllerInner {
 
   var titles: [TitleCollectionViewCell.TitleViewModel] {
-    return [
-      TitleCollectionViewCell.TitleViewModel(title: "Blue", indicatorColor: .blue),
-      TitleCollectionViewCell.TitleViewModel(title: "Black", indicatorColor: .black),
+    return Array([
+      TitleCollectionViewCell.TitleViewModel(title: "Mid Blue", indicatorColor: .blue),
+      TitleCollectionViewCell.TitleViewModel(title: "Super Long Black", indicatorColor: .black),
       TitleCollectionViewCell.TitleViewModel(title: "Green", indicatorColor: .green),
       TitleCollectionViewCell.TitleViewModel(title: "Gray", indicatorColor: .gray),
       TitleCollectionViewCell.TitleViewModel(title: "Orange", indicatorColor: .orange)
-    ]
+    ].prefix(count))
   }
 }

@@ -11,23 +11,26 @@ import Astrolabe
 import RxSwift
 import RxCocoa
 
-public let DecorationViewId = "DecorationView"
+open class GenericDecorationView<T: CollectionViewCell, M: CollectionViewCell, A: UICollectionViewLayoutAttributes & Attributable>:
+  CollectionViewCell, DecorationViewPageable where T: Reusable, T.Data == A.TitleViewModel, T.Data: Indicatorable {
 
-class DecorationView<TitleCell: CollectionViewCell, MarkerCell: CollectionViewCell>: CollectionViewCell
-      where TitleCell: Reusable, TitleCell.Data: ViewModelable {
+  public typealias TitleCell = T
+  public typealias MarkerCell = M
+  public typealias Attributes = A
 
-  typealias Item                  = CollectionCell<TitleCell>
-
-  typealias ViewModel             = TitleCell.Data
-  typealias DecorationAttributes  = DecorationViewAttributes<ViewModel>
-  typealias DecorationLayout      = DecorationViewCollectionViewLayout<ViewModel, MarkerCell>
+  typealias Item                         = CollectionCell<TitleCell>
+  public typealias ViewModel             = TitleCell.Data
+  public typealias DecorationLayout      = DecorationViewCollectionViewLayout<ViewModel, MarkerCell>
 
   fileprivate let disposeBag = DisposeBag()
-  fileprivate let decorationContainerView = CollectionView<CollectionViewSource>()
-  fileprivate var layout: DecorationLayout?
+  open let decorationContainerView = CollectionView<CollectionViewSource>()
+
+  public private(set) var layout: DecorationLayout?
+
+  open class var layoutType: DecorationLayout.Type { return DecorationLayout.self }
 
   fileprivate weak var hostPagerSource: CollectionViewSource?
-  fileprivate var currentLayoutAttributes: DecorationAttributes? {
+  fileprivate var currentLayoutAttributes: Attributes? {
     didSet {
       if let settings = currentLayoutAttributes?.settings, let layout = layout {
         layout.minimumLineSpacing = settings.itemMargin
@@ -39,7 +42,9 @@ class DecorationView<TitleCell: CollectionViewCell, MarkerCell: CollectionViewCe
     }
   }
 
-  override func setup() {
+  override open func setup() {
+    super.setup()
+
     let layout = collectionViewLayout()
     self.layout = layout
     decorationContainerView.collectionViewLayout = layout
@@ -50,17 +55,19 @@ class DecorationView<TitleCell: CollectionViewCell, MarkerCell: CollectionViewCe
     decorationContainerView.isScrollEnabled = false
     decorationContainerView.showsHorizontalScrollIndicator = false
     decorationContainerView.translatesAutoresizingMaskIntoConstraints = false
+
+    let views = ["content": decorationContainerView]
     contentView.addConstraints(NSLayoutConstraint.constraints(withVisualFormat: "V:|[content]|", metrics: nil,
-                                                              views: ["content": decorationContainerView]))
+                                                              views: views))
     contentView.addConstraints(NSLayoutConstraint.constraints(withVisualFormat: "H:|[content]|", metrics: nil,
-                                                              views: ["content": decorationContainerView]))
+                                                              views: views))
     backgroundColor = UIColor.clear
   }
 
-  override func apply(_ layoutAttributes: UICollectionViewLayoutAttributes) {
+  override open func apply(_ layoutAttributes: UICollectionViewLayoutAttributes) {
     super.apply(layoutAttributes)
 
-    if let decorationViewAttributes: DecorationViewAttributes<ViewModel> = convert(from: layoutAttributes) {
+    if let decorationViewAttributes: Attributes = convert(from: layoutAttributes) {
       guard let hostViewController = decorationViewAttributes.hostPagerSource?.hostViewController else {
         return
       }
@@ -73,8 +80,12 @@ class DecorationView<TitleCell: CollectionViewCell, MarkerCell: CollectionViewCe
       }) {
         titles = decorationViewAttributes.titles
       }
-      backgroundColor = decorationViewAttributes.backgroundColor
+      backgroundColor = decorationViewAttributes.settings?.backgroundColor
       self.currentLayoutAttributes = decorationViewAttributes
+
+      if decorationViewAttributes.invalidateTabFrames {
+        invalidateTabFrames(decorationViewAttributes.newCollectionViewWidth)
+      }
     }
   }
 
@@ -84,38 +95,46 @@ class DecorationView<TitleCell: CollectionViewCell, MarkerCell: CollectionViewCe
 
   fileprivate var titles: [ViewModel] = [] {
     willSet(newTitles) {
-      if let layout = layout {
-        layout.titles = newTitles
-      }
 
-      if newTitles.map({ $0.title }) == titles.map({ $0.title }) { return }
+      if newTitles.map({ $0.id }) == titles.map({ $0.id }) { return }
 
       let cells: [Cellable] = newTitles.map { title in
         let item = Item(data: title) { [weak self] in
-          if let index = self?.titles.index(where: { $0.title == title.title }) {
+          if let index = self?.titles.index(where: { $0.id == title.id }) {
             self?.currentLayoutAttributes?.selectionClosure?(index)
           }
         }
         item.id = title.title
         return item
       }
-      contentView.layoutIfNeeded()
+
+      if let layout = layout {
+        layout.titles = newTitles
+
+        invalidateTabFrames(nil)
+      }
+
       decorationContainerView.source.sections = [Section(cells: cells)]
       decorationContainerView.reloadData()
     }
   }
 
+  private func invalidateTabFrames(_ width: CGFloat?) {
+    let context = DecorationLayout.InvalidationContext()
+    context.invalidateFlowLayoutAttributes = true
+    context.invalidateFlowLayoutDelegateMetrics = true
+    context.newCollectionViewWidth = width
+    layout?.invalidateLayout(with: context)
+  }
+
   fileprivate func collectionViewLayout() -> DecorationLayout {
-    let layout = DecorationLayout()
+    let layout = type(of: self).layoutType.init()
     layout.titles = titles
     layout.scrollDirection = .horizontal
     return layout
   }
-}
 
-extension DecorationView {
-
-  fileprivate func setupSource(for layoutAttributes: DecorationAttributes,
+  fileprivate func setupSource(for layoutAttributes: Attributes,
                                in hostViewController: UIViewController) {
     self.hostPagerSource = layoutAttributes.hostPagerSource
     self.containerViewController = hostViewController
@@ -141,10 +160,10 @@ extension DecorationView {
             if width > 0.0 {
               let page = Int(offset.x / width)
               let progress = (offset.x - (width * CGFloat(page))) / width
-              return (pages: page...(page + settings.pagesOnScreen - 1), progress: progress)
+              return .init(pages: page...(page + settings.pagesOnScreen - 1), progress: progress)
             }
           }
-          return (pages: 0...0, progress: 0.0)
+          return .init(pages: 0...0, progress: 0.0)
         }.bind(to: layout.progressVariable).disposed(by: disposeBag)
     }
   }

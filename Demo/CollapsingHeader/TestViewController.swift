@@ -40,21 +40,21 @@ class TestCell: CollectionViewCell, Reusable {
   }
 }
 
-class TestViewController: UIViewController, Accessor, CollapsingItem {
+class TestLoaderViewController: UIViewController, Accessor, CollapsingItem, Loader {
 
   typealias Cell = CollectionCell<TestCell>
-  let containerView = CollectionView<CollectionViewSource>()
+  let containerView = CollectionView<LoaderDecoratorSource<CollectionViewSource>>()
 
   let visible = Variable<Bool>(false)
-  var extraInset: CGFloat = 0.0
   var scrollView: UIScrollView {
     return containerView
   }
 
   let color: UIColor
-
-  init(_ color: UIColor) {
+  let numberOfItems: Int
+  init(_ color: UIColor, numberOfItems: Int = 3) {
     self.color = color
+    self.numberOfItems = numberOfItems
     super.init(nibName: nil, bundle: nil)
   }
 
@@ -65,15 +65,71 @@ class TestViewController: UIViewController, Accessor, CollapsingItem {
   override func viewDidLoad() {
     super.viewDidLoad()
 
-    let cells: [Cellable] = (1...100).map { _ in Cell(data: color) }
-    sections = [ Section(cells: cells) ]
+    source.loader = self
+    source.hostViewController = self
 
     view.addSubview(containerView)
     containerView.snp.remakeConstraints { $0.edges.equalToSuperview() }
   }
 
-  override func viewDidAppear(_ animated: Bool) {
-    super.viewDidAppear(animated)
+  func performLoading(intent: LoaderIntent) -> SectionObservable? {
+    if numberOfItems > 1 {
+      let cells: [Cellable] = (1...numberOfItems).map { _ in Cell(data: color) }
+      let sections = [ Section(cells: cells) ]
+      return Observable.just(sections).delay(1.0, scheduler: MainScheduler.instance)
+    }
+
+    return nil
+  }
+
+  override func viewWillAppear(_ animated: Bool) {
+    super.viewWillAppear(animated)
+    visible.value = true
+    source.appear()
+  }
+
+  override func viewDidDisappear(_ animated: Bool) {
+    super.viewDidDisappear(animated)
+    visible.value = false
+    source.disappear()
+  }
+}
+
+class TestViewController: UIViewController, Accessor, CollapsingItem {
+
+  typealias Cell = CollectionCell<TestCell>
+  let containerView = CollectionView<CollectionViewSource>()
+
+  let visible = Variable<Bool>(false)
+  var scrollView: UIScrollView {
+    return containerView
+  }
+
+  let color: UIColor
+  let numberOfItems: Int
+  init(_ color: UIColor, numberOfItems: Int = 3) {
+    self.color = color
+    self.numberOfItems = numberOfItems
+    super.init(nibName: nil, bundle: nil)
+  }
+
+  required init?(coder aDecoder: NSCoder) {
+    fatalError("init(coder:) has not been implemented")
+  }
+
+  override func viewDidLoad() {
+    super.viewDidLoad()
+
+    if numberOfItems > 1 {
+      let cells: [Cellable] = (1...numberOfItems).map { _ in Cell(data: color) }
+      sections = [ Section(cells: cells) ]
+    }
+    view.addSubview(containerView)
+    containerView.snp.remakeConstraints { $0.edges.equalToSuperview() }
+  }
+
+  override func viewWillAppear(_ animated: Bool) {
+    super.viewWillAppear(animated)
     visible.value = true
   }
 
@@ -86,16 +142,17 @@ class TestViewController: UIViewController, Accessor, CollapsingItem {
 class TestPagerViewControllerInner: UIViewController {
 
   let controller1 = TestViewController(.red)
-  let controller2 = TestViewController(.blue)
-  let controller3 = TestViewController(.green)
-  let controller4 = TestViewController(.lightGray)
+  let controller2 = TestLoaderViewController(.lightGray)
+  let controller3 = TestLoaderViewController(.green)
+  let controller4 = TestViewController(.blue, numberOfItems: 0)
   let controller5 = TestViewController(.black)
 
   let offsetVariable = Variable<CGFloat>(0.0)
-
   let collectionView = CollectionView<CollectionViewPagerSource>()
 
-  typealias Layout = CollectionViewLayout<CollectionViewPagerSource, TitleCollectionViewCell, MarkerDecorationView<TitleCollectionViewCell.TitleViewModel>>
+  typealias Layout = CollectionViewLayout
+
+  let collasingItemsSubject = PublishSubject<[CollapsingItem]>()
 
   override func viewDidLoad() {
     super.viewDidLoad()
@@ -106,25 +163,29 @@ class TestPagerViewControllerInner: UIViewController {
                             markerHeight: 5.5,
                             itemMargin: 12.0,
                             bottomStripSpacing: 0.0,
+                            backgroundColor: .red,
                             inset: .zero,
                             alignment: .topOffset(variable: offsetVariable))
 
-    collectionView.collectionViewLayout = Layout(hostPagerSource: collectionView.source, settings: settings) { [weak self] in
+    let layout = Layout(hostPagerSource: collectionView.source, settings: settings) { [weak self] in
       return self?.titles ?? []
     }
-
+    collectionView.collectionViewLayout = layout
     view.addSubview(collectionView)
     collectionView.snp.remakeConstraints {
       $0.edges.equalToSuperview()
     }
-
-    controller1.extraInset = 80.0
-    controller2.extraInset = 80.0
-    controller3.extraInset = 80.0
-    controller4.extraInset = 80.0
-    controller5.extraInset = 80.0
-
     collectionView.source.reloadData()
+  }
+
+  override func viewDidAppear(_ animated: Bool) {
+    super.viewDidAppear(animated)
+
+    DispatchQueue.main.async {
+      self.collasingItemsSubject.onNext([
+        self.controller1, self.controller2, self.controller3, self.controller4, self.controller5
+      ])
+    }
   }
 }
 

@@ -9,15 +9,17 @@
 import UIKit
 import Astrolabe
 
-class DecorationViewAttributes<TitleViewModel: Titleable>: UICollectionViewLayoutAttributes {
+open class DecorationViewAttributes<TitleViewModel: Titleable>: UICollectionViewLayoutAttributes, Attributable {
 
-  var titles: [TitleViewModel] = []
-  var backgroundColor: UIColor = .clear
-  var selectionClosure: ((Int) -> Void)?
-  var settings: Settings?
-  weak var hostPagerSource: CollectionViewSource?
+  public var titles: [TitleViewModel] = []
+  public var selectionClosure: ((Int) -> Void)?
+  public var settings: Settings?
+  public weak var hostPagerSource: CollectionViewSource?
 
-  override func copy(with zone: NSZone? = nil) -> Any {
+  public var invalidateTabFrames = false
+  public var newCollectionViewWidth: CGFloat?
+
+  open override func copy(with zone: NSZone? = nil) -> Any {
     let copy = super.copy(with: zone)
     guard let typedCopy = copy as? DecorationViewAttributes else {
       return copy
@@ -25,13 +27,15 @@ class DecorationViewAttributes<TitleViewModel: Titleable>: UICollectionViewLayou
 
     typedCopy.titles = self.titles
     typedCopy.hostPagerSource = self.hostPagerSource
-    typedCopy.backgroundColor = self.backgroundColor
     typedCopy.selectionClosure = self.selectionClosure
     typedCopy.settings = self.settings
+    typedCopy.invalidateTabFrames = self.invalidateTabFrames
+    typedCopy.newCollectionViewWidth = self.newCollectionViewWidth
+
     return typedCopy
   }
 
-  override func isEqual(_ object: Any?) -> Bool {
+  open override func isEqual(_ object: Any?) -> Bool {
     if super.isEqual(object) == false {
       return false
     }
@@ -40,11 +44,6 @@ class DecorationViewAttributes<TitleViewModel: Titleable>: UICollectionViewLayou
       if self.titles.map({ $0.title }) != other.titles.map({ $0.title }) {
         return false
       }
-//      else if self.titles.map({ $0.indicatorColor }) != other.titles.map({ $0.indicatorColor }) {
-//        return false
-//      } else if self.backgroundColor != other.backgroundColor {
-//        return false
-//      }
     }
 
     return true
