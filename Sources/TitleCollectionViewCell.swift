@@ -1,6 +1,6 @@
 //
 //  TitleCollectionViewCell.swift
-//  PSGOneApp
+//  Sundial
 //
 //  Created by Eugen Filipkov on 4/17/17.
 //  Copyright © 2017 Netcosports. All rights reserved.

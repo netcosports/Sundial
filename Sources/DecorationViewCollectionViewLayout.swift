@@ -1,6 +1,6 @@
 //
 //  DecorationViewCollectionViewLayout.swift
-//  UArena
+//  Sundial
 //
 //  Created by Sergei Mikhan on 8/1/17.
 //  Copyright © 2017 NetcoSports. All rights reserved.
