@@ -124,7 +124,7 @@ Example of ```CollapsingItem``` implementation:
 
 ```swift
 class TestViewController: UIViewController, Accessor, CollapsingItem {
-  let visible = Variable<Bool>(false)
+  let visible = BehaviorRelay<Bool>(value: false)
   var scrollView: UIScrollView {
     return containerView
   }

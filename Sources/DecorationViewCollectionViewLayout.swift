@@ -8,6 +8,7 @@
 
 import UIKit
 import RxSwift
+import RxCocoa
 import Astrolabe
 
 open class DecorationViewCollectionViewLayout<TitleViewModel: ViewModelable, MarkerCell: CollectionViewCell>: UICollectionViewFlowLayout {
@@ -16,7 +17,7 @@ open class DecorationViewCollectionViewLayout<TitleViewModel: ViewModelable, Mar
     public var newCollectionViewWidth: CGFloat?
   }
 
-  public let progressVariable = Variable<Progress>(.init(pages: 0 ... 0, progress: 0))
+  public let progress = BehaviorRelay<Progress>(value: .init(pages: 0 ... 0, progress: 0))
   public internal(set) var anchor: Anchor = .content(.left)
   public internal(set) var markerHeight: CGFloat = 15
   public internal(set) var titles: [TitleViewModel] = []
@@ -202,7 +203,7 @@ open class DecorationViewCollectionViewLayout<TitleViewModel: ViewModelable, Mar
 
     if disposeBag == nil {
       let disposeBag = DisposeBag()
-      progressVariable.asDriver().drive(onNext: { [weak self] _ in
+      progress.asDriver().drive(onNext: { [weak self] _ in
         let context = UICollectionViewFlowLayoutInvalidationContext()
         context.invalidateFlowLayoutAttributes = false
         context.invalidateFlowLayoutDelegateMetrics = false
@@ -220,13 +221,13 @@ open class DecorationViewCollectionViewLayout<TitleViewModel: ViewModelable, Mar
       return attributes
     }
 
-    let progress = progressVariable.value
+    let progressValue = progress.value
 
     var currentPages = [TitleAttributes]()
     var nextPages = [TitleAttributes]()
 
-    let currentRange = progress.pages
-    let nextRange = progress.pages.next
+    let currentRange = progressValue.pages
+    let nextRange = progressValue.pages.next
 
     titleAttributes.forEach { itemAttributes in
       let index = itemAttributes.indexPath.item
@@ -235,10 +236,10 @@ open class DecorationViewCollectionViewLayout<TitleViewModel: ViewModelable, Mar
         currentPages.append(itemAttributes)
         nextPages.append(itemAttributes)
       } else if currentRange ~= index {
-        itemAttributes.fade = 1.0 - progress.progress
+        itemAttributes.fade = 1.0 - progressValue.progress
         currentPages.append(itemAttributes)
       } else if nextRange ~= index {
-        itemAttributes.fade = progress.progress
+        itemAttributes.fade = progressValue.progress
         nextPages.append(itemAttributes)
       } else {
         itemAttributes.fade = 0.0
@@ -307,14 +308,14 @@ extension DecorationViewCollectionViewLayout {
 
     guard let collectionView = collectionView, currentPages.count > 0 else { return nil }
 
-    let progress = progressVariable.value
+    let progressValue = progress.value
     let decorationAttributes = MarkerAttributes(forDecorationViewOfKind: MarkerDecorationViewId,
                                                 with: IndexPath(item: 0, section: 0))
 
     decorationAttributes.zIndex = -1
     decorationAttributes.apply(currentTitle: titles[safe: currentPages[0].indexPath.item],
                                nextTitle: titles[safe: currentPages[0].indexPath.item + 1],
-                               progress: progress.progress)
+                               progress: progressValue.progress)
 
     let currentFrame = currentPages.reduce(into: CGRect(), { result, attributes in
       if result == .zero {
@@ -339,8 +340,8 @@ extension DecorationViewCollectionViewLayout {
       let height = markerHeight
 
       if let nextFrame = nextFrame {
-        width = currentFrame.width + progress.progress * (nextFrame.width - currentFrame.width)
-        x = currentFrame.minX + progress.progress * (nextFrame.minX - currentFrame.minX)
+        width = currentFrame.width + progressValue.progress * (nextFrame.width - currentFrame.width)
+        x = currentFrame.minX + progressValue.progress * (nextFrame.minX - currentFrame.minX)
       } else {
         width = currentFrame.width
         x = currentFrame.minX
