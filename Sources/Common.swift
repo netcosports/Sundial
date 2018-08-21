@@ -43,7 +43,7 @@ public protocol DecorationViewPageable {
 public protocol CollapsingItem: class {
 
   var scrollView: UIScrollView { get }
-  var visible: Variable<Bool> { get }
+  var visible: BehaviorRelay<Bool> { get }
   var extraInset: UIEdgeInsets { get }
 
   func headerHeightDidChange(_ height: CGFloat)

@@ -72,12 +72,12 @@ class CollapsingHeaderViewController: UIViewController {
     let layout = Layout(items: [], hostPagerSource: collectionView.source, settings: settings) { [weak self] in
       return self?.titles ?? []
     }
-    layout.maxHeaderHeight.value = 300
-    layout.minHeaderHeight.value = 100
-    layout.headerHeight.value = layout.maxHeaderHeight.value
+    layout.maxHeaderHeight.accept(300)
+    layout.minHeaderHeight.accept(100)
+    layout.headerHeight.accept(layout.maxHeaderHeight.value)
     layout.headerHeight.asDriver()
       .map { $0 + 80.0 }
-      .drive(controller3.offsetVariable)
+      .drive(controller3.offsetBehaviorRelay)
       .disposed(by: disposeBag)
 
     collasingItemsSubject.asDriver(onErrorJustReturn: []).drive(onNext: { [weak layout] collasingItems in

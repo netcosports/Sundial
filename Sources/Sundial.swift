@@ -69,7 +69,7 @@ public enum Anchor {
 
 public enum DecorationAlignment {
   case top
-  case topOffset(variable: Variable<CGFloat>)
+  case topOffset(behaviorRelay: BehaviorRelay<CGFloat>)
 }
 
 public enum JumpingPolicy: Equatable {
