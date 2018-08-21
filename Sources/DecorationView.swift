@@ -164,7 +164,7 @@ open class GenericDecorationView<T: CollectionViewCell, M: CollectionViewCell, A
             }
           }
           return .init(pages: 0...0, progress: 0.0)
-        }.bind(to: layout.progressVariable).disposed(by: disposeBag)
+        }.bind(to: layout.progress).disposed(by: disposeBag)
     }
   }
 
