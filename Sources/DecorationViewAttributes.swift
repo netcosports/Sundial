@@ -16,8 +16,17 @@ open class DecorationViewAttributes<TitleViewModel: Titleable>: UICollectionView
   public var settings: Settings?
   public weak var hostPagerSource: CollectionViewSource?
 
-//  public var invalidateTabFrames = false
+  public var invalidateTabFrames = false
 //  public var newCollectionViewWidth: CGFloat?
+  open override var frame: CGRect {
+    get { return super.frame }
+    set {
+      if super.frame != newValue {
+        invalidateTabFrames = true
+      }
+      super.frame = newValue
+    }
+  }
 
   open override func copy(with zone: NSZone? = nil) -> Any {
     let copy = super.copy(with: zone)
@@ -29,7 +38,7 @@ open class DecorationViewAttributes<TitleViewModel: Titleable>: UICollectionView
     typedCopy.hostPagerSource = self.hostPagerSource
     typedCopy.selectionClosure = self.selectionClosure
     typedCopy.settings = self.settings
-//    typedCopy.invalidateTabFrames = self.invalidateTabFrames
+    typedCopy.invalidateTabFrames = self.invalidateTabFrames
 //    typedCopy.newCollectionViewWidth = self.newCollectionViewWidth
 
     return typedCopy

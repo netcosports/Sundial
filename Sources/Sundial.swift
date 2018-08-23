@@ -104,6 +104,7 @@ public struct Settings {
       assert(newValue == .disabled || pagesOnScreen == 1, "jumping policy doesn't support 2+ pages currently")
     }
   }
+  public var shouldKeepFocusOnBoundsChange: Bool
 
   public init(stripHeight: CGFloat = 80.0,
               markerHeight: CGFloat = 5.5,
@@ -114,7 +115,8 @@ public struct Settings {
               inset: UIEdgeInsets = .zero,
               alignment: DecorationAlignment = .top,
               pagesOnScreen: Int = 1,
-              jumpingPolicy: JumpingPolicy = .disabled) {
+              jumpingPolicy: JumpingPolicy = .disabled,
+              shouldKeepFocusOnBoundsChange: Bool = true) {
     self.stripHeight = stripHeight
     self.markerHeight = markerHeight
     self.itemMargin = itemMargin
@@ -127,6 +129,7 @@ public struct Settings {
     self.pagesOnScreen = pagesOnScreen
     assert(jumpingPolicy == .disabled || pagesOnScreen == 1, "jumping policy doesn't support 2+ pages currently")
     self.jumpingPolicy = jumpingPolicy
+    self.shouldKeepFocusOnBoundsChange = shouldKeepFocusOnBoundsChange
   }
 }
 

@@ -23,7 +23,7 @@ open class GenericCollectionViewLayout<DecorationView: CollectionViewCell & Deco
 
   open weak var hostPagerSource: Source?
   open var pager: PagerClosure?
-  open var settings: Settings = Settings()
+  open var settings: Settings  { didSet { applySettings() } }
   open var decorationFrame: CGRect {
     guard let collectionView = collectionView else { return .zero }
 
@@ -41,14 +41,12 @@ open class GenericCollectionViewLayout<DecorationView: CollectionViewCell & Deco
                   height: settings.stripHeight)
   }
 
-  open override var collectionViewContentSize: CGSize { return contentSize }
+  open override var collectionViewContentSize: CGSize {
+    return settings.shouldKeepFocusOnBoundsChange ? contentSize : super.collectionViewContentSize
+  }
 
   public var ready: (() -> Void)?
   public var readyObservable: Observable<Void> { return readySubject }
-
-  //  public var invalidateTabFrames = false
-  //  public var newCollectionViewWidth: CGFloat?
-  //  public var target: CGPoint?
 
   let disposeBag = DisposeBag()
   var currentIndex: Int? {
@@ -62,8 +60,19 @@ open class GenericCollectionViewLayout<DecorationView: CollectionViewCell & Deco
   }
 
   private var layoutData = [IndexPath: UICollectionViewLayoutAttributes]()
+//  private var layoutData: [IndexPath: UICollectionViewLayoutAttributes] {
+//    if !settings.shouldKeepFocusOnBoundsChange { return [:] }
+//    if internalLayoutData == nil || internalLayoutData?.count == 0 {
+//      calculateLayout()
+//    }
+//
+//    return internalLayoutData ?? [:]
+//  }
+//  private var internalLayoutData: [IndexPath: UICollectionViewLayoutAttributes]?
   private var contentSize = CGSize.zero
-  private(set) var selectedIndexPath = IndexPath(item: 0, section: 0)
+  private var selectedIndexPath = IndexPath(item: 0, section: 0)
+  private var settingsReuseBag: DisposeBag?
+//  private var boundsReuseBag: DisposeBag?
 
   private let readySubject = PublishSubject<Void>()
   private var jumpSourceLayoutAttribute: UICollectionViewLayoutAttributes?
@@ -72,6 +81,7 @@ open class GenericCollectionViewLayout<DecorationView: CollectionViewCell & Deco
   // MARK: - Init
 
   public init(hostPagerSource: Source, settings: Settings? = nil, pager: PagerClosure?) {
+    self.settings = settings ?? Settings()
     super.init()
 
     sectionInset = .zero
@@ -81,41 +91,7 @@ open class GenericCollectionViewLayout<DecorationView: CollectionViewCell & Deco
 
     self.hostPagerSource = hostPagerSource
     self.pager = pager
-    if let settings = settings {
-      self.settings = settings
-    }
-
-    hostPagerSource.selectedItem.asObservable()
-      .observeOn(MainScheduler.asyncInstance)
-      .subscribe(onNext: { [weak self] index in
-        guard let `self` = self else { return }
-
-        var orderedIndexes = [Int: IndexPath]()
-        self.layoutData.keys.sorted().enumerated()
-          .forEach {
-            orderedIndexes[$0.offset] = $0.element
-        }
-
-        if let selectedIndexPath = orderedIndexes[index] {
-          self.selectedIndexPath = selectedIndexPath
-        }
-      })
-    .disposed(by: disposeBag)
-
-    rx.observe(UICollectionView.self, "collectionView")
-      .subscribe(onNext: { [weak self] collectionView in
-        collectionView?.decelerationRate = UIScrollViewDecelerationRateFast
-      })
-    .disposed(by: disposeBag)
-
-    // TODO: should we do it every time settings are set via setter?
-    switch self.settings.alignment {
-    case .topOffset(let variable):
-      variable.asDriver().drive(onNext: { [weak self] _ in
-        self?.invalidateLayout()
-      }).disposed(by: disposeBag)
-    default: break
-    }
+    applySettings()
   }
 
   required public init?(coder aDecoder: NSCoder) {
@@ -131,12 +107,16 @@ open class GenericCollectionViewLayout<DecorationView: CollectionViewCell & Deco
   open override func invalidateLayout(with context: UICollectionViewLayoutInvalidationContext) {
     super.invalidateLayout(with: context)
     // TODO: Should we take into account UICollectionViewFlowLayoutInvalidationContext.invalidateFlowLayoutAttributes and UICollectionViewFlowLayoutInvalidationContext.invalidateFlowLayoutDelegateMetrics ???
-    layoutData.removeAll()
+    layoutData.removeAll()// = nil
     contentSize = .zero
   }
 
   open override func prepare() {
-    calculateLayout()
+    if settings.shouldKeepFocusOnBoundsChange {
+      calculateLayout()
+    } else {
+      super.prepare()
+    }
     register(DecorationView.self, forDecorationViewOfKind: DecorationViewId)
 
     ready?()
@@ -144,14 +124,19 @@ open class GenericCollectionViewLayout<DecorationView: CollectionViewCell & Deco
   }
 
   open override func layoutAttributesForElements(in rect: CGRect) -> [UICollectionViewLayoutAttributes]? {
-    let oldAttributes = layoutData
-      .compactMap { (_, value) -> UICollectionViewLayoutAttributes? in
-        if rect.intersects(value.frame) {
-          return value
-        }
-        return nil
+    let sourceAttributes: [UICollectionViewLayoutAttributes]
+    if settings.shouldKeepFocusOnBoundsChange {
+      sourceAttributes = layoutData
+        .compactMap { (_, value) -> UICollectionViewLayoutAttributes? in
+          if rect.intersects(value.frame) {
+            return value
+          }
+          return nil
+      }
+    } else {
+      sourceAttributes = super.layoutAttributesForElements(in: rect) ?? []
     }
-    var attributes = oldAttributes.compactMap { $0.copy() as? UICollectionViewLayoutAttributes }
+    var attributes = sourceAttributes.compactMap { $0.copy() as? UICollectionViewLayoutAttributes }
 
     addDecorationAttributes(to: &attributes)
     addJumpAttributes(to: &attributes)
@@ -175,11 +160,11 @@ open class GenericCollectionViewLayout<DecorationView: CollectionViewCell & Deco
     return decorationAttributes(with: pager?())
   }
 
-  //  open override func targetContentOffset(forProposedContentOffset proposedContentOffset: CGPoint) -> CGPoint {
-  //    return proposedContentOffset // target ?? proposedContentOffset
-  //  }
-
   open override func targetContentOffset(forProposedContentOffset proposedContentOffset: CGPoint) -> CGPoint {
+    guard settings.shouldKeepFocusOnBoundsChange else {
+      return proposedContentOffset
+    }
+
     guard let collectionView = collectionView,
       let currentAttributes = layoutAttributesForItem(at: selectedIndexPath) else {
         return proposedContentOffset
@@ -190,29 +175,29 @@ open class GenericCollectionViewLayout<DecorationView: CollectionViewCell & Deco
     return result
   }
 
-  open override func targetContentOffset(forProposedContentOffset proposedContentOffset: CGPoint,
-                                         withScrollingVelocity velocity: CGPoint) -> CGPoint {
-    guard let currentAttributes = layoutAttributesForItem(at: selectedIndexPath),
-      let attributes = self.attributes(for: proposedContentOffset) else {
-        return proposedContentOffset
-    }
-
-    let distance = attributes.indexPath.item - currentAttributes.indexPath.item
-    let maxDistance = 1 // isLandscape ? 1 : 1
-    let targetAttributes: UICollectionViewLayoutAttributes
-    if abs(distance) <= maxDistance {
-      targetAttributes = attributes
-    } else {
-      let targetIndex = currentAttributes.indexPath.item + distance.signum()
-      targetAttributes = layoutData[IndexPath(item: targetIndex, section: 0)] ?? currentAttributes
-    }
-
-    self.selectedIndexPath = targetAttributes.indexPath
-    var targetOffset = alignmentOffset(for: targetAttributes)
-    checkDirection(for: &targetOffset, velocity: velocity)
-
-    return targetOffset
-  }
+//  open override func targetContentOffset(forProposedContentOffset proposedContentOffset: CGPoint,
+//                                         withScrollingVelocity velocity: CGPoint) -> CGPoint {
+//    guard let currentAttributes = layoutAttributesForItem(at: selectedIndexPath),
+//      let attributes = self.attributes(for: proposedContentOffset) else {
+//        return proposedContentOffset
+//    }
+//
+//    let distance = attributes.indexPath.item - currentAttributes.indexPath.item
+//    let maxDistance = 1 // isLandscape ? 1 : 1
+//    let targetAttributes: UICollectionViewLayoutAttributes
+//    if abs(distance) <= maxDistance {
+//      targetAttributes = attributes
+//    } else {
+//      let targetIndex = currentAttributes.indexPath.item + distance.signum()
+//      targetAttributes = layoutData[IndexPath(item: targetIndex, section: 0)] ?? currentAttributes
+//    }
+//
+//    self.selectedIndexPath = targetAttributes.indexPath
+//    var targetOffset = alignmentOffset(for: targetAttributes)
+//    checkDirection(for: &targetOffset, velocity: velocity)
+//
+//    return targetOffset
+//  }
 
   // MARK: - Open
 
@@ -247,11 +232,6 @@ open class GenericCollectionViewLayout<DecorationView: CollectionViewCell & Deco
     }
     decorationAttributes.frame = decorationFrame
 
-    //    if invalidateTabFrames {
-    //      decorationAttributes.invalidateTabFrames = invalidateTabFrames
-    //      decorationAttributes.newCollectionViewWidth = newCollectionViewWidth
-    //    }
-
     return decorationAttributes
   }
 
@@ -271,31 +251,52 @@ open class GenericCollectionViewLayout<DecorationView: CollectionViewCell & Deco
 
   // MARK: - Private
 
-  private func calculateLayout() {
-    guard let collectionView = collectionView,
-      let delegate = collectionView.delegate as? UICollectionViewDelegateFlowLayout else { return }
+  private func applySettings() {
+    let disposeBag = DisposeBag()
 
-    var x: CGFloat = 0.0
-    var y: CGFloat = 0.0
-    let sections = collectionView.numberOfSections
-    (0..<sections).forEach { section in
-      let items = collectionView.numberOfItems(inSection: section)
-      (0..<items)
-        .map { item in IndexPath(item: item, section: section) }
-        .forEach { indexPath in
-          if let size = delegate.collectionView?(collectionView, layout: self, sizeForItemAt: indexPath) {
-            let attributes = UICollectionViewLayoutAttributes(forCellWith: indexPath)
-            attributes.frame = CGRect(x: x, y: y, width: size.width, height: size.height)
-            layoutData[indexPath] = attributes
-            switch scrollDirection {
-            case .horizontal: x += size.width
-            case .vertical: y += size.height
-            }
-            contentSize.width = max(contentSize.width, attributes.frame.maxX)
-            contentSize.height = max(contentSize.height, attributes.frame.maxY)
-          }
-      }
+    if settings.shouldKeepFocusOnBoundsChange {
+      hostPagerSource?.selectedItem.asObservable()
+        .subscribe(onNext: { [weak self] index in
+          guard let `self` = self else { return }
+
+          // TODO: should we handle more general case? (When we have 2 and more sections)
+          print("UPDATED SELECTED INDEX: \(index)")
+          self.selectedIndexPath = IndexPath(item: index, section: 0)
+        })
+        .disposed(by: disposeBag)
+
+      rx.observe(UICollectionView.self, "collectionView")
+        .asDriver(onErrorJustReturn: nil)
+        .drive(onNext: { [weak self] collectionView in
+          collectionView?.decelerationRate = UIScrollViewDecelerationRateFast
+//
+//          let disposeBag = DisposeBag()
+//          collectionView?.rx.observe(CGRect.self, "bounds").asObservable()
+//            .map { $0?.size }
+//            .distinctUntilChanged()
+//            .observeOn(MainScheduler.instance)
+//            .subscribe(onNext: { [weak self] _ in
+//              guard let `self` = self else { return }
+//
+//              let ctx = UICollectionViewFlowLayoutInvalidationContext()
+//              ctx.invalidateFlowLayoutDelegateMetrics = true
+//              ctx.invalidateFlowLayoutAttributes = true
+//              self.invalidateLayout(with: ctx)
+//            })
+//          .disposed(by: disposeBag)
+//          self?.boundsReuseBag = disposeBag
+        })
+        .disposed(by: disposeBag)
     }
+
+    switch settings.alignment {
+    case .topOffset(let value):
+      value.asDriver().drive(onNext: { [weak self] _ in
+        self?.invalidateLayout()
+      }).disposed(by: disposeBag)
+    default: break
+    }
+    settingsReuseBag = disposeBag
   }
 
   // MARK: Jumping
@@ -378,66 +379,95 @@ open class GenericCollectionViewLayout<DecorationView: CollectionViewCell & Deco
     hostPagerSource?.containerView?.isUserInteractionEnabled = true
   }
 
-  // MARK: Paging
+  // MARK: Keeping Focus
 
-  // TODO: What should we do if settings.pages > 1 ?
-  private func attributes(for contentOffset: CGPoint) -> UICollectionViewLayoutAttributes? {
-    guard let collectionView = collectionView else {
-      return nil
-    }
+  private func calculateLayout() {
+    guard let collectionView = collectionView,
+      let delegate = collectionView.delegate as? UICollectionViewDelegateFlowLayout else { return }
 
-    let width = collectionView.bounds.size.width
-    let visualCenter = contentOffset.x + width * 0.5
-    return layoutData.values
-      .min(by: {
-        let lhs = abs(visualCenter - $0.frame.midX)
-        let rhs = abs(visualCenter - $1.frame.midX)
-        return lhs < rhs
-      })
-  }
-
-  // TODO: What should we do if settings.pages > 1 ?
-  private func alignmentOffset(for attributes: UICollectionViewLayoutAttributes) -> CGPoint {
-    guard let width = collectionView?.bounds.size.width, width > 0.0 else {
-      return .zero
-    }
-
-    let result = CGPoint(x: attributes.frame.midX - width * 0.5, y: 0.0)
-    return result
-  }
-
-  private func checkDirection(for targetOffset: inout CGPoint, velocity: CGPoint) {
-    guard let collectionView = collectionView else { return }
-
-    var indexedOrders = [IndexPath: Int]()
-    var orderedIndexes = [Int: IndexPath]()
-    layoutData.keys.sorted().enumerated()
-      .forEach {
-        indexedOrders[$0.element] = $0.offset
-        orderedIndexes[$0.offset] = $0.element
-    }
-
-    guard let selectedIndex = indexedOrders[selectedIndexPath] else { return }
-
-    let delta = targetOffset.x - collectionView.contentOffset.x
-    let sameDirections = (delta < 0.0) == (velocity.x < 0.0) || velocity.x == 0.0
-    if !sameDirections {
-      let lowerBound = 0
-      let upperBound = layoutData.count - 1
-      var targetIndex = selectedIndex
-      if velocity.x < 0.0 && selectedIndex > lowerBound {
-        targetIndex = selectedIndex - 1
-      } else if velocity.x > 0.0 && selectedIndex < upperBound {
-        targetIndex = selectedIndex + 1
-      }
-      if targetIndex != selectedIndex,
-        let targetIndexPath = orderedIndexes[targetIndex],
-        let targetAttributes = layoutData[targetIndexPath] {
-          selectedIndexPath = targetIndexPath
-          targetOffset = alignmentOffset(for: targetAttributes)
+    print(collectionView.bounds.size)
+    var x: CGFloat = 0.0
+    var y: CGFloat = 0.0
+    let sections = collectionView.numberOfSections
+    (0..<sections).forEach { section in
+      let items = collectionView.numberOfItems(inSection: section)
+      (0..<items)
+        .map { item in IndexPath(item: item, section: section) }
+        .forEach { indexPath in
+          if let size = delegate.collectionView?(collectionView, layout: self, sizeForItemAt: indexPath) {
+            let attributes = UICollectionViewLayoutAttributes(forCellWith: indexPath)
+            attributes.frame = CGRect(x: x, y: y, width: size.width, height: size.height)
+            layoutData[indexPath] = attributes
+            switch scrollDirection {
+            case .horizontal: x += size.width
+            case .vertical: y += size.height
+            }
+            contentSize.width = max(contentSize.width, attributes.frame.maxX)
+            contentSize.height = max(contentSize.height, attributes.frame.maxY)
+          }
       }
     }
   }
+
+//  // TODO: What should we do if settings.pages > 1 ?
+//  private func attributes(for contentOffset: CGPoint) -> UICollectionViewLayoutAttributes? {
+//    guard let collectionView = collectionView else {
+//      return nil
+//    }
+//
+//    let width = collectionView.bounds.size.width
+//    let visualCenter = contentOffset.x + width * 0.5
+//    return layoutData.values
+//      .min(by: {
+//        let lhs = abs(visualCenter - $0.frame.midX)
+//        let rhs = abs(visualCenter - $1.frame.midX)
+//        return lhs < rhs
+//      })
+//  }
+
+//  // TODO: What should we do if settings.pages > 1 ?
+//  private func alignmentOffset(for attributes: UICollectionViewLayoutAttributes) -> CGPoint {
+//    guard let width = collectionView?.bounds.size.width, width > 0.0 else {
+//      return .zero
+//    }
+//
+//    let result = CGPoint(x: attributes.frame.midX - width * 0.5, y: 0.0)
+//    return result
+//  }
+
+//  private func checkDirection(for targetOffset: inout CGPoint, velocity: CGPoint) {
+//    guard let collectionView = collectionView else { return }
+//
+//    var indexedOrders = [IndexPath: Int]()
+//    var orderedIndexes = [Int: IndexPath]()
+//    layoutData.keys.sorted().enumerated()
+//      .forEach {
+//        indexedOrders[$0.element] = $0.offset
+//        orderedIndexes[$0.offset] = $0.element
+//    }
+//
+//    guard let selectedIndex = indexedOrders[selectedIndexPath] else { return }
+//
+//    let delta = targetOffset.x - collectionView.contentOffset.x
+//    let sameDirections = (delta < 0.0) == (velocity.x < 0.0) || velocity.x == 0.0
+//    if !sameDirections {
+//      let lowerBound = 0
+//      let upperBound = layoutData.count - 1
+//      var targetIndex = selectedIndex
+//      if velocity.x < 0.0 && selectedIndex > lowerBound {
+//        targetIndex = selectedIndex - 1
+//      } else if velocity.x > 0.0 && selectedIndex < upperBound {
+//        targetIndex = selectedIndex + 1
+//      }
+//      if targetIndex != selectedIndex,
+//        let targetIndexPath = orderedIndexes[targetIndex],
+//        let targetAttributes = layoutData[targetIndexPath] {
+//          selectedIndexPath = targetIndexPath
+//          targetOffset = alignmentOffset(for: targetAttributes)
+//      }
+//    }
+//  }
+
 }
 
 // MARK: - Rx

@@ -83,9 +83,9 @@ open class GenericDecorationView<T: CollectionViewCell, M: CollectionViewCell, A
       backgroundColor = decorationViewAttributes.settings?.backgroundColor
       self.currentLayoutAttributes = decorationViewAttributes
 
-//      if decorationViewAttributes.invalidateTabFrames {
-//        invalidateTabFrames(decorationViewAttributes.newCollectionViewWidth)
-//      }
+      if decorationViewAttributes.invalidateTabFrames {
+        invalidateTabFrames(bounds.size.width)
+      }
     }
   }
 
@@ -120,10 +120,10 @@ open class GenericDecorationView<T: CollectionViewCell, M: CollectionViewCell, A
   }
 
   private func invalidateTabFrames(_ width: CGFloat?) {
-    let context = UICollectionViewFlowLayoutInvalidationContext()//  DecorationLayout.InvalidationContext()
+    let context = DecorationLayout.InvalidationContext()
     context.invalidateFlowLayoutAttributes = true
     context.invalidateFlowLayoutDelegateMetrics = true
-//    context.newCollectionViewWidth = width
+    context.newCollectionViewWidth = width
     layout?.invalidateLayout(with: context)
   }
 

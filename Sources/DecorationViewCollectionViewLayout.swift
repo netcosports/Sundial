@@ -13,9 +13,9 @@ import Astrolabe
 
 open class DecorationViewCollectionViewLayout<TitleViewModel: ViewModelable, MarkerCell: CollectionViewCell>: UICollectionViewFlowLayout {
 
-//  open class InvalidationContext: UICollectionViewFlowLayoutInvalidationContext {
-//    public var newCollectionViewWidth: CGFloat?
-//  }
+  open class InvalidationContext: UICollectionViewFlowLayoutInvalidationContext {
+    public var newCollectionViewWidth: CGFloat?
+  }
 
   public let progress = BehaviorRelay<Progress>(value: .init(pages: 0 ... 0, progress: 0))
   public internal(set) var anchor: Anchor = .content(.left)
@@ -293,10 +293,9 @@ open class DecorationViewCollectionViewLayout<TitleViewModel: ViewModelable, Mar
   override open func invalidateLayout(with context: UICollectionViewLayoutInvalidationContext) {
     super.invalidateLayout(with: context)
 
-//    if let context = context as? InvalidationContext {
-    if let context = context as? UICollectionViewFlowLayoutInvalidationContext {
+    if let context = context as? InvalidationContext {
       setupFrames = context.invalidateFlowLayoutDelegateMetrics
-//      newCollectionViewWidth = context.newCollectionViewWidth
+      newCollectionViewWidth = context.newCollectionViewWidth
     }
   }
 

@@ -26,7 +26,7 @@ public protocol Attributable: class {
   var selectionClosure: ((Int) -> Void)?  { get set }
   var settings: Settings?  { get set }
   var hostPagerSource: CollectionViewSource?  { get set }
-//  var invalidateTabFrames: Bool { get set }
+  var invalidateTabFrames: Bool { get set }
 //  var newCollectionViewWidth: CGFloat? { get set }
 
 }
