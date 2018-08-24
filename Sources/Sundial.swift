@@ -116,7 +116,7 @@ public struct Settings {
               alignment: DecorationAlignment = .top,
               pagesOnScreen: Int = 1,
               jumpingPolicy: JumpingPolicy = .disabled,
-              shouldKeepFocusOnBoundsChange: Bool = true) {
+              shouldKeepFocusOnBoundsChange: Bool = false) {
     self.stripHeight = stripHeight
     self.markerHeight = markerHeight
     self.itemMargin = itemMargin
