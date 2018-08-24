@@ -60,23 +60,15 @@ open class GenericCollectionViewLayout<DecorationView: CollectionViewCell & Deco
   }
 
   private var layoutData = [IndexPath: UICollectionViewLayoutAttributes]()
-//  private var layoutData: [IndexPath: UICollectionViewLayoutAttributes] {
-//    if !settings.shouldKeepFocusOnBoundsChange { return [:] }
-//    if internalLayoutData == nil || internalLayoutData?.count == 0 {
-//      calculateLayout()
-//    }
-//
-//    return internalLayoutData ?? [:]
-//  }
-//  private var internalLayoutData: [IndexPath: UICollectionViewLayoutAttributes]?
   private var contentSize = CGSize.zero
   private var selectedIndexPath = IndexPath(item: 0, section: 0)
   private var settingsReuseBag: DisposeBag?
-//  private var boundsReuseBag: DisposeBag?
 
   private let readySubject = PublishSubject<Void>()
   private var jumpSourceLayoutAttribute: UICollectionViewLayoutAttributes?
   private var jumpTargetLayoutAttribute: UICollectionViewLayoutAttributes?
+
+  private var shouldScrollToSelectedIndex = false
 
   // MARK: - Init
 
@@ -101,13 +93,16 @@ open class GenericCollectionViewLayout<DecorationView: CollectionViewCell & Deco
   // MARK: - Overrides
 
   open override func shouldInvalidateLayout(forBoundsChange newBounds: CGRect) -> Bool {
+    if settings.shouldKeepFocusOnBoundsChange && newBounds.size != collectionView?.bounds.size {
+      shouldScrollToSelectedIndex = true
+    }
     return true
   }
 
   open override func invalidateLayout(with context: UICollectionViewLayoutInvalidationContext) {
     super.invalidateLayout(with: context)
     // TODO: Should we take into account UICollectionViewFlowLayoutInvalidationContext.invalidateFlowLayoutAttributes and UICollectionViewFlowLayoutInvalidationContext.invalidateFlowLayoutDelegateMetrics ???
-    layoutData.removeAll()// = nil
+    layoutData.removeAll()
     contentSize = .zero
   }
 
@@ -121,6 +116,13 @@ open class GenericCollectionViewLayout<DecorationView: CollectionViewCell & Deco
 
     ready?()
     readySubject.onNext(())
+
+    if shouldScrollToSelectedIndex {
+      shouldScrollToSelectedIndex = false
+      if let offset = layoutData[selectedIndexPath]?.frame.origin {
+        collectionView?.setContentOffset(offset, animated: false)
+      }
+    }
   }
 
   open override func layoutAttributesForElements(in rect: CGRect) -> [UICollectionViewLayoutAttributes]? {
@@ -174,30 +176,6 @@ open class GenericCollectionViewLayout<DecorationView: CollectionViewCell & Deco
     let result = CGPoint(x: currentAttributes.frame.midX - width * 0.5, y: proposedContentOffset.y)
     return result
   }
-
-//  open override func targetContentOffset(forProposedContentOffset proposedContentOffset: CGPoint,
-//                                         withScrollingVelocity velocity: CGPoint) -> CGPoint {
-//    guard let currentAttributes = layoutAttributesForItem(at: selectedIndexPath),
-//      let attributes = self.attributes(for: proposedContentOffset) else {
-//        return proposedContentOffset
-//    }
-//
-//    let distance = attributes.indexPath.item - currentAttributes.indexPath.item
-//    let maxDistance = 1 // isLandscape ? 1 : 1
-//    let targetAttributes: UICollectionViewLayoutAttributes
-//    if abs(distance) <= maxDistance {
-//      targetAttributes = attributes
-//    } else {
-//      let targetIndex = currentAttributes.indexPath.item + distance.signum()
-//      targetAttributes = layoutData[IndexPath(item: targetIndex, section: 0)] ?? currentAttributes
-//    }
-//
-//    self.selectedIndexPath = targetAttributes.indexPath
-//    var targetOffset = alignmentOffset(for: targetAttributes)
-//    checkDirection(for: &targetOffset, velocity: velocity)
-//
-//    return targetOffset
-//  }
 
   // MARK: - Open
 
@@ -259,8 +237,8 @@ open class GenericCollectionViewLayout<DecorationView: CollectionViewCell & Deco
         .subscribe(onNext: { [weak self] index in
           guard let `self` = self else { return }
 
-          // TODO: should we handle more general case? (When we have 2 and more sections)
-          print("UPDATED SELECTED INDEX: \(index)")
+          // TODO: should we handle more general case? (When we have 2+ sections)
+          print("UPDATED Selected index: \(index)")
           self.selectedIndexPath = IndexPath(item: index, section: 0)
         })
         .disposed(by: disposeBag)
@@ -269,22 +247,6 @@ open class GenericCollectionViewLayout<DecorationView: CollectionViewCell & Deco
         .asDriver(onErrorJustReturn: nil)
         .drive(onNext: { [weak self] collectionView in
           collectionView?.decelerationRate = UIScrollViewDecelerationRateFast
-//
-//          let disposeBag = DisposeBag()
-//          collectionView?.rx.observe(CGRect.self, "bounds").asObservable()
-//            .map { $0?.size }
-//            .distinctUntilChanged()
-//            .observeOn(MainScheduler.instance)
-//            .subscribe(onNext: { [weak self] _ in
-//              guard let `self` = self else { return }
-//
-//              let ctx = UICollectionViewFlowLayoutInvalidationContext()
-//              ctx.invalidateFlowLayoutDelegateMetrics = true
-//              ctx.invalidateFlowLayoutAttributes = true
-//              self.invalidateLayout(with: ctx)
-//            })
-//          .disposed(by: disposeBag)
-//          self?.boundsReuseBag = disposeBag
         })
         .disposed(by: disposeBag)
     }
@@ -385,7 +347,7 @@ open class GenericCollectionViewLayout<DecorationView: CollectionViewCell & Deco
     guard let collectionView = collectionView,
       let delegate = collectionView.delegate as? UICollectionViewDelegateFlowLayout else { return }
 
-    print(collectionView.bounds.size)
+//    print(collectionView.bounds.size)
     var x: CGFloat = 0.0
     var y: CGFloat = 0.0
     let sections = collectionView.numberOfSections
@@ -408,65 +370,6 @@ open class GenericCollectionViewLayout<DecorationView: CollectionViewCell & Deco
       }
     }
   }
-
-//  // TODO: What should we do if settings.pages > 1 ?
-//  private func attributes(for contentOffset: CGPoint) -> UICollectionViewLayoutAttributes? {
-//    guard let collectionView = collectionView else {
-//      return nil
-//    }
-//
-//    let width = collectionView.bounds.size.width
-//    let visualCenter = contentOffset.x + width * 0.5
-//    return layoutData.values
-//      .min(by: {
-//        let lhs = abs(visualCenter - $0.frame.midX)
-//        let rhs = abs(visualCenter - $1.frame.midX)
-//        return lhs < rhs
-//      })
-//  }
-
-//  // TODO: What should we do if settings.pages > 1 ?
-//  private func alignmentOffset(for attributes: UICollectionViewLayoutAttributes) -> CGPoint {
-//    guard let width = collectionView?.bounds.size.width, width > 0.0 else {
-//      return .zero
-//    }
-//
-//    let result = CGPoint(x: attributes.frame.midX - width * 0.5, y: 0.0)
-//    return result
-//  }
-
-//  private func checkDirection(for targetOffset: inout CGPoint, velocity: CGPoint) {
-//    guard let collectionView = collectionView else { return }
-//
-//    var indexedOrders = [IndexPath: Int]()
-//    var orderedIndexes = [Int: IndexPath]()
-//    layoutData.keys.sorted().enumerated()
-//      .forEach {
-//        indexedOrders[$0.element] = $0.offset
-//        orderedIndexes[$0.offset] = $0.element
-//    }
-//
-//    guard let selectedIndex = indexedOrders[selectedIndexPath] else { return }
-//
-//    let delta = targetOffset.x - collectionView.contentOffset.x
-//    let sameDirections = (delta < 0.0) == (velocity.x < 0.0) || velocity.x == 0.0
-//    if !sameDirections {
-//      let lowerBound = 0
-//      let upperBound = layoutData.count - 1
-//      var targetIndex = selectedIndex
-//      if velocity.x < 0.0 && selectedIndex > lowerBound {
-//        targetIndex = selectedIndex - 1
-//      } else if velocity.x > 0.0 && selectedIndex < upperBound {
-//        targetIndex = selectedIndex + 1
-//      }
-//      if targetIndex != selectedIndex,
-//        let targetIndexPath = orderedIndexes[targetIndex],
-//        let targetAttributes = layoutData[targetIndexPath] {
-//          selectedIndexPath = targetIndexPath
-//          targetOffset = alignmentOffset(for: targetAttributes)
-//      }
-//    }
-//  }
 
 }
 
