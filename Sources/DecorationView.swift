@@ -1,6 +1,6 @@
 //
 //  DecorationView.swift
-//  PSGOneApp
+//  Sundial
 //
 //  Created by Sergei Mikhan on 5/31/17.
 //  Copyright © 2017 Netcosports. All rights reserved.
@@ -84,7 +84,7 @@ open class GenericDecorationView<T: CollectionViewCell, M: CollectionViewCell, A
       self.currentLayoutAttributes = decorationViewAttributes
 
       if decorationViewAttributes.invalidateTabFrames {
-        invalidateTabFrames(decorationViewAttributes.newCollectionViewWidth)
+        invalidateTabFrames(bounds.size.width)
       }
     }
   }

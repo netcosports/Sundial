@@ -1,6 +1,6 @@
 //
 //  UIScrollView+ScrollingToTop.h
-//  Pods
+//  Sundial
 //
 //  Created by Vladimir Burdukov on 23/04/2018.
 //

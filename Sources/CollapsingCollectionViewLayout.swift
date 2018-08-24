@@ -27,6 +27,8 @@ where DecorationView: DecorationViewPageable, DecorationView.TitleCell.Data: Ind
   fileprivate weak var connectedItem: CollapsingItem?
   fileprivate var updateMaxHeightDisposeBag: DisposeBag?
 
+  // MARK: - Init
+
   public init(items: [CollapsingItem], hostPagerSource: Source, settings: Settings? = nil, pager: PagerClosure?) {
     super.init(hostPagerSource: hostPagerSource, settings: settings, pager: pager)
     self.handlers = items.compactMap { [weak self] item in
@@ -54,6 +56,12 @@ where DecorationView: DecorationViewPageable, DecorationView.TitleCell.Data: Ind
   public required init?(coder aDecoder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
   }
+
+  public required init(hostPagerSource: Source, settings: Settings?, pager: PagerClosure?) {
+    fatalError("init(hostPagerSource:settings:pager:) has not been implemented")
+  }
+
+  // MARK: - Override
 
   open override func layoutAttributesForElements(in rect: CGRect) -> [UICollectionViewLayoutAttributes]? {
     guard var layoutAttributes = super.layoutAttributesForElements(in: rect) else { return nil }

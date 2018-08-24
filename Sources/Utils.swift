@@ -8,6 +8,11 @@
 
 import UIKit
 
+func log(functionName: String = #function, fileName: String = #file, lineNumber: Int = #line) {
+  let url = URL(fileURLWithPath: fileName)
+  print("\(functionName) in \(url.lastPathComponent) at line \(lineNumber)")
+}
+
 extension UIColor {
 
   public func blended(with color: UIColor, progress: CGFloat) -> UIColor {

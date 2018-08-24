@@ -27,7 +27,7 @@ public protocol Attributable: class {
   var settings: Settings?  { get set }
   var hostPagerSource: CollectionViewSource?  { get set }
   var invalidateTabFrames: Bool { get set }
-  var newCollectionViewWidth: CGFloat? { get set }
+//  var newCollectionViewWidth: CGFloat? { get set }
 
 }
 
