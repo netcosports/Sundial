@@ -18,6 +18,8 @@ class ViewControllerInner: UIViewController {
   let controller4 = UIViewController()
   let controller5 = UIViewController()
 
+  var inverted = false
+
   let anchor: Anchor
   let count: Int
   let margin: CGFloat
@@ -75,6 +77,21 @@ class ViewControllerInner: UIViewController {
     controller5.view.backgroundColor = .orange
 
     collectionView.source.reloadData()
+
+    let button = UIButton()
+    button.backgroundColor = .magenta
+    button.addTarget(self, action: #selector(click), for: UIControlEvents.touchUpInside)
+    controller1.view.addSubview(button)
+    button.snp.remakeConstraints {
+      $0.height.width.equalTo(120)
+      $0.centerX.equalToSuperview()
+      $0.top.equalToSuperview().offset(60)
+    }
+  }
+
+  @objc func click() {
+    self.inverted = !self.inverted
+    self.collectionView.reloadData()
   }
 }
 
@@ -87,19 +104,29 @@ extension ViewControllerInner: CollectionViewPager {
       Page(controller: controller3, id: "Title 3"),
       Page(controller: controller4, id: "Title 4"),
       Page(controller: controller5, id: "Title 5")
-    ].prefix(count))
+      ].prefix(count))
   }
 }
 
 extension ViewControllerInner {
 
   var titles: [TitleCollectionViewCell.TitleViewModel] {
-    return Array([
-      TitleCollectionViewCell.TitleViewModel(title: "Mid Blue", indicatorColor: .blue),
-      TitleCollectionViewCell.TitleViewModel(title: "Super Long Black", indicatorColor: .black),
-      TitleCollectionViewCell.TitleViewModel(title: "Green", indicatorColor: .green),
-      TitleCollectionViewCell.TitleViewModel(title: "Gray", indicatorColor: .gray),
-      TitleCollectionViewCell.TitleViewModel(title: "Orange", indicatorColor: .orange)
-    ].prefix(count))
+    if inverted {
+      return Array([
+        TitleCollectionViewCell.TitleViewModel(title: "Inverted Mid Blue", indicatorColor: .blue),
+        TitleCollectionViewCell.TitleViewModel(title: "Inverted Super Long Black", indicatorColor: .black),
+        TitleCollectionViewCell.TitleViewModel(title: "Inverted Green", indicatorColor: .green),
+        TitleCollectionViewCell.TitleViewModel(title: "Inverted Gray", indicatorColor: .gray),
+        TitleCollectionViewCell.TitleViewModel(title: "Inverted Orange", indicatorColor: .orange)
+        ].prefix(count))
+    } else {
+      return Array([
+        TitleCollectionViewCell.TitleViewModel(title: "Mid Blue", indicatorColor: .blue),
+        TitleCollectionViewCell.TitleViewModel(title: "Super Long Black", indicatorColor: .black),
+        TitleCollectionViewCell.TitleViewModel(title: "Green", indicatorColor: .green),
+        TitleCollectionViewCell.TitleViewModel(title: "Gray", indicatorColor: .gray),
+        TitleCollectionViewCell.TitleViewModel(title: "Orange", indicatorColor: .orange)
+        ].prefix(count))
+    }
   }
 }

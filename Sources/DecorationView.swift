@@ -76,7 +76,7 @@ open class GenericDecorationView<T: CollectionViewCell, M: CollectionViewCell, A
         setupSource(for: decorationViewAttributes, in: hostViewController)
       }
       if !decorationViewAttributes.titles.elementsEqual(titles, by: {
-        return $0.title == $1.title
+        return $0.id == $1.id
       }) {
         titles = decorationViewAttributes.titles
       }

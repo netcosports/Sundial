@@ -14,24 +14,17 @@ DEPENDENCIES:
   - SnapKit
   - Sundial (from `.`)
 
-SPEC REPOS:
-  https://github.com/cocoapods/specs.git:
-    - Astrolabe
-    - RxCocoa
-    - RxSwift
-    - SnapKit
-
 EXTERNAL SOURCES:
   Sundial:
-    :path: "."
+    :path: .
 
 SPEC CHECKSUMS:
   Astrolabe: 8bc4f77a84065c0d4ebda0bed72b69e9f5a7f2bd
   RxCocoa: 0b54909c902e1e581212a03e690bbd94032d8baa
   RxSwift: 99e10317ddfcc7fbe01356aafd118fde4a0be104
   SnapKit: a42d492c16e80209130a3379f73596c3454b7694
-  Sundial: be6e44fdf2679759619d49e86a1fcfd764c596fb
+  Sundial: d09d42749e193be8399cd314e81108483ee61e58
 
 PODFILE CHECKSUM: 02fa4c9824422002ab2681323a1ceb3297241c68
 
-COCOAPODS: 1.5.3
+COCOAPODS: 1.3.1
