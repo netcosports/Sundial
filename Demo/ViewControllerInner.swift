@@ -113,12 +113,12 @@ extension ViewControllerInner {
   var titles: [TitleCollectionViewCell.TitleViewModel] {
     if inverted {
       return Array([
-        TitleCollectionViewCell.TitleViewModel(title: "Inverted Mid Blue", indicatorColor: .blue),
-        TitleCollectionViewCell.TitleViewModel(title: "Inverted Super Long Black", indicatorColor: .black),
-        TitleCollectionViewCell.TitleViewModel(title: "Inverted Green", indicatorColor: .green),
-        TitleCollectionViewCell.TitleViewModel(title: "Inverted Gray", indicatorColor: .gray),
-        TitleCollectionViewCell.TitleViewModel(title: "Inverted Orange", indicatorColor: .orange)
-        ].prefix(count))
+        TitleCollectionViewCell.TitleViewModel(title: "Mid Blue", id: "Inverted Mid Blue", indicatorColor: .magenta),
+        TitleCollectionViewCell.TitleViewModel(title: "Super Long Black", indicatorColor: .black),
+        TitleCollectionViewCell.TitleViewModel(title: "Green", indicatorColor: .green),
+        TitleCollectionViewCell.TitleViewModel(title: "Gray", indicatorColor: .gray),
+        TitleCollectionViewCell.TitleViewModel(title: "Orange", indicatorColor: .orange)
+      ].prefix(count))
     } else {
       return Array([
         TitleCollectionViewCell.TitleViewModel(title: "Mid Blue", indicatorColor: .blue),
