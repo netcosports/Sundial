@@ -149,7 +149,6 @@ open class PlainCollectionViewLayout: UICollectionViewFlowLayout, PreparedLayout
           guard let `self` = self else { return }
 
           // TODO: should we handle more general case? (When we have 2+ sections)
-          print("UPDATED Selected index: \(index)")
           self.selectedIndexPath = IndexPath(item: index, section: 0)
         })
         .disposed(by: disposeBag)

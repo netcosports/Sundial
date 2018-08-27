@@ -17,7 +17,7 @@ open class DecorationViewAttributes<TitleViewModel: Titleable>: UICollectionView
   public weak var hostPagerSource: CollectionViewSource?
 
   public var invalidateTabFrames = false
-//  public var newCollectionViewWidth: CGFloat?
+
   open override var frame: CGRect {
     get { return super.frame }
     set {
@@ -39,7 +39,6 @@ open class DecorationViewAttributes<TitleViewModel: Titleable>: UICollectionView
     typedCopy.selectionClosure = self.selectionClosure
     typedCopy.settings = self.settings
     typedCopy.invalidateTabFrames = self.invalidateTabFrames
-//    typedCopy.newCollectionViewWidth = self.newCollectionViewWidth
 
     return typedCopy
   }
