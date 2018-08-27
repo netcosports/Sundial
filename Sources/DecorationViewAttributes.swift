@@ -50,7 +50,7 @@ open class DecorationViewAttributes<TitleViewModel: Titleable>: UICollectionView
     }
 
     if let other = object as? DecorationViewAttributes {
-      if self.titles.map({ $0.title }) != other.titles.map({ $0.title }) {
+      if self.titles.map({ $0.id }) != other.titles.map({ $0.id }) {
         return false
       }
     }
