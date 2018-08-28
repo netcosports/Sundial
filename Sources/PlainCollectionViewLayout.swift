@@ -91,7 +91,6 @@ open class PlainCollectionViewLayout: UICollectionViewFlowLayout, PreparedLayout
     } else {
       super.prepare()
     }
-    register(DecorationView.self, forDecorationViewOfKind: DecorationViewId)
 
     ready?()
     readySubject.onNext(())
