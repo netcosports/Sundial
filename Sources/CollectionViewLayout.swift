@@ -48,6 +48,11 @@ open class GenericCollectionViewLayout<DecorationView: CollectionViewCell & Deco
 
   // MARK: - Override
 
+  open override func prepare() {
+    register(DecorationView.self, forDecorationViewOfKind: DecorationViewId)
+    super.prepare()
+  }
+
   open override func layoutAttributesForElements(in rect: CGRect) -> [UICollectionViewLayoutAttributes]? {
     let sourceAttributes = super.layoutAttributesForElements(in: rect) ?? []
     var attributes = sourceAttributes.compactMap { $0.copy() as? UICollectionViewLayoutAttributes }
