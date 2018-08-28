@@ -128,7 +128,7 @@ open class PlainCollectionViewLayout: UICollectionViewFlowLayout, PreparedLayout
     }
 
     guard let collectionView = collectionView,
-      let currentAttributes = layoutAttributesForItem(at: selectedIndexPath) else {
+      let currentAttributes = layoutData[selectedIndexPath] else {
         return proposedContentOffset
     }
 
