@@ -206,6 +206,8 @@ open class PlainCollectionViewLayout: UICollectionViewFlowLayout, PreparedLayout
     case .disabled: threshold = .max
     case .skip(let pages): threshold = max(pages, 2)
     }
+    
+    selectedIndexPath = indexPath(for: item) ?? selectedIndexPath
     guard let currentIndex = currentIndex, abs(currentIndex - item) >= threshold else {
       hostPagerSource?.selectedItem.onNext(item)
       return
