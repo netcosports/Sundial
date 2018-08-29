@@ -51,7 +51,7 @@ open class PlainCollectionViewLayout: UICollectionViewFlowLayout, PreparedLayout
 
   // MARK: - Init
 
-  public init(hostPagerSource: Source, settings: Settings? = nil) {//}, pager: PagerClosure?) {
+  public init(hostPagerSource: Source, settings: Settings? = nil) {
     self.settings = settings ?? Settings()
     super.init()
 
@@ -61,7 +61,6 @@ open class PlainCollectionViewLayout: UICollectionViewFlowLayout, PreparedLayout
     scrollDirection = .horizontal
 
     self.hostPagerSource = hostPagerSource
-//    self.pager = pager
     applySettings()
   }
 
@@ -128,7 +127,7 @@ open class PlainCollectionViewLayout: UICollectionViewFlowLayout, PreparedLayout
     }
 
     guard let collectionView = collectionView,
-      let currentAttributes = layoutAttributesForItem(at: selectedIndexPath) else {
+      let currentAttributes = layoutData[selectedIndexPath] else {
         return proposedContentOffset
     }
 
@@ -145,10 +144,9 @@ open class PlainCollectionViewLayout: UICollectionViewFlowLayout, PreparedLayout
     if settings.shouldKeepFocusOnBoundsChange {
       hostPagerSource?.selectedItem.asObservable()
         .subscribe(onNext: { [weak self] index in
-          guard let `self` = self else { return }
+          guard let `self` = self, let selectedIndexPath = self.indexPath(for: index) else { return }
 
-          // TODO: should we handle more general case? (When we have 2+ sections)
-          self.selectedIndexPath = IndexPath(item: index, section: 0)
+          self.selectedIndexPath = selectedIndexPath
         })
         .disposed(by: disposeBag)
 
@@ -170,7 +168,37 @@ open class PlainCollectionViewLayout: UICollectionViewFlowLayout, PreparedLayout
     settingsReuseBag = disposeBag
   }
 
+  // TODO: should we handle more general case? (When we have 2+ sections)
+  private func indexPath(for item: Int) -> IndexPath? {
+    let result = IndexPath(item: item, section: 0)
+    guard layoutData[result] != nil else { return nil }
+
+    return result
+  }
+
   // MARK: Jumping
+
+  public func select(item: Int, animated: Bool = false) {
+    let isLayoutReady = layoutData.count > 0 ? Observable.just(Void()) : readySubject.take(1)
+    isLayoutReady
+      .asDriver(onErrorJustReturn: ())
+      .drive(onNext: { [weak self] in
+        guard let `self` = self, let selectedIndexPath = self.indexPath(for: item) else { return }
+
+        self.shouldScrollToSelectedIndex = false
+        self.selectedIndexPath = selectedIndexPath
+        if animated {
+          self.select(item: item, jumpingPolicy: self.settings.jumpingPolicy)
+          return
+        }
+
+        guard let collectionView = self.collectionView,
+          let itemFrame = self.layoutData[self.selectedIndexPath]?.frame else { return }
+
+        self.collectionView?.contentOffset = CGPoint(x: itemFrame.origin.x, y: itemFrame.origin.y)
+      })
+      .disposed(by: disposeBag)
+  }
 
   internal func select(item: Int, jumpingPolicy: JumpingPolicy) {
     let threshold: Int

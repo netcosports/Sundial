@@ -11,6 +11,8 @@ import Astrolabe
 import RxSwift
 import RxCocoa
 
+// MARK: - Titleable
+
 public protocol Titleable {
   var title: String { get }
   var id: String { get }
@@ -20,23 +22,41 @@ public extension Titleable {
   var id: String { return title }
 }
 
+// MARK: - Indicatorable
+
 public protocol Indicatorable {
   var indicatorColor: UIColor { get }
 }
 
 public typealias ViewModelable = Titleable & Indicatorable
 
+// MARK: - Selectable
+
 public protocol Selectable: class {
   var selectedItem: ControlProperty<Int> { get }
+
+  func select(item: Int, animated: Bool)
 }
 
 extension CollectionViewPagerSource: Selectable {
+
   public var selectedItem: ControlProperty<Int> { return rx.selectedItem }
+
+  public func select(item: Int, animated: Bool) {
+    (self.containerView?.collectionViewLayout as? PlainCollectionViewLayout)?.select(item: item, animated: animated)
+  }
 }
 
 extension CollectionViewReusedPagerSource: Selectable {
+
   public var selectedItem: ControlProperty<Int> { return rx.selectedItem }
+
+  public func select(item: Int, animated: Bool) {
+    (self.containerView?.collectionViewLayout as? PlainCollectionViewLayout)?.select(item: item, animated: animated)
+  }
 }
+
+// MARK: - Progress
 
 public struct Progress: Equatable {
   public let pages: CountableClosedRange<Int>
@@ -54,9 +74,13 @@ extension CountableClosedRange where Bound == Int {
   }
 }
 
+// MARK: - Distribution
+
 public enum Distribution {
   case left, right, center, proportional, inverseProportional, equalSpacing
 }
+
+// MARK: - Anchor
 
 public enum Anchor {
   case content(Distribution)
@@ -67,10 +91,14 @@ public enum Anchor {
   case right(offset: CGFloat)
 }
 
+// MARK: - DecorationAlignment
+
 public enum DecorationAlignment {
   case top
   case topOffset(behaviorRelay: BehaviorRelay<CGFloat>)
 }
+
+// MARK: - JumpingPolicy
 
 public enum JumpingPolicy: Equatable {
   case disabled
@@ -84,6 +112,8 @@ public enum JumpingPolicy: Equatable {
     }
   }
 }
+
+// MARK: - Settings
 
 public struct Settings {
   public var stripHeight: CGFloat
