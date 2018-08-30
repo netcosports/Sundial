@@ -8,9 +8,12 @@
 
 import UIKit
 
-func log(functionName: String = #function, fileName: String = #file, lineNumber: Int = #line) {
+func log(_ value: Any..., functionName: String = #function, fileName: String = #file, lineNumber: Int = #line) {
   let url = URL(fileURLWithPath: fileName)
-  print("\(functionName) in \(url.lastPathComponent) at line \(lineNumber)")
+  let loggedValue = value.count == 0
+    ? ""
+    : value.reduce("") { "\($0) \(String(reflecting: $1))" }
+  print("\(functionName)\(loggedValue) in \(url.lastPathComponent) at line \(lineNumber)")
 }
 
 extension UIColor {
