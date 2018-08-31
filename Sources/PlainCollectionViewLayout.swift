@@ -223,8 +223,8 @@ open class PlainCollectionViewLayout: UICollectionViewFlowLayout, PreparedLayout
 
     let sourceIndex = IndexPath(item: source, section: 0)
     let targetIndex = IndexPath(item: target, section: 0)
-    guard let sourceLayoutAttributes = layoutAttributesForItem(at: sourceIndex)?.copy() as? UICollectionViewLayoutAttributes,
-      let targetLayoutAttributes = layoutAttributesForItem(at: targetIndex)?.copy() as? UICollectionViewLayoutAttributes else {
+    guard let sourceLayoutAttributes = self.layoutData[sourceIndex],
+      let targetLayoutAttributes = self.layoutData[targetIndex] else {
         return
     }
 
