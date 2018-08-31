@@ -94,9 +94,9 @@ open class PlainCollectionViewLayout: UICollectionViewFlowLayout, PreparedLayout
     ready?()
     readySubject.onNext(())
 
-    if shouldScrollToSelectedIndex {
+    if settings.shouldKeepFocusOnBoundsChange && shouldScrollToSelectedIndex {
       shouldScrollToSelectedIndex = false
-      if let offset = layoutData[selectedIndexPath]?.frame.origin {
+      if let offset = layoutAttributesForItem(at: selectedIndexPath)?.frame.origin {
         collectionView?.setContentOffset(offset, animated: false)
       }
     }
@@ -121,13 +121,21 @@ open class PlainCollectionViewLayout: UICollectionViewFlowLayout, PreparedLayout
     return attributes
   }
 
+  open override func layoutAttributesForItem(at indexPath: IndexPath) -> UICollectionViewLayoutAttributes? {
+    if settings.shouldKeepFocusOnBoundsChange {
+      return layoutData[indexPath]
+    } else {
+      return super.layoutAttributesForItem(at: indexPath)
+    }
+  }
+
   open override func targetContentOffset(forProposedContentOffset proposedContentOffset: CGPoint) -> CGPoint {
     guard settings.shouldKeepFocusOnBoundsChange else {
       return proposedContentOffset
     }
 
     guard let collectionView = collectionView,
-      let currentAttributes = layoutData[selectedIndexPath] else {
+      let currentAttributes = layoutAttributesForItem(at: selectedIndexPath) else {
         return proposedContentOffset
     }
 
@@ -171,7 +179,7 @@ open class PlainCollectionViewLayout: UICollectionViewFlowLayout, PreparedLayout
   // TODO: should we handle more general case? (When we have 2+ sections)
   private func indexPath(for item: Int) -> IndexPath? {
     let result = IndexPath(item: item, section: 0)
-    guard layoutData[result] != nil else { return nil }
+    guard layoutAttributesForItem(at: result) != nil else { return nil }
 
     return result
   }
@@ -179,7 +187,9 @@ open class PlainCollectionViewLayout: UICollectionViewFlowLayout, PreparedLayout
   // MARK: Jumping
 
   public func select(item: Int, animated: Bool = false) {
-    let isLayoutReady = layoutData.count > 0 ? Observable.just(Void()) : readySubject.take(1)
+    let isLayoutReady = (layoutData.count > 0 || !settings.shouldKeepFocusOnBoundsChange)
+      ? Observable.just(Void())
+      : readySubject.take(1)
     isLayoutReady
       .asDriver(onErrorJustReturn: ())
       .drive(onNext: { [weak self] in
@@ -193,7 +203,7 @@ open class PlainCollectionViewLayout: UICollectionViewFlowLayout, PreparedLayout
         }
 
         guard let collectionView = self.collectionView,
-          let itemFrame = self.layoutData[self.selectedIndexPath]?.frame else { return }
+          let itemFrame = self.layoutAttributesForItem(at: self.selectedIndexPath)?.frame else { return }
 
         self.collectionView?.contentOffset = CGPoint(x: itemFrame.origin.x, y: itemFrame.origin.y)
       })
@@ -223,8 +233,8 @@ open class PlainCollectionViewLayout: UICollectionViewFlowLayout, PreparedLayout
 
     let sourceIndex = IndexPath(item: source, section: 0)
     let targetIndex = IndexPath(item: target, section: 0)
-    guard let sourceLayoutAttributes = self.layoutData[sourceIndex],
-      let targetLayoutAttributes = self.layoutData[targetIndex] else {
+    guard let sourceLayoutAttributes = layoutAttributesForItem(at: sourceIndex)?.copy() as? UICollectionViewLayoutAttributes,
+      let targetLayoutAttributes = layoutAttributesForItem(at: targetIndex)?.copy() as? UICollectionViewLayoutAttributes else {
         return
     }
 
