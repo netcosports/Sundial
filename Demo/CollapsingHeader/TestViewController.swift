@@ -50,6 +50,9 @@ class TestLoaderViewController: UIViewController, Accessor, CollapsingItem, Load
   var scrollView: UIScrollView {
     return containerView
   }
+  var followDirection: Bool {
+    return true
+  }
 
   let color: UIColor
   let numberOfItems: Int

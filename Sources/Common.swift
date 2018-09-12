@@ -45,7 +45,11 @@ public protocol CollapsingItem: class {
   var scrollView: UIScrollView { get }
   var visible: BehaviorRelay<Bool> { get }
   var extraInset: UIEdgeInsets { get }
+  // FIXME: move this to settings
+  var followDirection: Bool { get }
 
+  // FIXME: do we really need it here?
+  // layout has relay for it
   func headerHeightDidChange(_ height: CGFloat)
 
 }
@@ -54,6 +58,10 @@ public extension CollapsingItem {
 
   var extraInset: UIEdgeInsets {
     return .zero
+  }
+
+  var followDirection: Bool {
+    return false
   }
 
   func headerHeightDidChange(_ height: CGFloat) {
