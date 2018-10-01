@@ -143,11 +143,17 @@ class CollapsingHeaderHandler {
       })
 
     if collapsingItem.followDirection {
-      collapsingBorder = collapsingItem.scrollView.contentOffset.y + headerHeight.value + self.headerInset.value
+      self.collapsingBorder = collapsingItem.scrollView.contentOffset.y + headerHeight.value + self.headerInset.value
+      if self.collapsingBorder < 0.0 {
+        self.collapsingBorder = 0.0
+      }
       let directionChangeDispose = directionChange().subscribe(onNext: { [weak self] value in
         guard let `self` = self else { return }
         guard let scrollView = self.collapsingItem?.scrollView else { return }
         self.collapsingBorder = scrollView.contentOffset.y + self.headerHeight.value + self.headerInset.value
+        if self.collapsingBorder < 0.0 {
+          self.collapsingBorder = 0.0
+        }
       })
       activeDispose = Disposables.create(headerHeightDispose, maxHeaderHeightDispose, directionChangeDispose)
     } else {
