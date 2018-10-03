@@ -78,7 +78,7 @@ where DecorationView: DecorationViewPageable, DecorationView.TitleCell.Data: Ind
 
   open func collapsingHeaderAttributes() -> CollapsingHeaderViewAttributes {
     let headerIndexPath = IndexPath(item: 0, section: 0)
-    let сollapsingHeaderViewAttributes = CollapsingHeaderViewAttributes(forSupplementaryViewOfKind: UICollectionElementKindSectionHeader, with: headerIndexPath)
+    let сollapsingHeaderViewAttributes = CollapsingHeaderViewAttributes(forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, with: headerIndexPath)
     сollapsingHeaderViewAttributes.zIndex = type(of: self).headerZIndex
 
     guard let collectionView = collectionView else { return сollapsingHeaderViewAttributes }
@@ -160,7 +160,7 @@ where DecorationView: DecorationViewPageable, DecorationView.TitleCell.Data: Ind
 
   fileprivate func crashIfHeaderPresent(in items: [UICollectionViewLayoutAttributes]) {
     for attributes in items {
-      if attributes.representedElementCategory == .supplementaryView && attributes.representedElementKind == UICollectionElementKindSectionHeader {
+      if attributes.representedElementCategory == .supplementaryView && attributes.representedElementKind == UICollectionView.elementKindSectionHeader {
         if attributes.size != .zero {
           fatalError("collapsing header size(for:, containerSize:) -> CGSize should return .zero")
         }

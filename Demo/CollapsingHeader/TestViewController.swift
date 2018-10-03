@@ -41,7 +41,7 @@ class TestCell: CollectionViewCell, Reusable {
   }
 }
 
-class TestLoaderViewController: UIViewController, Accessor, CollapsingItem, Loader {
+class TestLoaderViewController: UIViewController, Accessor, CollapsingItem, Loadable, Containerable {
 
   typealias Cell = CollectionCell<TestCell>
   let containerView = CollectionView<LoaderDecoratorSource<CollectionViewSource>>()
@@ -52,6 +52,15 @@ class TestLoaderViewController: UIViewController, Accessor, CollapsingItem, Load
   }
   var followDirection: Bool {
     return true
+  }
+  var sections: [Sectionable] {
+    get {
+      return source.sections
+    }
+
+    set {
+      source.sections = newValue
+    }
   }
 
   let color: UIColor
@@ -69,14 +78,14 @@ class TestLoaderViewController: UIViewController, Accessor, CollapsingItem, Load
   override func viewDidLoad() {
     super.viewDidLoad()
 
-    source.loader = self
+    source.loader = LoaderMediator(loader: self)
     source.hostViewController = self
 
     view.addSubview(containerView)
     containerView.snp.remakeConstraints { $0.edges.equalToSuperview() }
   }
 
-  func performLoading(intent: LoaderIntent) -> SectionObservable? {
+  func load(for intent: LoaderIntent) -> SectionObservable? {
     if numberOfItems > 1 {
       let cells: [Cellable] = (1...numberOfItems).map { _ in Cell(data: color) }
       let sections = [ Section(cells: cells) ]
@@ -115,6 +124,16 @@ class TestViewController: UIViewController, Accessor, CollapsingItem {
     self.color = color
     self.numberOfItems = numberOfItems
     super.init(nibName: nil, bundle: nil)
+  }
+
+  var sections: [Sectionable] {
+    get {
+      return source.sections
+    }
+
+    set {
+      source.sections = newValue
+    }
   }
 
   required init?(coder aDecoder: NSCoder) {
