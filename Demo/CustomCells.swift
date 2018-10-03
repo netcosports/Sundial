@@ -39,7 +39,7 @@ extension String {
     let constraintRect = CGSize(width: CGFloat.greatestFiniteMagnitude, height: CGFloat.greatestFiniteMagnitude)
     let boundingBox = self.boundingRect(with: constraintRect,
                                         options: [.usesFontLeading, .usesLineFragmentOrigin],
-                                        attributes: [NSAttributedStringKey.font: font],
+                                        attributes: [NSAttributedString.Key.font: font],
                                         context: nil)
 
     return boundingBox.width
@@ -49,7 +49,7 @@ extension String {
     let constraintRect = CGSize(width: width, height: .greatestFiniteMagnitude)
     let boundingBox = self.boundingRect(with: constraintRect,
                                         options: [.usesFontLeading, .usesLineFragmentOrigin],
-                                        attributes: [NSAttributedStringKey.font: font],
+                                        attributes: [NSAttributedString.Key.font: font],
                                         context: nil)
 
     return boundingBox.height

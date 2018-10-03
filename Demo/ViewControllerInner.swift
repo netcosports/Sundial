@@ -80,7 +80,7 @@ class ViewControllerInner: UIViewController {
 
     let button = UIButton()
     button.backgroundColor = .magenta
-    button.addTarget(self, action: #selector(click), for: UIControlEvents.touchUpInside)
+    button.addTarget(self, action: #selector(click), for: UIControl.Event.touchUpInside)
     controller1.view.addSubview(button)
     button.snp.remakeConstraints {
       $0.height.width.equalTo(120)

@@ -160,8 +160,8 @@ open class PlainCollectionViewLayout: UICollectionViewFlowLayout, PreparedLayout
 
       rx.observe(UICollectionView.self, "collectionView")
         .asDriver(onErrorJustReturn: nil)
-        .drive(onNext: { collectionView in
-          collectionView?.decelerationRate = UIScrollViewDecelerationRateFast
+        .drive(onNext: { [weak self] collectionView in
+          collectionView?.decelerationRate = UIScrollView.DecelerationRate.fast
         })
         .disposed(by: disposeBag)
     }
