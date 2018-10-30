@@ -11,7 +11,7 @@ import Astrolabe
 
 open class TitleCollectionViewCell: CollectionViewCell, Reusable {
 
-  open let titleLabel: UILabel = {
+  public let titleLabel: UILabel = {
     let label = UILabel()
     label.textColor = .white
     label.textAlignment = .center
@@ -109,7 +109,7 @@ open class TitleCollectionViewCell: CollectionViewCell, Reusable {
     self.data = data
   }
 
-  open static func size(for data: Data, containerSize: CGSize) -> CGSize {
+  public static func size(for data: Data, containerSize: CGSize) -> CGSize {
     let width = data.title.width(with: data.textFont) + 1
     let size = CGSize(width: ceil(width), height: containerSize.height)
     return data.padding.inverted.inset(size: size)

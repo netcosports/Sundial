@@ -23,7 +23,7 @@ open class GenericDecorationView<T: CollectionViewCell, M: CollectionViewCell, A
   public typealias DecorationLayout      = DecorationViewCollectionViewLayout<ViewModel, MarkerCell>
 
   fileprivate let disposeBag = DisposeBag()
-  open let decorationContainerView = CollectionView<CollectionViewSource>()
+  public let decorationContainerView = CollectionView<CollectionViewSource>()
 
   public private(set) var layout: DecorationLayout?
 
