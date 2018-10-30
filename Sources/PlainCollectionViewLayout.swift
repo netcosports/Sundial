@@ -144,6 +144,16 @@ open class PlainCollectionViewLayout: UICollectionViewFlowLayout, PreparedLayout
     return result
   }
 
+  open override var collectionView: UICollectionView? {
+    get {
+      let result = super.collectionView
+      if settings.shouldKeepFocusOnBoundsChange {
+        result?.decelerationRate = UIScrollView.DecelerationRate.fast
+      }
+      return result
+    }
+  }
+
   // MARK: - Private
 
   private func applySettings() {
@@ -155,13 +165,6 @@ open class PlainCollectionViewLayout: UICollectionViewFlowLayout, PreparedLayout
           guard let `self` = self, let selectedIndexPath = self.indexPath(for: index) else { return }
 
           self.selectedIndexPath = selectedIndexPath
-        })
-        .disposed(by: disposeBag)
-
-      rx.observe(UICollectionView.self, "collectionView")
-        .asDriver(onErrorJustReturn: nil)
-        .drive(onNext: { [weak self] collectionView in
-          collectionView?.decelerationRate = UIScrollView.DecelerationRate.fast
         })
         .disposed(by: disposeBag)
     }
@@ -205,7 +208,7 @@ open class PlainCollectionViewLayout: UICollectionViewFlowLayout, PreparedLayout
         guard let collectionView = self.collectionView,
           let itemFrame = self.layoutAttributesForItem(at: self.selectedIndexPath)?.frame else { return }
 
-        self.collectionView?.contentOffset = CGPoint(x: itemFrame.origin.x, y: itemFrame.origin.y)
+        collectionView.contentOffset = CGPoint(x: itemFrame.origin.x, y: itemFrame.origin.y)
       })
       .disposed(by: disposeBag)
   }
