@@ -83,7 +83,7 @@ open class TitleCollectionViewCell: CollectionViewCell, Reusable {
     }
   }
 
-  private(set) var fade: CGFloat = 0 {
+  public var fade: CGFloat = 0 {
     didSet {
       updateFade()
     }
