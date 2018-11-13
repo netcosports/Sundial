@@ -160,7 +160,7 @@ open class PlainCollectionViewLayout: UICollectionViewFlowLayout, PreparedLayout
 
       rx.observe(UICollectionView.self, "collectionView")
         .asDriver(onErrorJustReturn: nil)
-        .drive(onNext: { [weak self] collectionView in
+        .drive(onNext: { collectionView in
           collectionView?.decelerationRate = UIScrollViewDecelerationRateFast
         })
         .disposed(by: disposeBag)
@@ -202,7 +202,7 @@ open class PlainCollectionViewLayout: UICollectionViewFlowLayout, PreparedLayout
           return
         }
 
-        guard let collectionView = self.collectionView,
+        guard let _ = self.collectionView,
           let itemFrame = self.layoutAttributesForItem(at: self.selectedIndexPath)?.frame else { return }
 
         self.collectionView?.contentOffset = CGPoint(x: itemFrame.origin.x, y: itemFrame.origin.y)

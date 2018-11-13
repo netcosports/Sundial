@@ -58,14 +58,14 @@ extension String {
 
 open class CustomTitleCollectionViewCell: CollectionViewCell, Reusable {
 
-  open let titleLabel: UILabel = {
+  public let titleLabel: UILabel = {
     let label = UILabel()
     label.textColor = .white
     label.textAlignment = .center
     return label
   }()
 
-  open let liveMarkerLabel: UILabel = {
+  public let liveMarkerLabel: UILabel = {
     let label = UILabel()
     label.text = "12"
     label.textColor = .white
@@ -159,7 +159,7 @@ open class CustomTitleCollectionViewCell: CollectionViewCell, Reusable {
     self.data = data
   }
 
-  open static func size(for data: Data, containerSize: CGSize) -> CGSize {
+  public static func size(for data: Data, containerSize: CGSize) -> CGSize {
     let width = data.title.width(with: data.textFont) + 1
     return CGSize(width: ceil(width), height: containerSize.height)
   }
@@ -167,7 +167,7 @@ open class CustomTitleCollectionViewCell: CollectionViewCell, Reusable {
 
 open class CustomMarkerDecorationView: CollectionViewCell {
 
-  open let titleLabel: UILabel = {
+  public let titleLabel: UILabel = {
     let label = UILabel()
     label.text = "marker"
     label.textColor = .white
