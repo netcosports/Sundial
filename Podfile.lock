@@ -16,7 +16,6 @@ DEPENDENCIES:
 
 SPEC REPOS:
   https://github.com/cocoapods/specs.git:
-    - Astrolabe
     - RxCocoa
     - RxSwift
     - SnapKit
@@ -39,5 +38,7 @@ SPEC CHECKSUMS:
   RxSwift: fe0fd770a43acdb7d0a53da411c9b892e69bb6e4
   SnapKit: 0de968a9fec17499afa29683b05d0c775b6d1c29
   Sundial: 86f92e4d7319b8748fa9e42a7b8c52ba7d3d3fbe
+
+PODFILE CHECKSUM: 0354445bc770b78798996459c5e8378857a97f8d
 
 COCOAPODS: 1.5.3

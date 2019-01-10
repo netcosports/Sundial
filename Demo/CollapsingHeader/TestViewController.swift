@@ -188,7 +188,8 @@ class TestPagerViewControllerInner: UIViewController {
                             bottomStripSpacing: 0.0,
                             backgroundColor: .red,
                             inset: .zero,
-                            alignment: .topOffset(behaviorRelay: offsetBehaviorRelay))
+                            alignment: .topOffset(behaviorRelay: offsetBehaviorRelay),
+                            jumpingPolicy: .skip(pages: 1))
 
     let layout = Layout(hostPagerSource: collectionView.source, settings: settings) { [weak self] in
       return self?.titles ?? []

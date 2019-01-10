@@ -68,7 +68,8 @@ class CollapsingHeaderViewController: UIViewController {
                             markerHeight: 5.5,
                             itemMargin: 12.0,
                             bottomStripSpacing: 0.0,
-                            inset: .zero)
+                            inset: .zero,
+                            jumpingPolicy: .skip(pages: 1))
     let layout = Layout(items: [], hostPagerSource: collectionView.source, settings: settings) { [weak self] in
       return self?.titles ?? []
     }

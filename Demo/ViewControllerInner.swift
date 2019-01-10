@@ -59,7 +59,8 @@ class ViewControllerInner: UIViewController {
                             itemMargin: margin,
                             bottomStripSpacing: 0.0,
                             anchor: anchor,
-                            inset: UIEdgeInsets(top: 0, left: margin, bottom: 0, right: margin))
+                            inset: UIEdgeInsets(top: 0, left: margin, bottom: 0, right: margin),
+                            jumpingPolicy: .skip(pages: 1))
 
     collectionView.collectionViewLayout = Layout(hostPagerSource: collectionView.source, settings: settings) { [weak self] in
       return self?.titles ?? []

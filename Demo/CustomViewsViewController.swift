@@ -32,7 +32,8 @@ class CustomViewsViewController: UIViewController {
                             itemMargin: 12.0,
                             bottomStripSpacing: 0.0,
                             anchor: .equal(size: 140),
-                            inset: .zero)
+                            inset: .zero,
+                            jumpingPolicy: .skip(pages: 1))
 
     collectionView.collectionViewLayout = Layout(hostPagerSource: collectionView.source, settings: settings) { [weak self] in
       return self?.titles ?? []

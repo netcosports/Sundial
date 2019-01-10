@@ -205,7 +205,7 @@ open class PlainCollectionViewLayout: UICollectionViewFlowLayout, PreparedLayout
           return
         }
 
-        guard let _ = self.collectionView,
+        guard let collectionView = self.collectionView,
           let itemFrame = self.layoutAttributesForItem(at: self.selectedIndexPath)?.frame else { return }
 
         collectionView.contentOffset = CGPoint(x: itemFrame.origin.x, y: itemFrame.origin.y)
