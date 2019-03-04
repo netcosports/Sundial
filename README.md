@@ -136,6 +136,19 @@ Here is the result:
   <img src="docs/collapsing.gif" width="320"/>
 </p>
 
+## 3. Distribution
+
+When you are using content based anchor, you must provide one of `Distribution` value:
+
+```
+public enum Distribution {
+  case left, right, center, proportional, inverseProportional, equalSpacing
+}
+```
+
+When content of provided titles are not fit into header width, titles will be distributed according to provided distribution.
+Content size of title is taking from title cell. Default implementation is `TitleCollectionViewCell`. If you need to provide custom size, you have to implement your own cell and provide custom `Data` which will implement `Titleable` protocol.
+
 ## 0. Missing points 
 
 1. More anchors
