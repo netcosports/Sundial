@@ -140,7 +140,7 @@ Here is the result:
 
 When you are using content based anchor, you must provide one of `Distribution` value:
 
-```
+```swift
 public enum Distribution {
   case left, right, center, proportional, inverseProportional, equalSpacing
 }
