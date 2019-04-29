@@ -56,6 +56,13 @@ public  class HeaderTestCell: CollectionViewCell, Reusable {
     title.text = "HEADER height is \(Int(self.frame.height))"
   }
 
+  public override func apply(_ layoutAttributes: UICollectionViewLayoutAttributes) {
+    super.apply(layoutAttributes)
+    if let stickyLayoutAttributes = layoutAttributes as? StickyHeaderCollectionViewLayoutAttributes {
+      print("progress is \(stickyLayoutAttributes.progress)")
+    }
+  }
+
   public static func size(for data: Void, containerSize: CGSize) -> CGSize {
     return CGSize(width: containerSize.width, height: 276)
   }
@@ -64,7 +71,8 @@ public  class HeaderTestCell: CollectionViewCell, Reusable {
 let containerView = CollectionView<CollectionViewSource>()
 let settings =  StickyHeaderCollectionViewLayout.Settings(
   sticky: true,
-  minHeight: 80.0
+  minHeight: 80.0,
+  alignToEdges: true
 )
 containerView.collectionViewLayout = StickyHeaderCollectionViewLayout(settings: settings)
 containerView.frame = CGRect(origin: CGPoint.zero, size: CGSize(width: 320.0, height: 620.0))
