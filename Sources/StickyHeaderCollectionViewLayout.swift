@@ -91,6 +91,13 @@ public class StickyHeaderCollectionViewLayout: UICollectionViewFlowLayout {
     if !settings.alignToEdges {
       return super.targetContentOffset(forProposedContentOffset: proposedContentOffset, withScrollingVelocity: velocity)
     }
+    guard let collectionView = collectionView, let dataSource = collectionView.dataSource else {
+      return proposedContentOffset
+    }
+    guard dataSource.numberOfSections!(in: collectionView) > 0,
+      dataSource.collectionView(collectionView, numberOfItemsInSection: 0) > 0 else {
+        return proposedContentOffset
+    }
     let topIndexPath = IndexPath(item: 0, section: 0)
     guard let topLayoutAttributes = self.layoutAttributesForItem(at: topIndexPath) else {
       return proposedContentOffset
