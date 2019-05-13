@@ -87,7 +87,7 @@ where DecorationView: DecorationViewPageable, DecorationView.TitleCell.Data: Ind
                                                   y: 0.0,
                                                   width: collectionView.frame.width,
                                                   height: headerHeight.value)
-
+    сollapsingHeaderViewAttributes.progress = headerHeight.value / maxHeaderHeight.value
     return сollapsingHeaderViewAttributes
   }
 
