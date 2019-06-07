@@ -118,7 +118,7 @@ open class GenericCollectionViewLayout<DecorationView: CollectionViewCell & Deco
   // MARK: - Internal
 
   func addDecorationAttributes(to attributes: inout [UICollectionViewLayoutAttributes]) {
-    guard attributes.count > 0 else { return }
+    guard attributes.count > settings.numberOfTitlesWhenHidden else { return }
     guard let decorationAttributes = self.decorationAttributes(with: pager?()) else {
       return
     }

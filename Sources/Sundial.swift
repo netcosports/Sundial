@@ -135,6 +135,7 @@ public struct Settings {
     }
   }
   public var shouldKeepFocusOnBoundsChange: Bool
+  public var numberOfTitlesWhenHidden: Int
 
   public init(stripHeight: CGFloat = 80.0,
               markerHeight: CGFloat = 5.5,
@@ -146,7 +147,8 @@ public struct Settings {
               alignment: DecorationAlignment = .top,
               pagesOnScreen: Int = 1,
               jumpingPolicy: JumpingPolicy = .disabled,
-              shouldKeepFocusOnBoundsChange: Bool = false) {
+              shouldKeepFocusOnBoundsChange: Bool = false,
+              numberOfTitlesWhenHidden: Int = 0) {
     self.stripHeight = stripHeight
     self.markerHeight = markerHeight
     self.itemMargin = itemMargin
@@ -160,6 +162,7 @@ public struct Settings {
     assert(jumpingPolicy == .disabled || pagesOnScreen == 1, "jumping policy doesn't support 2+ pages currently")
     self.jumpingPolicy = jumpingPolicy
     self.shouldKeepFocusOnBoundsChange = shouldKeepFocusOnBoundsChange
+    self.numberOfTitlesWhenHidden = numberOfTitlesWhenHidden
   }
 }
 

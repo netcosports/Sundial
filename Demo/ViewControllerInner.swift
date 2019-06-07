@@ -21,7 +21,7 @@ class ViewControllerInner: UIViewController {
   var inverted = false
 
   let anchor: Anchor
-  let count: Int
+  var count: Int
   let margin: CGFloat
 
   init(_ anchor: Anchor, count: Int = 5, margin: CGFloat = 80) {
@@ -38,7 +38,7 @@ class ViewControllerInner: UIViewController {
 
   let collectionView = CollectionView<CollectionViewPagerSource>()
 
-  typealias Layout = GenericCollectionViewLayout<CustomDecorationView<TitleCollectionViewCell, MarkerDecorationView<TitleCollectionViewCell.TitleViewModel>>>
+  typealias Layout = CollectionViewLayout
 
   override func viewDidLoad() {
     super.viewDidLoad()
@@ -60,7 +60,7 @@ class ViewControllerInner: UIViewController {
                             bottomStripSpacing: 0.0,
                             anchor: anchor,
                             inset: UIEdgeInsets(top: 0, left: margin, bottom: 0, right: margin),
-                            jumpingPolicy: .skip(pages: 1))
+                            numberOfTitlesWhenHidden: 1)
 
     collectionView.collectionViewLayout = Layout(hostPagerSource: collectionView.source, settings: settings) { [weak self] in
       return self?.titles ?? []
@@ -82,7 +82,7 @@ class ViewControllerInner: UIViewController {
     let button = UIButton()
     button.backgroundColor = .magenta
     button.addTarget(self, action: #selector(click), for: UIControl.Event.touchUpInside)
-    controller1.view.addSubview(button)
+    controller3.view.addSubview(button)
     button.snp.remakeConstraints {
       $0.height.width.equalTo(120)
       $0.centerX.equalToSuperview()
@@ -91,8 +91,9 @@ class ViewControllerInner: UIViewController {
   }
 
   @objc func click() {
-    self.inverted = !self.inverted
-    self.collectionView.reloadData()
+    self.count = 1
+    self.collectionView.source.reloadData()
+    self.collectionView.collectionViewLayout.invalidateLayout()
   }
 }
 
@@ -105,7 +106,7 @@ extension ViewControllerInner: CollectionViewPager {
       Page(controller: controller3, id: "Title 3"),
       Page(controller: controller4, id: "Title 4"),
       Page(controller: controller5, id: "Title 5")
-      ].prefix(count))
+    ].prefix(count))
   }
 }
 
@@ -119,7 +120,7 @@ extension ViewControllerInner {
         TitleCollectionViewCell.TitleViewModel(title: "Green", indicatorColor: .green),
         TitleCollectionViewCell.TitleViewModel(title: "Gray", indicatorColor: .gray),
         TitleCollectionViewCell.TitleViewModel(title: "Orange", indicatorColor: .orange)
-      ].prefix(count))
+        ].prefix(count))
     } else {
       return Array([
         TitleCollectionViewCell.TitleViewModel(title: "Mid Blue", indicatorColor: .blue),
