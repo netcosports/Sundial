@@ -26,6 +26,7 @@ where DecorationView: DecorationViewPageable, DecorationView.TitleCell.Data: Ind
   fileprivate var handlers: [CollapsingHeaderHandler] = []
   fileprivate weak var connectedItem: CollapsingItem?
   fileprivate var updateHeightDisposeBag: DisposeBag?
+  fileprivate var updateMaxHeightDisposeBag: DisposeBag?
 
   // MARK: - Init
 
@@ -122,10 +123,10 @@ where DecorationView: DecorationViewPageable, DecorationView.TitleCell.Data: Ind
       if sself.maxHeaderHeight.value > maxHeight {
         sself.maxHeaderHeight.accept(maxHeight)
       }
-      sself.updateHeightDisposeBag = nil
+      sself.updateMaxHeightDisposeBag = nil
       sself.followOffsetChanges.accept(false)
     }).disposed(by: updateMaxHeightDisposeBag)
-    self.updateHeightDisposeBag = updateMaxHeightDisposeBag
+    self.updateMaxHeightDisposeBag = updateMaxHeightDisposeBag
   }
 
   open func update(height: CGFloat, animated: Bool = true) {

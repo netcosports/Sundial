@@ -80,11 +80,6 @@ class CollapsingHeaderViewController: UIViewController {
       .map { $0 + 80.0 }
       .drive(controller3.offsetBehaviorRelay)
       .disposed(by: disposeBag)
-    if #available(iOS 10.0, *) {
-      Timer.scheduledTimer(withTimeInterval: 5.0, repeats: false, block: { timer in
-        layout.update(height: 50)
-      })
-    }
 
     collasingItemsSubject.asDriver(onErrorJustReturn: []).drive(onNext: { [weak layout] collasingItems in
       layout?.append(collapsingItems: collasingItems)
