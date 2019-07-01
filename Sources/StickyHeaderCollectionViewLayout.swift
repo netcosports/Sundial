@@ -7,17 +7,19 @@
 
 import UIKit
 
-public class StickyHeaderCollectionViewLayout: UICollectionViewFlowLayout {
+open class StickyHeaderCollectionViewLayout: UICollectionViewFlowLayout {
 
   public struct Settings {
+    public var collapsing: Bool
     public var minHeight: CGFloat
     public var sticky: Bool
     public var alignToEdges: Bool
 
-    public init(sticky: Bool = false, minHeight: CGFloat = 0.0, alignToEdges: Bool = false) {
+    public init(collapsing: Bool = true, sticky: Bool = false, minHeight: CGFloat = 0.0, alignToEdges: Bool = false) {
       self.minHeight = minHeight
       self.sticky = sticky
       self.alignToEdges = alignToEdges
+      self.collapsing = collapsing
     }
   }
 
@@ -32,7 +34,7 @@ public class StickyHeaderCollectionViewLayout: UICollectionViewFlowLayout {
     super.init()
   }
 
-  required init?(coder aDecoder: NSCoder) {
+  required public init?(coder aDecoder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
   }
 
@@ -42,10 +44,11 @@ public class StickyHeaderCollectionViewLayout: UICollectionViewFlowLayout {
 
   open override func layoutAttributesForElements(in rect: CGRect) -> [UICollectionViewLayoutAttributes]? {
     let topIndexPath = IndexPath(item: 0, section: 0)
-    guard var layoutAttributes = super.layoutAttributesForElements(in: rect)?
-      .filter({ $0.indexPath != topIndexPath }) else {
+    guard var allLayoutAttributes = super.layoutAttributesForElements(in: rect) else {
         return nil
     }
+    var layoutAttributes = allLayoutAttributes.filter({ $0.indexPath != topIndexPath })
+    guard settings.collapsing else { return allLayoutAttributes }
     guard let collectionView = collectionView, let dataSource = collectionView.dataSource else {
       return layoutAttributes
     }
