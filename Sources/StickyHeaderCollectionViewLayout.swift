@@ -38,10 +38,6 @@ open class StickyHeaderCollectionViewLayout: EmptyViewCollectionViewLayout {
     fatalError("init(coder:) has not been implemented")
   }
 
-  open override func shouldInvalidateLayout(forBoundsChange newBounds: CGRect) -> Bool {
-    return true
-  }
-
   open override func layoutAttributesForElements(in rect: CGRect) -> [UICollectionViewLayoutAttributes]? {
     let topIndexPath = IndexPath(item: 0, section: 0)
     guard let allLayoutAttributes = super.layoutAttributesForElements(in: rect) else {

@@ -47,6 +47,10 @@ open class EmptyViewCollectionViewLayout: UICollectionViewFlowLayout, PreparedLa
     readySubject.onNext(())
   }
 
+  open override func shouldInvalidateLayout(forBoundsChange newBounds: CGRect) -> Bool {
+    return true
+  }
+
   open override var collectionViewContentSize: CGSize {
     guard let collectionView = collectionView else { return super.collectionViewContentSize }
     let size = super.collectionViewContentSize
@@ -108,7 +112,14 @@ extension EmptyViewCollectionViewLayout {
     decorationAttributes.isHidden = !needToShowLoaderView
     let height = collectionView.frame.height - collectionView.contentInset.top
     let size = CGSize(width: collectionView.frame.width, height: height)
-    decorationAttributes.frame = CGRect(origin: .zero, size: size)
+    var offset = collectionView.contentOffset
+    if offset.x < 0.0 && scrollDirection == .horizontal {
+      offset.x = 0.0
+    }
+    if offset.y < 0.0 && scrollDirection == .vertical {
+      offset.y = 0.0
+    }
+    decorationAttributes.frame = CGRect(origin: offset, size: size)
     return decorationAttributes
   }
 
