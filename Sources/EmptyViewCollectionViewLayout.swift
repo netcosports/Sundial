@@ -124,6 +124,7 @@ extension EmptyViewCollectionViewLayout {
   public func register<T: LoaderDecoration>(emptyViewDecoration: T.Type,
                                             showEmptyView: BehaviorSubject<Bool>,
                                             reloadSubject: PublishSubject<Void>) {
+    register(emptyViewDecoration, forDecorationViewOfKind: emptyViewDecoration.kind)
     self.emptyViewDecoration = emptyViewDecoration
     self.showEmptyView = showEmptyView
     self.reloadSubject = reloadSubject
