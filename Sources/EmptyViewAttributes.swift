@@ -10,7 +10,7 @@ import RxSwift
 
 open class EmptyViewAttributes: UICollectionViewLayoutAttributes {
 
-  var reloadSubject: PublishSubject<Void>?
+  public var reloadSubject: PublishSubject<Void>?
 
   open override func copy(with zone: NSZone? = nil) -> Any {
     let copy = super.copy(with: zone)
