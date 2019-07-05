@@ -36,6 +36,7 @@
 		AA22E94A1FC4569C0070DD70 /* TestViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestViewController.swift; sourceTree = "<group>"; };
 		AA22E94C1FC4595E0070DD70 /* CollapsingHeaderViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CollapsingHeaderViewController.swift; sourceTree = "<group>"; };
 		AA5CEC9C226F372900C130CE /* StickyHeaderLayout.playground */ = {isa = PBXFileReference; lastKnownFileType = file.playground; path = StickyHeaderLayout.playground; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
+		AAA7893F22AA7B62007209FF /* CollectionViewLayout.playground */ = {isa = PBXFileReference; lastKnownFileType = file.playground; path = CollectionViewLayout.playground; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		AAC615A01FBF807E00C1F91B /* ViewControllerInner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewControllerInner.swift; sourceTree = "<group>"; };
 		AAC615A21FC0CAA100C1F91B /* CustomCells.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomCells.swift; sourceTree = "<group>"; };
 		AAE7481A1FC21A1600F66501 /* CustomViewsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomViewsViewController.swift; sourceTree = "<group>"; };
@@ -92,6 +93,7 @@
 		607FACD21AFB9204008FA782 /* Demo */ = {
 			isa = PBXGroup;
 			children = (
+				AAA7893F22AA7B62007209FF /* CollectionViewLayout.playground */,
 				AA5CEC9C226F372900C130CE /* StickyHeaderLayout.playground */,
 				AA22E9491FC4567C0070DD70 /* CollapsingHeader */,
 				607FACD51AFB9204008FA782 /* AppDelegate.swift */,

@@ -7,7 +7,7 @@
 
 import UIKit
 
-open class StickyHeaderCollectionViewLayout: UICollectionViewFlowLayout {
+open class StickyHeaderCollectionViewLayout: EmptyViewCollectionViewLayout {
 
   public struct Settings {
     public var collapsing: Bool
@@ -44,8 +44,8 @@ open class StickyHeaderCollectionViewLayout: UICollectionViewFlowLayout {
 
   open override func layoutAttributesForElements(in rect: CGRect) -> [UICollectionViewLayoutAttributes]? {
     let topIndexPath = IndexPath(item: 0, section: 0)
-    guard var allLayoutAttributes = super.layoutAttributesForElements(in: rect) else {
-        return nil
+    guard let allLayoutAttributes = super.layoutAttributesForElements(in: rect) else {
+      return nil
     }
     var layoutAttributes = allLayoutAttributes.filter({ $0.indexPath != topIndexPath })
     guard settings.collapsing else { return allLayoutAttributes }
