@@ -48,6 +48,13 @@ open class EmptyViewCollectionViewLayout: UICollectionViewFlowLayout, PreparedLa
   }
 
   open override func shouldInvalidateLayout(forBoundsChange newBounds: CGRect) -> Bool {
+    // NOTE: important to perform this, because when sectionHeadersPinToVisibleBounds is true
+    // `layoutAttributesForElements` is not called even when `shouldInvalidateLayout` is true
+    if sectionHeadersPinToVisibleBounds, let loaderDecoration = loaderDecoration {
+      let context = UICollectionViewFlowLayoutInvalidationContext()
+      context.invalidateDecorationElements(ofKind: loaderDecoration.kind, at: [IndexPath(index: 1)])
+      self.invalidateLayout(with: context)
+    }
     return true
   }
 
@@ -63,10 +70,10 @@ open class EmptyViewCollectionViewLayout: UICollectionViewFlowLayout, PreparedLa
   open override func layoutAttributesForElements(in rect: CGRect) -> [UICollectionViewLayoutAttributes]? {
     var originalAttributes = super.layoutAttributesForElements(in: rect)
     guard collectionView != nil else { return originalAttributes }
-    if let emptyViewDecorationAttributes = emptyViewDecorationAttributes() {
+    if let emptyViewDecorationAttributes = emptyViewDecorationAttributes(), emptyViewDecorationAttributes.frame.intersects(rect) {
       originalAttributes?.append(emptyViewDecorationAttributes)
     }
-    if let loaderViewDecorationAttributes = loaderViewDecorationAttributes() {
+    if let loaderViewDecorationAttributes = loaderViewDecorationAttributes(), loaderViewDecorationAttributes.frame.intersects(rect) {
       originalAttributes?.append(loaderViewDecorationAttributes)
     }
     return originalAttributes
