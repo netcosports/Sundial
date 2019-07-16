@@ -101,9 +101,7 @@ extension EmptyViewCollectionViewLayout {
     showLoaderView.asObservable()
       .observeOn(MainScheduler.instance)
       .subscribe(onNext: { [weak self] _ in
-        let context = UICollectionViewFlowLayoutInvalidationContext()
-        context.invalidateDecorationElements(ofKind: loaderDecoration.kind, at: [IndexPath(index: 1)])
-        self?.invalidateLayout(with: context)
+        self?.invalidateLayout()
       }).disposed(by: loaderDisposeBag)
     self.loaderDisposeBag = loaderDisposeBag
   }
@@ -151,9 +149,7 @@ extension EmptyViewCollectionViewLayout {
     showEmptyView.asObservable()
       .observeOn(MainScheduler.instance)
       .subscribe(onNext: { [weak self] _ in
-        let context = UICollectionViewFlowLayoutInvalidationContext()
-        context.invalidateDecorationElements(ofKind: emptyViewDecoration.kind, at: [IndexPath(index: 0)])
-        self?.invalidateLayout(with: context)
+        self?.invalidateLayout()
       }).disposed(by: disposeBag)
     self.emptyViewDisposeBag = emptyViewDisposeBag
   }
