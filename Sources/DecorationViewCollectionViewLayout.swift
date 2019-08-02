@@ -94,6 +94,7 @@ open class DecorationViewCollectionViewLayout<TitleViewModel: ViewModelable, Mar
       size.width = last.maxX + sectionInset.right
     }
 
+    print("size.width is \(size.width), collectionViewWidth is \(collectionViewWidth)")
     if case let .content(distribution) = anchor, size.width < collectionViewWidth {
       switch distribution {
       case .left:
@@ -272,6 +273,14 @@ open class DecorationViewCollectionViewLayout<TitleViewModel: ViewModelable, Mar
       attributes.append(markerAttributes)
     }
 
+    if case .content(_) = anchor {
+      print("============================== frame is \(rect)")
+      print("frame is \(collectionView?.frame) offset \(collectionView?.contentOffset)")
+      titleAttributes.forEach {
+        print("att = \($0), alpha = \($0.alpha), hidden = \($0.isHidden), fade = \($0.fade)")
+      }
+      print("==============================")
+    }
     return attributes
   }
 
@@ -351,7 +360,10 @@ extension DecorationViewCollectionViewLayout {
 
     switch anchor {
     case .content, .equal:
-      adjustContentOffset(for: decorationAttributes, collectionView: collectionView)
+      // FIXME: temporary workaround for the issue with autoscroll, MUST be fixed in correct way
+      DispatchQueue.main.async {
+        self.adjustContentOffset(for: decorationAttributes, collectionView: collectionView)
+      }
     case .centered:
       adjustCenteredContentOffset(for: decorationAttributes, collectionView: collectionView)
     case .left(let offset):
