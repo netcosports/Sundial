@@ -94,7 +94,6 @@ open class DecorationViewCollectionViewLayout<TitleViewModel: ViewModelable, Mar
       size.width = last.maxX + sectionInset.right
     }
 
-    print("size.width is \(size.width), collectionViewWidth is \(collectionViewWidth)")
     if case let .content(distribution) = anchor, size.width < collectionViewWidth {
       switch distribution {
       case .left:
@@ -271,15 +270,6 @@ open class DecorationViewCollectionViewLayout<TitleViewModel: ViewModelable, Mar
 
     if let markerAttributes = decorationAttributes(for: currentPages, nextPages: !nextPages.isEmpty ? nextPages : nil) {
       attributes.append(markerAttributes)
-    }
-
-    if case .content(_) = anchor {
-      print("============================== frame is \(rect)")
-      print("frame is \(collectionView?.frame) offset \(collectionView?.contentOffset)")
-      titleAttributes.forEach {
-        print("att = \($0), alpha = \($0.alpha), hidden = \($0.isHidden), fade = \($0.fade)")
-      }
-      print("==============================")
     }
     return attributes
   }
