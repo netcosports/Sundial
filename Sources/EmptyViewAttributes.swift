@@ -17,6 +17,7 @@ open class EmptyViewAttributes: UICollectionViewLayoutAttributes {
     guard let typedCopy = copy as? EmptyViewAttributes else {
       return copy
     }
+    typedCopy.reloadSubject = reloadSubject
     return typedCopy
   }
 
@@ -25,6 +26,14 @@ open class EmptyViewAttributes: UICollectionViewLayoutAttributes {
       return false
     }
 
-    return true
+    guard let typedObject = object as? EmptyViewAttributes else {
+      return false
+    }
+
+    if typedObject.reloadSubject == nil && self.reloadSubject == nil {
+      return true
+    }
+
+    return typedObject.reloadSubject === self.reloadSubject
   }
 }
