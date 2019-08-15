@@ -39,6 +39,7 @@
 		AAA7893F22AA7B62007209FF /* CollectionViewLayout.playground */ = {isa = PBXFileReference; lastKnownFileType = file.playground; path = CollectionViewLayout.playground; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		AAC615A01FBF807E00C1F91B /* ViewControllerInner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewControllerInner.swift; sourceTree = "<group>"; };
 		AAC615A21FC0CAA100C1F91B /* CustomCells.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomCells.swift; sourceTree = "<group>"; };
+		AAD9615D2304263B00CBCC7C /* AlignedLayout.playground */ = {isa = PBXFileReference; lastKnownFileType = file.playground; path = AlignedLayout.playground; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		AAE7481A1FC21A1600F66501 /* CustomViewsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomViewsViewController.swift; sourceTree = "<group>"; };
 		B0C15CD1201F7394004E6CE8 /* CustomDecorationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomDecorationView.swift; sourceTree = "<group>"; };
 		B555DCEC1FC6DAEC00296E4B /* Fastfile */ = {isa = PBXFileReference; lastKnownFileType = text; path = Fastfile; sourceTree = "<group>"; };
@@ -93,6 +94,7 @@
 		607FACD21AFB9204008FA782 /* Demo */ = {
 			isa = PBXGroup;
 			children = (
+				AAD9615D2304263B00CBCC7C /* AlignedLayout.playground */,
 				AAA7893F22AA7B62007209FF /* CollectionViewLayout.playground */,
 				AA5CEC9C226F372900C130CE /* StickyHeaderLayout.playground */,
 				AA22E9491FC4567C0070DD70 /* CollapsingHeader */,
