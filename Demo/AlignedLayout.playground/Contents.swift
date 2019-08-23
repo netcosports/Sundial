@@ -52,7 +52,7 @@ containerView.collectionViewLayout = layout
 containerView.backgroundColor = .red
 containerView.decelerationRate = .fast
 var cells: [Cellable] = (1...50).map { "Item \($0)" }.map { CollectionCell<TestCell>(data: $0) }
-containerView.source.sections = [Section(cells: cells)]
+containerView.source.sections = [Section(cells: []), Section(cells: cells), Section(cells: []),]
 containerView.reloadData()
 
 PlaygroundPage.current.liveView = containerView

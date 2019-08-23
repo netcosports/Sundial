@@ -10,6 +10,7 @@ import Astrolabe
 import RxSwift
 import RxCocoa
 
+// deprecated
 open class GenericCollapsingCollectionViewLayout<DecorationView: CollectionViewCell>: GenericCollectionViewLayout<DecorationView>
 where DecorationView: DecorationViewPageable, DecorationView.TitleCell.Data: Indicatorable {
 

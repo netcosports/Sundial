@@ -266,6 +266,7 @@ private extension AutoAlignedCollectionViewLayout {
     let section = collectionView.numberOfSections - 1
     guard section >= 0, section < collectionView.numberOfSections else { return nil }
     let item = collectionView.numberOfItems(inSection: section) - 1
+    guard item >= 0 else { return nil }
     return IndexPath(item: item, section: section)
   }
 

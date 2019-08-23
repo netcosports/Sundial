@@ -36,10 +36,11 @@
 		AA22E94A1FC4569C0070DD70 /* TestViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestViewController.swift; sourceTree = "<group>"; };
 		AA22E94C1FC4595E0070DD70 /* CollapsingHeaderViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CollapsingHeaderViewController.swift; sourceTree = "<group>"; };
 		AA5CEC9C226F372900C130CE /* StickyHeaderLayout.playground */ = {isa = PBXFileReference; lastKnownFileType = file.playground; path = StickyHeaderLayout.playground; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
-		AAA7893F22AA7B62007209FF /* CollectionViewLayout.playground */ = {isa = PBXFileReference; lastKnownFileType = file.playground; path = CollectionViewLayout.playground; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
+		AAA7893F22AA7B62007209FF /* DeprecatedLayout.playground */ = {isa = PBXFileReference; lastKnownFileType = file.playground; path = DeprecatedLayout.playground; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		AAC615A01FBF807E00C1F91B /* ViewControllerInner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewControllerInner.swift; sourceTree = "<group>"; };
 		AAC615A21FC0CAA100C1F91B /* CustomCells.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomCells.swift; sourceTree = "<group>"; };
 		AAD9615D2304263B00CBCC7C /* AlignedLayout.playground */ = {isa = PBXFileReference; lastKnownFileType = file.playground; path = AlignedLayout.playground; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
+		AADC3E482310262000234BB4 /* PagerHeader.playground */ = {isa = PBXFileReference; lastKnownFileType = file.playground; path = PagerHeader.playground; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		AAE7481A1FC21A1600F66501 /* CustomViewsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomViewsViewController.swift; sourceTree = "<group>"; };
 		B0C15CD1201F7394004E6CE8 /* CustomDecorationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomDecorationView.swift; sourceTree = "<group>"; };
 		B555DCEC1FC6DAEC00296E4B /* Fastfile */ = {isa = PBXFileReference; lastKnownFileType = text; path = Fastfile; sourceTree = "<group>"; };
@@ -94,8 +95,9 @@
 		607FACD21AFB9204008FA782 /* Demo */ = {
 			isa = PBXGroup;
 			children = (
+				AADC3E482310262000234BB4 /* PagerHeader.playground */,
 				AAD9615D2304263B00CBCC7C /* AlignedLayout.playground */,
-				AAA7893F22AA7B62007209FF /* CollectionViewLayout.playground */,
+				AAA7893F22AA7B62007209FF /* DeprecatedLayout.playground */,
 				AA5CEC9C226F372900C130CE /* StickyHeaderLayout.playground */,
 				AA22E9491FC4567C0070DD70 /* CollapsingHeader */,
 				607FACD51AFB9204008FA782 /* AppDelegate.swift */,
@@ -431,6 +433,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "org.cocoapods.demo.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_SWIFT3_OBJC_INFERENCE = Default;
+				SWIFT_TREAT_WARNINGS_AS_ERRORS = NO;
 				SWIFT_VERSION = 4.2;
 				TARGETED_DEVICE_FAMILY = 1;
 			};
@@ -447,6 +450,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "org.cocoapods.demo.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_SWIFT3_OBJC_INFERENCE = Default;
+				SWIFT_TREAT_WARNINGS_AS_ERRORS = NO;
 				SWIFT_VERSION = 4.2;
 				TARGETED_DEVICE_FAMILY = 1;
 			};

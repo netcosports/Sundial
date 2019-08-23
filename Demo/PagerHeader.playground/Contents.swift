@@ -1,14 +1,11 @@
-//
-//  ViewControllerInner.swift
-//  Sundial_Example
-//
-//  Created by Sergei Mikhan on 11/17/17.
-//  Copyright © 2017 CocoaPods. All rights reserved.
-//
+//: A UIKit based Playground for presenting user interface
 
 import UIKit
 import Astrolabe
 import Sundial
+import SnapKit
+
+import PlaygroundSupport
 
 class ColoredViewController: UIViewController, ReusedPageData {
 
@@ -79,9 +76,10 @@ class ViewControllerInner: UIViewController {
     let cells: [Cellable] = colors.map {
       CollectionCell<ReusedPagerCollectionViewCell<ColoredViewController>>(data: $0)
     }
+
     typealias Supplementary = PagerHeaderSupplementaryView<TitleCollectionViewCell, MarkerDecorationView<TitleCollectionViewCell.Data>>
-    let supplementaries = CollectionCell<Supplementary>(data: titles, id: "", click: nil, type: .custom(kind: PagerHeaderSupplementaryViewKind), setup: nil)
-    let section = MultipleSupplementariesSection(supplementaries: [supplementaries], cells: cells)
+    let supplementary = CollectionCell<Supplementary>(data: titles, id: "", click: nil, type: .custom(kind: PagerHeaderSupplementaryViewKind), setup: nil)
+    let section = MultipleSupplementariesSection(supplementaries: [supplementary], cells: cells)
     collectionView.source.sections = [section]
     collectionView.reloadData()
   }
@@ -99,3 +97,5 @@ extension ViewControllerInner {
       ].prefix(count))
   }
 }
+
+PlaygroundPage.current.liveView = ViewControllerInner(.content(Distribution.center))

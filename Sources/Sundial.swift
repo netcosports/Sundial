@@ -82,7 +82,7 @@ public enum Distribution {
 
 // MARK: - Anchor
 
-public enum Anchor {
+public enum Anchor: Equatable {
   case content(Distribution)
   case centered
   case fillEqual
@@ -93,9 +93,19 @@ public enum Anchor {
 
 // MARK: - DecorationAlignment
 
-public enum DecorationAlignment {
+public enum DecorationAlignment: Equatable {
   case top
   case topOffset(behaviorRelay: BehaviorRelay<CGFloat>)
+
+  public static func == (lhs: DecorationAlignment, rhs: DecorationAlignment) -> Bool {
+    switch (lhs, rhs) {
+    case (.top, .top):
+      return true
+    case (.topOffset(let lBehaviorRelay), .topOffset(let rBehaviorRelay)):
+      return lBehaviorRelay === rBehaviorRelay
+    default: return false
+    }
+  }
 }
 
 // MARK: - JumpingPolicy
@@ -113,9 +123,24 @@ public enum JumpingPolicy: Equatable {
   }
 }
 
+// MARK: - Prepared
+
+public protocol PreparedLayout {
+
+  var readyObservable: Observable<Void> { get }
+}
+
+public extension Reactive where Base: PreparedLayout {
+
+  var ready: ControlEvent<Void> {
+    return ControlEvent(events: base.readyObservable)
+  }
+}
+
+
 // MARK: - Settings
 
-public struct Settings {
+public struct Settings: Equatable {
   public var stripHeight: CGFloat
   public var markerHeight: CGFloat
   public var itemMargin: CGFloat

@@ -11,6 +11,7 @@ import Astrolabe
 import RxSwift
 import RxCocoa
 
+// DO WE NEED THIS?
 public protocol Markerable {
 
   associatedtype ViewModel: ViewModelable
@@ -18,6 +19,7 @@ public protocol Markerable {
   func apply(currentTitle: ViewModel?, nextTitle: ViewModel?, progress: CGFloat)
 }
 
+// deprecated to PagerHeaderAttributes
 public protocol Attributable: class {
 
   associatedtype TitleViewModel: Titleable
@@ -30,9 +32,9 @@ public protocol Attributable: class {
 //  var newCollectionViewWidth: CGFloat? { get set }
 
 }
-
+// deprecated to
 public let DecorationViewId = "DecorationView"
-
+// deprecated to
 public protocol DecorationViewPageable {
 
   associatedtype TitleCell: CollectionViewCell, Reusable

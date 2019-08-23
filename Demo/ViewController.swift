@@ -79,7 +79,7 @@ extension ViewController: CollectionViewPager {
 
   var pages: [Page] {
     var controllers: [UIViewController] = inners
-    controllers.insert(collapsing, at: 0)
+    controllers.insert(collapsing, at: 1)
     controllers.append(customViews)
 
     return controllers.enumerated().map { Page(controller: $1, id: "Title \($0)") }
