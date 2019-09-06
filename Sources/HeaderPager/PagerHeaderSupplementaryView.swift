@@ -18,8 +18,6 @@ public protocol PagerHeaderAttributes {
   var hostPagerSource: CollectionViewSource? { get }
 }
 
-public let PagerHeaderSupplementaryViewKind = "PagerHeaderSupplementaryViewKind"
-
 open class PagerHeaderSupplementaryView<T: CollectionViewCell, M: CollectionViewCell>: CollectionViewCell, Reusable where T: Reusable, T.Data: Titleable, T.Data: Indicatorable {
 
   public typealias TitleCell                     = T

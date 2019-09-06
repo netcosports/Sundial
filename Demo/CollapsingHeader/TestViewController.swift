@@ -12,7 +12,7 @@ import RxCocoa
 import Astrolabe
 import Sundial
 
-class TestCell: CollectionViewCell, Reusable {
+class ColoredTestCell: CollectionViewCell, Reusable {
 
   let title: UILabel = {
     let title = UILabel()
@@ -43,7 +43,7 @@ class TestCell: CollectionViewCell, Reusable {
 
 class TestLoaderViewController: UIViewController, Accessor, CollapsingItem, Loadable, Containerable {
 
-  typealias Cell = CollectionCell<TestCell>
+  typealias Cell = CollectionCell<ColoredTestCell>
   let containerView = CollectionView<LoaderDecoratorSource<CollectionViewSource>>()
 
   let visible = BehaviorRelay<Bool>(value: false)
@@ -110,7 +110,7 @@ class TestLoaderViewController: UIViewController, Accessor, CollapsingItem, Load
 
 class TestViewController: UIViewController, Accessor, CollapsingItem {
 
-  typealias Cell = CollectionCell<TestCell>
+  typealias Cell = CollectionCell<ColoredTestCell>
   let containerView = CollectionView<CollectionViewSource>()
 
   let visible = BehaviorRelay<Bool>(value: false)

@@ -10,15 +10,122 @@ import UIKit
 import Astrolabe
 import Sundial
 
-class ColoredViewController: UIViewController, ReusedPageData {
+import RxSwift
+import RxCocoa
+
+public  class CollapsingCell: CollectionViewCell, Reusable {
+
+  let title: UILabel = {
+    let title = UILabel()
+    title.textColor = .white
+    title.textAlignment = .center
+    return title
+  }()
+
+  open override func setup() {
+    super.setup()
+    contentView.backgroundColor = .orange
+    contentView.addSubview(title)
+  }
+
+  open override func layoutSubviews() {
+    super.layoutSubviews()
+    title.frame = contentView.bounds
+    title.text = "HEADER height is \(Int(self.frame.height))"
+  }
+
+  public override func apply(_ layoutAttributes: UICollectionViewLayoutAttributes) {
+    super.apply(layoutAttributes)
+    if let collapsingHeaderViewAttributes = layoutAttributes as? CollapsingHeaderViewAttributes {
+      print("progress is \(collapsingHeaderViewAttributes.progress)")
+    }
+  }
+
+  public static func size(for data: Void, containerSize: CGSize) -> CGSize {
+    return CGSize(width: containerSize.width, height: 276)
+  }
+}
+
+public class TestCell: CollectionViewCell, Reusable {
+
+  let title: UILabel = {
+    let title = UILabel()
+    title.textColor = .white
+    title.textAlignment = .center
+    return title
+  }()
+
+  open override func setup() {
+    super.setup()
+    self.backgroundColor = .green
+    contentView.addSubview(title)
+  }
+
+  open override func layoutSubviews() {
+    super.layoutSubviews()
+    title.frame = contentView.bounds
+  }
+
+  open func setup(with data: String) {
+    title.text = data
+  }
+
+  public static func size(for data: String, containerSize: CGSize) -> CGSize {
+    return CGSize(width: containerSize.width, height: containerSize.width * 0.35)
+  }
+}
+
+class ColoredViewController: UIViewController, ReusedPageData, CollapsingItem {
+
+  var scrollView: UIScrollView {
+    return containerView
+  }
+  var visible = BehaviorRelay<Bool>(value: false)
 
   var data: UIColor? {
     didSet {
       view.backgroundColor = data
     }
   }
-}
 
+  let containerView = CollectionView<CollectionViewSource>()
+
+  override func viewDidLoad() {
+    super.viewDidLoad()
+
+    containerView.frame = CGRect(origin: CGPoint.zero, size: CGSize(width: 320.0, height: 640.0))
+
+    let layout = UICollectionViewFlowLayout()
+    layout.scrollDirection = .vertical
+    layout.minimumInteritemSpacing = 30.0
+    layout.minimumLineSpacing = 30.0
+
+    containerView.collectionViewLayout = layout
+    containerView.backgroundColor = .red
+    containerView.decelerationRate = .fast
+
+    view.addSubview(containerView)
+
+    let cells: [Cellable] = (1...50).map { "Item \($0)" }.map { CollectionCell<TestCell>(data: $0) }
+    containerView.source.sections = [Section(cells: []), Section(cells: cells), Section(cells: []),]
+  }
+
+  override func viewDidLayoutSubviews() {
+    super.viewDidLayoutSubviews()
+    containerView.frame = view.bounds
+  }
+
+  override func viewDidAppear(_ animated: Bool) {
+    super.viewDidAppear(animated)
+    visible.accept(true)
+  }
+
+  override func viewDidDisappear(_ animated: Bool) {
+    super.viewDidDisappear(animated)
+    visible.accept(false)
+  }
+
+}
 
 class ViewControllerInner: UIViewController {
 
@@ -61,11 +168,16 @@ class ViewControllerInner: UIViewController {
                             markerHeight: 5.5,
                             itemMargin: margin,
                             bottomStripSpacing: 0.0,
+                            backgroundColor: .white,
                             anchor: anchor,
                             inset: UIEdgeInsets(top: 0, left: margin, bottom: 0, right: margin),
                             numberOfTitlesWhenHidden: 1)
 
-    collectionView.collectionViewLayout = Layout(hostPagerSource: collectionView.source, settings: settings)
+    let layout = Layout(hostPagerSource: collectionView.source, settings: settings)
+    layout.headerHeight.accept(320.0)
+    layout.minHeaderHeight.accept(80.0)
+    layout.maxHeaderHeight.accept(320.0)
+    collectionView.collectionViewLayout = layout
 
     view.addSubview(collectionView)
     collectionView.snp.remakeConstraints {
@@ -76,12 +188,21 @@ class ViewControllerInner: UIViewController {
       .blue, .black, .green, .gray, .orange
     ]
 
-    let cells: [Cellable] = colors.map {
-      CollectionCell<ReusedPagerCollectionViewCell<ColoredViewController>>(data: $0)
+    let cells: [Cellable] = colors.prefix(count).map {
+      CollectionCell<ReusedPagerCollectionViewCell<ColoredViewController>>(data: $0, setup: { [weak layout] cellView in
+        layout?.append(collapsingItems: [cellView.viewController])
+      })
     }
+
     typealias Supplementary = PagerHeaderSupplementaryView<TitleCollectionViewCell, MarkerDecorationView<TitleCollectionViewCell.Data>>
-    let supplementaries = CollectionCell<Supplementary>(data: titles, id: "", click: nil, type: .custom(kind: PagerHeaderSupplementaryViewKind), setup: nil)
-    let section = MultipleSupplementariesSection(supplementaries: [supplementaries], cells: cells)
+
+    let supplementaryPager = CollectionCell<Supplementary>(data: titles, id: "", click: nil,
+                                                           type: .custom(kind:  PagerHeaderSupplementaryViewKind), setup: nil)
+//    let supplementaryCollapsing = CollectionCell<CollapsingCell>(data: (), id: "", click: nil,
+//                                                                 type: .custom(kind:  PagerHeaderCollapsingSupplementaryViewKind), setup: nil)
+    let section = MultipleSupplementariesSection(supplementaries: [supplementaryPager
+                                                                   //, supplementaryCollapsing
+      ], cells: cells)
     collectionView.source.sections = [section]
     collectionView.reloadData()
   }
@@ -96,6 +217,6 @@ extension ViewControllerInner {
       TitleCollectionViewCell.TitleViewModel(title: "Green", indicatorColor: .green),
       TitleCollectionViewCell.TitleViewModel(title: "Gray", indicatorColor: .gray),
       TitleCollectionViewCell.TitleViewModel(title: "Orange", indicatorColor: .orange)
-      ].prefix(count))
+    ].prefix(count))
   }
 }
