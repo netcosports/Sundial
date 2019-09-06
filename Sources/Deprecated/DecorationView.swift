@@ -11,6 +11,7 @@ import Astrolabe
 import RxSwift
 import RxCocoa
 
+@available(*, deprecated, message: "Please use PagerHeaderCollectionViewLayout")
 open class GenericDecorationView<T: CollectionViewCell, M: CollectionViewCell, A: UICollectionViewLayoutAttributes & Attributable>:
   CollectionViewCell, DecorationViewPageable where T: Reusable, T.Data == A.TitleViewModel, T.Data: Indicatorable {
 

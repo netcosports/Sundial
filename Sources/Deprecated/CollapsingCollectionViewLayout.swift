@@ -10,7 +10,7 @@ import Astrolabe
 import RxSwift
 import RxCocoa
 
-// deprecated
+@available(*, deprecated, message: "Please use PagerHeaderCollectionViewLayout")
 open class GenericCollapsingCollectionViewLayout<DecorationView: CollectionViewCell>: GenericCollectionViewLayout<DecorationView>
 where DecorationView: DecorationViewPageable, DecorationView.TitleCell.Data: Indicatorable {
 

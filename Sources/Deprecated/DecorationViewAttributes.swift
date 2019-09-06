@@ -9,6 +9,7 @@
 import UIKit
 import Astrolabe
 
+@available(*, deprecated, message: "Please use PagerHeaderCollectionViewLayout")
 open class DecorationViewAttributes<TitleViewModel: Titleable>: UICollectionViewLayoutAttributes, Attributable {
 
   public var titles: [TitleViewModel] = []

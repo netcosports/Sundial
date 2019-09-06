@@ -11,6 +11,7 @@ import RxSwift
 import RxCocoa
 import Astrolabe
 
+@available(*, deprecated, message: "Please use PagerHeaderCollectionViewLayout")
 open class DecorationViewCollectionViewLayout<TitleViewModel: ViewModelable, MarkerCell: CollectionViewCell>: UICollectionViewFlowLayout {
 
   open class InvalidationContext: UICollectionViewFlowLayoutInvalidationContext {
