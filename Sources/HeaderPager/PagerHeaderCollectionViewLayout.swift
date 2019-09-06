@@ -30,6 +30,7 @@ open class PagerHeaderCollectionViewLayout: PlainCollectionViewLayout {
 
   fileprivate let expandedSubject = BehaviorSubject<Bool>(value: true)
   fileprivate var handlers: [CollapsingHeaderHandler] = []
+  fileprivate var pengingCollapsingItems: [CollapsingItem] = []
   fileprivate weak var connectedItem: CollapsingItem?
   fileprivate var updateHeightDisposeBag: DisposeBag?
   fileprivate var updateMaxHeightDisposeBag: DisposeBag?
@@ -57,6 +58,15 @@ open class PagerHeaderCollectionViewLayout: PlainCollectionViewLayout {
 
   required public init?(coder aDecoder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
+  }
+
+  open override func prepare() {
+    super.prepare()
+
+    if hasCollapsingSupplementary && !pengingCollapsingItems.isEmpty {
+      append(collapsingItems: pengingCollapsingItems)
+      pengingCollapsingItems = []
+    }
   }
 
   open override func layoutAttributesForElements(in rect: CGRect) -> [UICollectionViewLayoutAttributes]? {
@@ -199,6 +209,10 @@ open class PagerHeaderCollectionViewLayout: PlainCollectionViewLayout {
   }
 
   open func append(collapsingItems: [CollapsingItem]) {
+    guard hasCollapsingSupplementary else {
+      pengingCollapsingItems.append(contentsOf: collapsingItems)
+      return
+    }
     let handlers: [CollapsingHeaderHandler] = collapsingItems.compactMap { item in
       guard !self.handlers.contains(where: { $0.collapsingItem === item }) else {
         return nil

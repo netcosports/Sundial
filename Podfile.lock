@@ -1,5 +1,5 @@
 PODS:
-  - Astrolabe/Core (4.2.0):
+  - Astrolabe/Core (4.2.3):
     - RxCocoa (~> 4.5)
     - RxSwift (~> 4.5)
   - RxCocoa (4.5.0):
@@ -29,11 +29,11 @@ EXTERNAL SOURCES:
 
 CHECKOUT OPTIONS:
   Astrolabe:
-    :commit: f0207e7d7a4a321a787a86cd9880add71f02fbe9
+    :commit: 8902cedc4bdafcc8bd24f70b859aee9f5b37e1df
     :git: "git@github.com:netcosports/Astrolabe.git"
 
 SPEC CHECKSUMS:
-  Astrolabe: a41998affa365bc86ea4d763e279554558ff2ae0
+  Astrolabe: 0287f943b9391fabf9f1879373ea36181fc55d03
   RxCocoa: cbf70265dc65a981d4ac982e513c10cf23df24a0
   RxSwift: f172070dfd1a93d70a9ab97a5a01166206e1c575
   SnapKit: fe8a619752f3f27075cc9a90244d75c6c3f27e2a

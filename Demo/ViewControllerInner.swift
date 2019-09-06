@@ -115,8 +115,8 @@ class ColoredViewController: UIViewController, ReusedPageData, CollapsingItem {
     containerView.frame = view.bounds
   }
 
-  override func viewDidAppear(_ animated: Bool) {
-    super.viewDidAppear(animated)
+  override func viewWillAppear(_ animated: Bool) {
+    super.viewWillAppear(animated)
     visible.accept(true)
   }
 
@@ -149,8 +149,6 @@ class ViewControllerInner: UIViewController {
 
   let collectionView = CollectionView<CollectionViewReusedPagerSource>()
 
-  typealias Layout = PagerHeaderCollectionViewLayout
-
   override func viewDidLoad() {
     super.viewDidLoad()
 
@@ -173,7 +171,7 @@ class ViewControllerInner: UIViewController {
                             inset: UIEdgeInsets(top: 0, left: margin, bottom: 0, right: margin),
                             numberOfTitlesWhenHidden: 1)
 
-    let layout = Layout(hostPagerSource: collectionView.source, settings: settings)
+    let layout = PagerHeaderCollectionViewLayout(hostPagerSource: collectionView.source, settings: settings)
     layout.headerHeight.accept(320.0)
     layout.minHeaderHeight.accept(80.0)
     layout.maxHeaderHeight.accept(320.0)
@@ -193,16 +191,13 @@ class ViewControllerInner: UIViewController {
         layout?.append(collapsingItems: [cellView.viewController])
       })
     }
-
     typealias Supplementary = PagerHeaderSupplementaryView<TitleCollectionViewCell, MarkerDecorationView<TitleCollectionViewCell.Data>>
 
     let supplementaryPager = CollectionCell<Supplementary>(data: titles, id: "", click: nil,
                                                            type: .custom(kind:  PagerHeaderSupplementaryViewKind), setup: nil)
-//    let supplementaryCollapsing = CollectionCell<CollapsingCell>(data: (), id: "", click: nil,
-//                                                                 type: .custom(kind:  PagerHeaderCollapsingSupplementaryViewKind), setup: nil)
-    let section = MultipleSupplementariesSection(supplementaries: [supplementaryPager
-                                                                   //, supplementaryCollapsing
-      ], cells: cells)
+    let supplementaryCollapsing = CollectionCell<CollapsingCell>(data: (), id: "", click: nil,
+                                                                 type: .custom(kind:  PagerHeaderCollapsingSupplementaryViewKind), setup: nil)
+    let section = MultipleSupplementariesSection(supplementaries: [supplementaryPager, supplementaryCollapsing], cells: cells)
     collectionView.source.sections = [section]
     collectionView.reloadData()
   }
