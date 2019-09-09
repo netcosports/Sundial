@@ -34,6 +34,7 @@ open class PagerHeaderCollectionViewLayout: PlainCollectionViewLayout {
   fileprivate weak var connectedItem: CollapsingItem?
   fileprivate var updateHeightDisposeBag: DisposeBag?
   fileprivate var updateMaxHeightDisposeBag: DisposeBag?
+  fileprivate let collapsingItemSubject = PublishSubject<CollapsingItem>()
 
   public override init(hostPagerSource: Source, settings: Settings? = nil) {
     super.init(hostPagerSource: hostPagerSource, settings: settings)
@@ -52,6 +53,10 @@ open class PagerHeaderCollectionViewLayout: PlainCollectionViewLayout {
     Observable.combineLatest(headerHeight.asObservable(), maxHeaderHeight.asObservable()) {
       Double($0) == Double($1)
     }.distinctUntilChanged().bind(to: expandedSubject).disposed(by: disposeBag)
+
+    collapsingItemSubject.subscribe(onNext: { [weak self] collapsingItem in
+      self?.append(collapsingItems: [collapsingItem])
+    }).disposed(by: disposeBag)
 
     headerInset.accept(self.settings.stripHeight)
   }
@@ -253,6 +258,13 @@ extension PagerHeaderCollectionViewLayout {
       $0.frame = adjustItem(frame: $0.frame)
     }
     attributes.append(pagerHeaderViewAttributes)
+  }
+}
+
+public extension Reactive where Base: PagerHeaderCollectionViewLayout {
+
+  var collapsingItem: AnyObserver<CollapsingItem> {
+    return base.collapsingItemSubject.asObserver()
   }
 }
 
