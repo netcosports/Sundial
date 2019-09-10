@@ -115,8 +115,9 @@ extension EmptyViewCollectionViewLayout {
                                                                 with: decorationIndexPath)
     decorationAttributes.zIndex = loaderDecoration.zIndex
     decorationAttributes.isHidden = !needToShowLoaderView
-    let height = collectionView.frame.height - collectionView.contentInset.top
-    let size = CGSize(width: collectionView.frame.width, height: height)
+    let width = collectionView.frame.width - collectionView.contentInset.left - collectionView.contentInset.right
+    let height = collectionView.frame.height - collectionView.contentInset.top - collectionView.contentInset.bottom
+    let size = CGSize(width: width, height: height)
     var offset = collectionView.contentOffset
     if offset.x < 0.0 && scrollDirection == .horizontal {
       offset.x = 0.0
@@ -163,8 +164,9 @@ extension EmptyViewCollectionViewLayout {
     decorationAttributes.zIndex = emptyViewDecoration.zIndex
     decorationAttributes.reloadSubject = reloadSubject
     decorationAttributes.isHidden = !needToShowEmptyView
-    let height = collectionView.frame.height - collectionView.contentInset.top
-    let size = CGSize(width: collectionView.frame.width, height: height)
+    let width = collectionView.frame.width - collectionView.contentInset.left - collectionView.contentInset.right
+    let height = collectionView.frame.height - collectionView.contentInset.top - collectionView.contentInset.bottom
+    let size = CGSize(width: width, height: height)
     decorationAttributes.frame = CGRect(origin: .zero, size: size)
     return decorationAttributes
   }
