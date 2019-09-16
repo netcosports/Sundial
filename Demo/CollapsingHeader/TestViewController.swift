@@ -63,6 +63,10 @@ class TestLoaderViewController: UIViewController, Accessor, CollapsingItem, Load
     }
   }
 
+  var extraInset: UIEdgeInsets {
+    return UIEdgeInsets(top: 60.0, left: 0.0, bottom: 0.0, right: 0.0)
+  }
+
   let color: UIColor
   let numberOfItems: Int
   init(_ color: UIColor, numberOfItems: Int = 3) {
@@ -136,6 +140,10 @@ class TestViewController: UIViewController, Accessor, CollapsingItem {
     }
   }
 
+  var extraInset: UIEdgeInsets {
+    return UIEdgeInsets(top: 60.0, left: 0.0, bottom: 0.0, right: 0.0)
+  }
+  
   required init?(coder aDecoder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
   }
