@@ -113,7 +113,7 @@ open class PagerHeaderCollectionViewLayout: PlainCollectionViewLayout {
     guard hasPagerSupplementary else { return nil }
     let pagerHeaderAttributes = PagerHeaderViewAttributes(forSupplementaryViewOfKind: PagerHeaderSupplementaryViewKind,
                                                           with: PagerHeaderCollectionViewLayout.headerIndex)
-    pagerHeaderAttributes.zIndex = 1024
+    pagerHeaderAttributes.zIndex = Int.max
     pagerHeaderAttributes.settings = self.settings
     pagerHeaderAttributes.hostPagerSource = hostPagerSource
     pagerHeaderAttributes.selectionClosure = { [weak self] in
