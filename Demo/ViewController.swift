@@ -16,7 +16,7 @@ class ViewController: UIViewController {
 
   let collapsing = CollapsingHeaderViewController()
   let inners = [
-    ViewControllerInner(.content(.left), count: 3, margin: 10),
+    ViewControllerInner(.equal(size: 120), count: 5, margin: 10),
     ViewControllerInner(.content(.right), count: 3, margin: 10),
     ViewControllerInner(.content(.center), count: 3, margin: 10),
     ViewControllerInner(.content(.proportional), count: 3, margin: 0),
@@ -79,7 +79,7 @@ extension ViewController: CollectionViewPager {
 
   var pages: [Page] {
     var controllers: [UIViewController] = inners
-    controllers.insert(collapsing, at: 0)
+    controllers.insert(collapsing, at: 1)
     controllers.append(customViews)
 
     return controllers.enumerated().map { Page(controller: $1, id: "Title \($0)") }

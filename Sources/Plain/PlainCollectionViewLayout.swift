@@ -10,7 +10,7 @@ import Astrolabe
 import RxSwift
 import RxCocoa
 
-open class PlainCollectionViewLayout: UICollectionViewFlowLayout, PreparedLayout {
+open class PlainCollectionViewLayout: EmptyViewCollectionViewLayout {
 
   public typealias Source = CollectionViewSource & Selectable
 
@@ -24,10 +24,6 @@ open class PlainCollectionViewLayout: UICollectionViewFlowLayout, PreparedLayout
     return super.collectionViewContentSize
   }
 
-  public var ready: (() -> Void)?
-  public var readyObservable: Observable<Void> { return readySubject }
-
-  let disposeBag = DisposeBag()
   var currentIndex: Int? {
     guard let source = hostPagerSource, let collectionView = collectionView,
       collectionView.bounds.size.width > 0.0 else { return nil }
@@ -43,7 +39,6 @@ open class PlainCollectionViewLayout: UICollectionViewFlowLayout, PreparedLayout
   private var selectedIndexPath = IndexPath(item: 0, section: 0)
   private var settingsReuseBag: DisposeBag?
 
-  private let readySubject = PublishSubject<Void>()
   private var jumpSourceLayoutAttribute: UICollectionViewLayoutAttributes?
   private var jumpTargetLayoutAttribute: UICollectionViewLayoutAttributes?
 
@@ -87,12 +82,12 @@ open class PlainCollectionViewLayout: UICollectionViewFlowLayout, PreparedLayout
   open override func prepare() {
     if settings.shouldKeepFocusOnBoundsChange {
       calculateLayout()
+
+      ready?()
+      readySubject.onNext(())
     } else {
       super.prepare()
     }
-
-    ready?()
-    readySubject.onNext(())
 
     if settings.shouldKeepFocusOnBoundsChange && shouldScrollToSelectedIndex {
       shouldScrollToSelectedIndex = false
@@ -322,5 +317,4 @@ open class PlainCollectionViewLayout: UICollectionViewFlowLayout, PreparedLayout
       }
     }
   }
-
 }

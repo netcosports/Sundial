@@ -11,6 +11,7 @@ import Astrolabe
 import RxSwift
 import RxCocoa
 
+@available(*, deprecated, message: "Please use PagerHeaderCollectionViewLayout")
 open class GenericCollectionViewLayout<DecorationView: CollectionViewCell & DecorationViewPageable>: PlainCollectionViewLayout {
 
   public typealias ViewModel = DecorationView.TitleCell.Data
@@ -75,7 +76,10 @@ open class GenericCollectionViewLayout<DecorationView: CollectionViewCell & Deco
 
   open override func layoutAttributesForDecorationView(ofKind elementKind: String,
                                                        at indexPath: IndexPath) -> UICollectionViewLayoutAttributes? {
-    guard elementKind == DecorationViewId, indexPath == IndexPath(item: 0, section: 0) else { return nil }
+
+    guard elementKind == DecorationViewId, indexPath == IndexPath(index: 2) else {
+      return super.layoutAttributesForDecorationView(ofKind: elementKind, at: indexPath)
+    }
     return decorationAttributes(with: pager?())
   }
 
@@ -98,7 +102,7 @@ open class GenericCollectionViewLayout<DecorationView: CollectionViewCell & Deco
 
     let settings = self.settings
     let validPagesRange = 0...(titles.count - settings.pagesOnScreen)
-    let decorationIndexPath = IndexPath(item: 0, section: 0)
+    let decorationIndexPath = IndexPath(index: 2)
     let decorationAttributes = DecorationView.Attributes(forDecorationViewOfKind: DecorationViewId, with: decorationIndexPath)
     decorationAttributes.zIndex = 1024
     decorationAttributes.settings = settings
@@ -118,7 +122,7 @@ open class GenericCollectionViewLayout<DecorationView: CollectionViewCell & Deco
   // MARK: - Internal
 
   func addDecorationAttributes(to attributes: inout [UICollectionViewLayoutAttributes]) {
-    guard attributes.count > 0 else { return }
+    guard attributes.count > settings.numberOfTitlesWhenHidden else { return }
     guard let decorationAttributes = self.decorationAttributes(with: pager?()) else {
       return
     }

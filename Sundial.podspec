@@ -13,6 +13,6 @@ Pod::Spec.new do |s|
 
   s.ios.deployment_target = '9.0'
   s.dependency 'Astrolabe/Core'
-  s.source_files = ['Sources/*.swift', 'Sources/UIScrollView+ScrollingToTop.{h,m}']
+  s.source_files = ['Sources/**/*.swift', 'Sources/Collapsing/UIScrollView+ScrollingToTop.{h,m}']
 
 end

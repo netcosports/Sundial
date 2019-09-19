@@ -1,17 +1,14 @@
-//
-//  ViewControllerInner.swift
-//  Sundial_Example
-//
-//  Created by Sergei Mikhan on 11/17/17.
-//  Copyright © 2017 CocoaPods. All rights reserved.
-//
+//: A UIKit based Playground for presenting user interface
 
 import UIKit
 import Astrolabe
 import Sundial
+import SnapKit
 
 import RxSwift
 import RxCocoa
+
+import PlaygroundSupport
 
 public  class CollapsingCell: CollectionViewCell, Reusable {
 
@@ -106,7 +103,7 @@ class ColoredViewController: UIViewController, ReusedPageData, CollapsingItem {
 
     view.addSubview(containerView)
 
-    let cells: [Cellable] = (1...50).map { "Item \($0)" }.map { CollectionCell<TestCell>(data: $0) }
+    var cells: [Cellable] = (1...50).map { "Item \($0)" }.map { CollectionCell<TestCell>(data: $0) }
     containerView.source.sections = [Section(cells: []), Section(cells: cells), Section(cells: []),]
   }
 
@@ -115,8 +112,8 @@ class ColoredViewController: UIViewController, ReusedPageData, CollapsingItem {
     containerView.frame = view.bounds
   }
 
-  override func viewWillAppear(_ animated: Bool) {
-    super.viewWillAppear(animated)
+  override func viewDidAppear(_ animated: Bool) {
+    super.viewDidAppear(animated)
     visible.accept(true)
   }
 
@@ -149,6 +146,8 @@ class ViewControllerInner: UIViewController {
 
   let collectionView = CollectionView<CollectionViewReusedPagerSource>()
 
+  typealias Layout = PagerHeaderCollectionViewLayout
+
   override func viewDidLoad() {
     super.viewDidLoad()
 
@@ -169,12 +168,10 @@ class ViewControllerInner: UIViewController {
                             backgroundColor: .white,
                             anchor: anchor,
                             inset: UIEdgeInsets(top: 0, left: margin, bottom: 0, right: margin),
-                            numberOfTitlesWhenHidden: 1)
+                            numberOfTitlesWhenHidden: 1,
+                            pagerIndependentScrolling: true)
 
-    let layout = PagerHeaderCollectionViewLayout(hostPagerSource: collectionView.source, settings: settings)
-    layout.headerHeight.accept(320.0)
-    layout.minHeaderHeight.accept(80.0)
-    layout.maxHeaderHeight.accept(320.0)
+    let layout = Layout(hostPagerSource: collectionView.source, settings: settings)
     collectionView.collectionViewLayout = layout
 
     view.addSubview(collectionView)
@@ -186,13 +183,13 @@ class ViewControllerInner: UIViewController {
       .blue, .black, .green, .gray, .orange
     ]
 
-    let cells: [Cellable] = colors.prefix(count).map {
+    let cells: [Cellable] = colors.map {
       CollectionCell<ReusedPagerCollectionViewCell<ColoredViewController>>(data: $0, setup: { [weak layout] cellView in
         layout?.append(collapsingItems: [cellView.viewController])
       })
     }
-    typealias Supplementary = PagerHeaderSupplementaryView<TitleCollectionViewCell, MarkerDecorationView<TitleCollectionViewCell.Data>>
 
+    typealias Supplementary = PagerHeaderSupplementaryView<TitleCollectionViewCell, MarkerDecorationView<TitleCollectionViewCell.Data>>
     let supplementaryPager = CollectionCell<Supplementary>(data: titles, id: "", click: nil,
                                                            type: .custom(kind:  PagerHeaderSupplementaryViewKind), setup: nil)
     let supplementaryCollapsing = CollectionCell<CollapsingCell>(data: (), id: "", click: nil,
@@ -211,7 +208,12 @@ extension ViewControllerInner {
       TitleCollectionViewCell.TitleViewModel(title: "Super Long Black", indicatorColor: .black),
       TitleCollectionViewCell.TitleViewModel(title: "Green", indicatorColor: .green),
       TitleCollectionViewCell.TitleViewModel(title: "Gray", indicatorColor: .gray),
-      TitleCollectionViewCell.TitleViewModel(title: "Orange", indicatorColor: .orange)
-    ].prefix(count))
+      TitleCollectionViewCell.TitleViewModel(title: "Orange", indicatorColor: .orange),
+
+      TitleCollectionViewCell.TitleViewModel(title: "Black", active: false, indicatorColor: .black),
+      TitleCollectionViewCell.TitleViewModel(title: "Green", active: false, indicatorColor: .green)
+    ])
   }
 }
+
+PlaygroundPage.current.liveView = ViewControllerInner(.content(Distribution.center))

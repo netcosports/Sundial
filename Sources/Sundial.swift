@@ -16,10 +16,12 @@ import RxCocoa
 public protocol Titleable {
   var title: String { get }
   var id: String { get }
+  var active: Bool { get }
 }
 
 public extension Titleable {
   var id: String { return title }
+  var active: Bool { return true }
 }
 
 // MARK: - Indicatorable
@@ -82,7 +84,7 @@ public enum Distribution {
 
 // MARK: - Anchor
 
-public enum Anchor {
+public enum Anchor: Equatable {
   case content(Distribution)
   case centered
   case fillEqual
@@ -93,9 +95,19 @@ public enum Anchor {
 
 // MARK: - DecorationAlignment
 
-public enum DecorationAlignment {
+public enum DecorationAlignment: Equatable {
   case top
   case topOffset(behaviorRelay: BehaviorRelay<CGFloat>)
+
+  public static func == (lhs: DecorationAlignment, rhs: DecorationAlignment) -> Bool {
+    switch (lhs, rhs) {
+    case (.top, .top):
+      return true
+    case (.topOffset(let lBehaviorRelay), .topOffset(let rBehaviorRelay)):
+      return lBehaviorRelay === rBehaviorRelay
+    default: return false
+    }
+  }
 }
 
 // MARK: - JumpingPolicy
@@ -113,9 +125,24 @@ public enum JumpingPolicy: Equatable {
   }
 }
 
+// MARK: - Prepared
+
+public protocol PreparedLayout {
+
+  var readyObservable: Observable<Void> { get }
+}
+
+public extension Reactive where Base: PreparedLayout {
+
+  var ready: ControlEvent<Void> {
+    return ControlEvent(events: base.readyObservable)
+  }
+}
+
+
 // MARK: - Settings
 
-public struct Settings {
+public struct Settings: Equatable {
   public var stripHeight: CGFloat
   public var markerHeight: CGFloat
   public var itemMargin: CGFloat
@@ -135,6 +162,8 @@ public struct Settings {
     }
   }
   public var shouldKeepFocusOnBoundsChange: Bool
+  public var numberOfTitlesWhenHidden: Int
+  public var pagerIndependentScrolling: Bool
 
   public init(stripHeight: CGFloat = 80.0,
               markerHeight: CGFloat = 5.5,
@@ -146,7 +175,9 @@ public struct Settings {
               alignment: DecorationAlignment = .top,
               pagesOnScreen: Int = 1,
               jumpingPolicy: JumpingPolicy = .disabled,
-              shouldKeepFocusOnBoundsChange: Bool = false) {
+              shouldKeepFocusOnBoundsChange: Bool = false,
+              numberOfTitlesWhenHidden: Int = 0,
+              pagerIndependentScrolling: Bool = false) {
     self.stripHeight = stripHeight
     self.markerHeight = markerHeight
     self.itemMargin = itemMargin
@@ -160,6 +191,8 @@ public struct Settings {
     assert(jumpingPolicy == .disabled || pagesOnScreen == 1, "jumping policy doesn't support 2+ pages currently")
     self.jumpingPolicy = jumpingPolicy
     self.shouldKeepFocusOnBoundsChange = shouldKeepFocusOnBoundsChange
+    self.numberOfTitlesWhenHidden = numberOfTitlesWhenHidden
+    self.pagerIndependentScrolling = pagerIndependentScrolling
   }
 }
 

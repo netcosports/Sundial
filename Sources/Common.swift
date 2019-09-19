@@ -12,12 +12,11 @@ import RxSwift
 import RxCocoa
 
 public protocol Markerable {
-
   associatedtype ViewModel: ViewModelable
-
   func apply(currentTitle: ViewModel?, nextTitle: ViewModel?, progress: CGFloat)
 }
 
+@available(*, deprecated, message: "Please use PagerHeaderCollectionViewLayout")
 public protocol Attributable: class {
 
   associatedtype TitleViewModel: Titleable
@@ -31,8 +30,10 @@ public protocol Attributable: class {
 
 }
 
+@available(*, deprecated, message: "Please use PagerHeaderCollectionViewLayout")
 public let DecorationViewId = "DecorationView"
 
+@available(*, deprecated, message: "Please use PagerHeaderCollectionViewLayout")
 public protocol DecorationViewPageable {
 
   associatedtype TitleCell: CollectionViewCell, Reusable

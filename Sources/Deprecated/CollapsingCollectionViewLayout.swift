@@ -10,6 +10,7 @@ import Astrolabe
 import RxSwift
 import RxCocoa
 
+@available(*, deprecated, message: "Please use PagerHeaderCollectionViewLayout")
 open class GenericCollapsingCollectionViewLayout<DecorationView: CollectionViewCell>: GenericCollectionViewLayout<DecorationView>
 where DecorationView: DecorationViewPageable, DecorationView.TitleCell.Data: Indicatorable {
 
@@ -25,6 +26,7 @@ where DecorationView: DecorationViewPageable, DecorationView.TitleCell.Data: Ind
   fileprivate let expandedSubject = BehaviorSubject<Bool>(value: true)
   fileprivate var handlers: [CollapsingHeaderHandler] = []
   fileprivate weak var connectedItem: CollapsingItem?
+  fileprivate var updateHeightDisposeBag: DisposeBag?
   fileprivate var updateMaxHeightDisposeBag: DisposeBag?
 
   // MARK: - Init
@@ -87,7 +89,7 @@ where DecorationView: DecorationViewPageable, DecorationView.TitleCell.Data: Ind
                                                   y: 0.0,
                                                   width: collectionView.frame.width,
                                                   height: headerHeight.value)
-    сollapsingHeaderViewAttributes.progress = headerHeight.value / maxHeaderHeight.value
+    сollapsingHeaderViewAttributes.progress = (headerHeight.value - minHeaderHeight.value) / (maxHeaderHeight.value - minHeaderHeight.value)
     return сollapsingHeaderViewAttributes
   }
 
@@ -109,7 +111,7 @@ where DecorationView: DecorationViewPageable, DecorationView.TitleCell.Data: Ind
     guard connectedItem.scrollView.contentOffset.y < 0 else { return }
 
     let point = CGPoint(x: 0.0, y: -(maxHeight + settings.stripHeight))
-    connectedItem.scrollView.setContentOffset(point, animated: true)
+    connectedItem.scrollView.setContentOffset(point, animated: animated)
 
     followOffsetChanges.accept(true)
     if self.maxHeaderHeight.value < maxHeight {
@@ -126,6 +128,30 @@ where DecorationView: DecorationViewPageable, DecorationView.TitleCell.Data: Ind
       sself.followOffsetChanges.accept(false)
     }).disposed(by: updateMaxHeightDisposeBag)
     self.updateMaxHeightDisposeBag = updateMaxHeightDisposeBag
+  }
+
+  open func update(height: CGFloat, animated: Bool = true) {
+    guard let connectedItem = connectedItem else { return }
+    guard connectedItem.scrollView.contentOffset.y < 0 else { return }
+
+    let point = CGPoint(x: 0.0, y: -(height + settings.stripHeight))
+    connectedItem.scrollView.setContentOffset(point, animated: animated)
+    
+    followOffsetChanges.accept(true)
+    if self.headerHeight.value < height {
+      headerHeight.accept(height)
+    }
+
+    let updateHeightDisposeBag = DisposeBag()
+    connectedItem.scrollView.rx.didEndScrollingAnimation.asDriver().drive(onNext: { [weak self] in
+      guard let `self` = self else { return }
+      if self.headerHeight.value > height {
+        self.headerHeight.accept(height)
+      }
+      self.updateHeightDisposeBag = nil
+      self.followOffsetChanges.accept(false)
+    }).disposed(by: updateHeightDisposeBag)
+    self.updateHeightDisposeBag = updateHeightDisposeBag
   }
 
   open func append(collapsingItems: [CollapsingItem]) {

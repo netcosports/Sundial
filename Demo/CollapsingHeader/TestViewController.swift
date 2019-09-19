@@ -12,7 +12,7 @@ import RxCocoa
 import Astrolabe
 import Sundial
 
-class TestCell: CollectionViewCell, Reusable {
+class ColoredTestCell: CollectionViewCell, Reusable {
 
   let title: UILabel = {
     let title = UILabel()
@@ -43,7 +43,7 @@ class TestCell: CollectionViewCell, Reusable {
 
 class TestLoaderViewController: UIViewController, Accessor, CollapsingItem, Loadable, Containerable {
 
-  typealias Cell = CollectionCell<TestCell>
+  typealias Cell = CollectionCell<ColoredTestCell>
   let containerView = CollectionView<LoaderDecoratorSource<CollectionViewSource>>()
 
   let visible = BehaviorRelay<Bool>(value: false)
@@ -61,6 +61,10 @@ class TestLoaderViewController: UIViewController, Accessor, CollapsingItem, Load
     set {
       source.sections = newValue
     }
+  }
+
+  var extraInset: UIEdgeInsets {
+    return UIEdgeInsets(top: 60.0, left: 0.0, bottom: 0.0, right: 0.0)
   }
 
   let color: UIColor
@@ -110,7 +114,7 @@ class TestLoaderViewController: UIViewController, Accessor, CollapsingItem, Load
 
 class TestViewController: UIViewController, Accessor, CollapsingItem {
 
-  typealias Cell = CollectionCell<TestCell>
+  typealias Cell = CollectionCell<ColoredTestCell>
   let containerView = CollectionView<CollectionViewSource>()
 
   let visible = BehaviorRelay<Bool>(value: false)
@@ -136,6 +140,10 @@ class TestViewController: UIViewController, Accessor, CollapsingItem {
     }
   }
 
+  var extraInset: UIEdgeInsets {
+    return UIEdgeInsets(top: 60.0, left: 0.0, bottom: 0.0, right: 0.0)
+  }
+  
   required init?(coder aDecoder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
   }

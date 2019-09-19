@@ -11,6 +11,7 @@ import RxSwift
 import RxCocoa
 import Astrolabe
 
+@available(*, deprecated, message: "Please use PagerHeaderCollectionViewLayout")
 open class DecorationViewCollectionViewLayout<TitleViewModel: ViewModelable, MarkerCell: CollectionViewCell>: UICollectionViewFlowLayout {
 
   open class InvalidationContext: UICollectionViewFlowLayoutInvalidationContext {
@@ -271,7 +272,6 @@ open class DecorationViewCollectionViewLayout<TitleViewModel: ViewModelable, Mar
     if let markerAttributes = decorationAttributes(for: currentPages, nextPages: !nextPages.isEmpty ? nextPages : nil) {
       attributes.append(markerAttributes)
     }
-
     return attributes
   }
 
@@ -351,7 +351,10 @@ extension DecorationViewCollectionViewLayout {
 
     switch anchor {
     case .content, .equal:
-      adjustContentOffset(for: decorationAttributes, collectionView: collectionView)
+      // FIXME: temporary workaround for the issue with autoscroll, MUST be fixed in correct way
+      DispatchQueue.main.async {
+        self.adjustContentOffset(for: decorationAttributes, collectionView: collectionView)
+      }
     case .centered:
       adjustCenteredContentOffset(for: decorationAttributes, collectionView: collectionView)
     case .left(let offset):

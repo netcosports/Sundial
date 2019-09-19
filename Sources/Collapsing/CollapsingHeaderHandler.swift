@@ -82,7 +82,7 @@ class CollapsingHeaderHandler {
         }
 
         let contentOffsetOriginal = collapsingItem.scrollView.contentOffset
-        let adjustedY = -(sself.headerHeight.value + sself.headerInset.value)
+        let adjustedY = -(sself.headerHeight.value + sself.headerInset.value + extraInset.top)
         let contentOffset = CGPoint(x: contentOffsetOriginal.x, y: adjustedY)
 
         collapsingItem.scrollView.contentInset = UIEdgeInsets(top: topInset, left: 0, bottom: bottomInset, right: 0)
@@ -125,8 +125,9 @@ class CollapsingHeaderHandler {
           || isScrollingToTop
           || self.followOffsetChanges.value != false
       }
-      .map { [unowned self] input in
-        let offset = self.collapsingBorder - input.y - self.headerInset.value
+      .map { [unowned self, weak collapsingItem] input in
+        guard let collapsingItem = collapsingItem else { return 0.0 }
+        let offset = self.collapsingBorder - input.y - self.headerInset.value - collapsingItem.extraInset.top
         return min(max(self.minHeaderHeight.value, offset), self.maxHeaderHeight.value)
       }.asDriver(onErrorJustReturn: maxHeaderHeight.value)
       .distinctUntilChanged()

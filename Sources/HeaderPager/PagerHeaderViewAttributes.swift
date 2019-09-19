@@ -1,22 +1,20 @@
 //
-//  DecorationViewAttributes.swift
+//  PagerHeaderViewAttributes.swift
 //  Sundial
 //
-//  Created by Sergei Mikhan on 5/31/17.
-//  Copyright © 2017 Netcosports. All rights reserved.
+//  Created by Sergei Mikhan on 08/23/19.
+//  Copyright © 2019 Netcosports. All rights reserved.
 //
 
 import UIKit
 import Astrolabe
 
-open class DecorationViewAttributes<TitleViewModel: Titleable>: UICollectionViewLayoutAttributes, Attributable {
+open class PagerHeaderViewAttributes: UICollectionViewLayoutAttributes, PagerHeaderAttributes {
 
-  public var titles: [TitleViewModel] = []
-  public var selectionClosure: ((Int) -> Void)?
   public var settings: Settings?
-  public weak var hostPagerSource: CollectionViewSource?
-
   public var invalidateTabFrames = false
+  public var selectionClosure: ((Int) -> Void)?
+  public weak var hostPagerSource: CollectionViewSource?
 
   open override var frame: CGRect {
     get { return super.frame }
@@ -30,15 +28,14 @@ open class DecorationViewAttributes<TitleViewModel: Titleable>: UICollectionView
 
   open override func copy(with zone: NSZone? = nil) -> Any {
     let copy = super.copy(with: zone)
-    guard let typedCopy = copy as? DecorationViewAttributes else {
+    guard let typedCopy = copy as? PagerHeaderViewAttributes else {
       return copy
     }
 
-    typedCopy.titles = self.titles
-    typedCopy.hostPagerSource = self.hostPagerSource
-    typedCopy.selectionClosure = self.selectionClosure
     typedCopy.settings = self.settings
     typedCopy.invalidateTabFrames = self.invalidateTabFrames
+    typedCopy.selectionClosure = self.selectionClosure
+    typedCopy.hostPagerSource = hostPagerSource
 
     return typedCopy
   }
@@ -48,8 +45,8 @@ open class DecorationViewAttributes<TitleViewModel: Titleable>: UICollectionView
       return false
     }
 
-    if let other = object as? DecorationViewAttributes {
-      if self.titles.map({ $0.id }) != other.titles.map({ $0.id }) {
+    if let other = object as? PagerHeaderViewAttributes {
+      if self.settings != other.settings || self.invalidateTabFrames != other.invalidateTabFrames  {
         return false
       }
     }
