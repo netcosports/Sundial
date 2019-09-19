@@ -42,6 +42,12 @@ open class PagerHeaderSupplementaryView<T: CollectionViewCell, M: CollectionView
         layout.sectionInset = settings.inset
         layout.anchor = settings.anchor
         layout.markerHeight = settings.markerHeight
+        pagerHeaderContainerView.isScrollEnabled = settings.pagerIndependentScrolling
+        pagerHeaderContainerView.showsHorizontalScrollIndicator = settings.pagerIndependentScrolling
+
+        if settings.pagerIndependentScrolling, let recognizer = hostPagerSource?.containerView?.panGestureRecognizer {
+          recognizer.require(toFail: pagerHeaderContainerView.panGestureRecognizer)
+        }
       }
     }
   }
@@ -76,12 +82,11 @@ open class PagerHeaderSupplementaryView<T: CollectionViewCell, M: CollectionView
     let layout = collectionViewLayout()
     self.layout = layout
     pagerHeaderContainerView.collectionViewLayout = layout
+    pagerHeaderContainerView.bounces = false
     if #available(iOS 10.0, tvOS 10.0, *) {
       pagerHeaderContainerView.isPrefetchingEnabled = false
     }
     contentView.addSubview(pagerHeaderContainerView)
-    pagerHeaderContainerView.isScrollEnabled = false
-    pagerHeaderContainerView.showsHorizontalScrollIndicator = false
     pagerHeaderContainerView.translatesAutoresizingMaskIntoConstraints = false
     backgroundColor = UIColor.clear
   }
@@ -171,7 +176,7 @@ private extension PagerHeaderSupplementaryView {
             }
           }
           return .init(pages: 0...0, progress: 0.0)
-        }.bind(to: layout.progress).disposed(by: disposeBag)
+        }.distinctUntilChanged().bind(to: layout.progress).disposed(by: disposeBag)
     }
   }
 

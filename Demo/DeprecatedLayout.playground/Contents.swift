@@ -51,11 +51,6 @@ open class GenericCollectionViewLayout<DecorationView: CollectionViewCell & Deco
     super.prepare()
   }
 
-//  open override func invalidateLayout(with context: UICollectionViewLayoutInvalidationContext) {
-//    print("TEST \(context.invalidateEverything), \(context.invalidatedItemIndexPaths), \(context.invalidatedDecorationIndexPaths)")
-//    super.invalidateLayout(with: context)
-//  }
-
   open override func layoutAttributesForElements(in rect: CGRect) -> [UICollectionViewLayoutAttributes]? {
     let sourceAttributes = super.layoutAttributesForElements(in: rect) ?? []
     var attributes = sourceAttributes.compactMap { $0.copy() as? UICollectionViewLayoutAttributes }

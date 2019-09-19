@@ -168,7 +168,8 @@ class ViewControllerInner: UIViewController {
                             backgroundColor: .white,
                             anchor: anchor,
                             inset: UIEdgeInsets(top: 0, left: margin, bottom: 0, right: margin),
-                            numberOfTitlesWhenHidden: 1)
+                            numberOfTitlesWhenHidden: 1,
+                            pagerIndependentScrolling: true)
 
     let layout = Layout(hostPagerSource: collectionView.source, settings: settings)
     collectionView.collectionViewLayout = layout

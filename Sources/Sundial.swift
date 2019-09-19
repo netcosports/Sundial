@@ -161,6 +161,7 @@ public struct Settings: Equatable {
   }
   public var shouldKeepFocusOnBoundsChange: Bool
   public var numberOfTitlesWhenHidden: Int
+  public var pagerIndependentScrolling: Bool
 
   public init(stripHeight: CGFloat = 80.0,
               markerHeight: CGFloat = 5.5,
@@ -173,7 +174,8 @@ public struct Settings: Equatable {
               pagesOnScreen: Int = 1,
               jumpingPolicy: JumpingPolicy = .disabled,
               shouldKeepFocusOnBoundsChange: Bool = false,
-              numberOfTitlesWhenHidden: Int = 0) {
+              numberOfTitlesWhenHidden: Int = 0,
+              pagerIndependentScrolling: Bool = false) {
     self.stripHeight = stripHeight
     self.markerHeight = markerHeight
     self.itemMargin = itemMargin
@@ -188,6 +190,7 @@ public struct Settings: Equatable {
     self.jumpingPolicy = jumpingPolicy
     self.shouldKeepFocusOnBoundsChange = shouldKeepFocusOnBoundsChange
     self.numberOfTitlesWhenHidden = numberOfTitlesWhenHidden
+    self.pagerIndependentScrolling = pagerIndependentScrolling
   }
 }
 
