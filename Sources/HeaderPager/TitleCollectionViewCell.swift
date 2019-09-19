@@ -55,9 +55,11 @@ open class TitleCollectionViewCell: CollectionViewCell, Reusable {
     public let textFont: UIFont
     public let fadeTextFont: UIFont
     public let padding: UIEdgeInsets
+    public let active: Bool
 
     public init(title: String,
                 id: String? = nil,
+                active: Bool = true,
                 textColor: UIColor = .black,
                 fadeTextColor: UIColor = .green,
                 indicatorColor: UIColor = .red,
@@ -67,6 +69,7 @@ open class TitleCollectionViewCell: CollectionViewCell, Reusable {
 
       self.title = title
       self.id = id ?? title
+      self.active = active
       self.textColor = textColor
       self.fadeTextColor = fadeTextColor
       self.indicatorColor = indicatorColor
@@ -106,6 +109,7 @@ open class TitleCollectionViewCell: CollectionViewCell, Reusable {
   open func setup(with data: Data) {
     titleInsets = data.padding
     titleLabel.text = data.title
+    titleLabel.alpha = data.active ? 1.0 : 0.33
     self.data = data
   }
 

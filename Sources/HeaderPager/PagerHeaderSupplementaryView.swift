@@ -59,7 +59,7 @@ open class PagerHeaderSupplementaryView<T: CollectionViewCell, M: CollectionView
 
       let cells: [Cellable] = newTitles.map { title in
         let item = Item(data: title) { [weak self] in
-          if let index = self?.titles.index(where: { $0.id == title.id }) {
+          if let index = self?.titles.index(where: { $0.active && $0.id == title.id }) {
             self?.currentLayoutAttributes?.selectionClosure?(index)
           }
         }

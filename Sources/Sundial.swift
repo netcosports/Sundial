@@ -16,10 +16,12 @@ import RxCocoa
 public protocol Titleable {
   var title: String { get }
   var id: String { get }
+  var active: Bool { get }
 }
 
 public extension Titleable {
   var id: String { return title }
+  var active: Bool { return true }
 }
 
 // MARK: - Indicatorable

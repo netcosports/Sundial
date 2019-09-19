@@ -208,8 +208,11 @@ extension ViewControllerInner {
       TitleCollectionViewCell.TitleViewModel(title: "Super Long Black", indicatorColor: .black),
       TitleCollectionViewCell.TitleViewModel(title: "Green", indicatorColor: .green),
       TitleCollectionViewCell.TitleViewModel(title: "Gray", indicatorColor: .gray),
-      TitleCollectionViewCell.TitleViewModel(title: "Orange", indicatorColor: .orange)
-    ].prefix(count))
+      TitleCollectionViewCell.TitleViewModel(title: "Orange", indicatorColor: .orange),
+
+      TitleCollectionViewCell.TitleViewModel(title: "Black", active: false, indicatorColor: .black),
+      TitleCollectionViewCell.TitleViewModel(title: "Green", active: false, indicatorColor: .green)
+    ])
   }
 }
 
