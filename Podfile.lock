@@ -6,7 +6,7 @@ PODS:
     - RxSwift (>= 4.4.2, ~> 4.4)
   - RxSwift (4.5.0)
   - SnapKit (4.2.0)
-  - Sundial (4.2):
+  - Sundial (5.0):
     - Astrolabe/Core
 
 DEPENDENCIES:
