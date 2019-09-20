@@ -86,6 +86,7 @@ open class PagerHeaderSupplementaryView<T: CollectionViewCell, M: CollectionView
     if #available(iOS 10.0, tvOS 10.0, *) {
       pagerHeaderContainerView.isPrefetchingEnabled = false
     }
+    pagerHeaderContainerView.showsHorizontalScrollIndicator = false
     contentView.addSubview(pagerHeaderContainerView)
     pagerHeaderContainerView.translatesAutoresizingMaskIntoConstraints = false
     backgroundColor = UIColor.clear
