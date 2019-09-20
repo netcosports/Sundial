@@ -237,7 +237,7 @@ extension PagerHeaderCollectionViewLayout {
   }
 
   func adjustItem(frame: CGRect) -> CGRect {
-    if hasCollapsingSupplementary || settings.pagerIndependentScrolling {
+    if hasCollapsingSupplementary /*|| settings.pagerIndependentScrolling*/ {
       return frame
     }
 
