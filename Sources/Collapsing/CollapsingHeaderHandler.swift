@@ -99,7 +99,7 @@ class CollapsingHeaderHandler {
     connection = .connected
 
     guard let collapsingItem = collapsingItem else { return }
-    let targetContentOffset = -headerHeight.value - headerInset.value
+    let targetContentOffset = -headerHeight.value - headerInset.value - collapsingItem.extraInset.top
     if collapsingItem.scrollView.contentOffset.y <= 0.0 {
       collapsingItem.scrollView.contentOffset = CGPoint(x: 0, y: targetContentOffset)
     }
@@ -138,20 +138,26 @@ class CollapsingHeaderHandler {
       .skip(1)
       .withLatestFrom(headerHeight.asDriver()) { ($0, $1) }
       .drive(onNext: { [weak collapsingItem = self.collapsingItem] maxHeight, height in
-        if maxHeight == height {
-          collapsingItem?.scrollView.contentOffset = CGPoint(x: 0, y: -maxHeight - self.headerInset.value)
+        if maxHeight == height, let collapsingItem = collapsingItem {
+          let y = -maxHeight - self.headerInset.value - collapsingItem.extraInset.top
+          collapsingItem.scrollView.contentOffset = CGPoint(x: 0, y: y)
         }
       })
 
     if collapsingItem.followDirection {
-      self.collapsingBorder = collapsingItem.scrollView.contentOffset.y + headerHeight.value + self.headerInset.value
+      self.collapsingBorder = collapsingItem.scrollView.contentOffset.y
+        + headerHeight.value
+        + self.headerInset.value
+        + collapsingItem.extraInset.top
+
       if self.collapsingBorder < 0.0 {
         self.collapsingBorder = 0.0
       }
       let directionChangeDispose = directionChange().subscribe(onNext: { [weak self] value in
         guard let `self` = self else { return }
         guard let scrollView = self.collapsingItem?.scrollView else { return }
-        self.collapsingBorder = scrollView.contentOffset.y + self.headerHeight.value + self.headerInset.value
+        self.collapsingBorder = scrollView.contentOffset.y + self.headerHeight.value
+          + self.headerInset.value + collapsingItem.extraInset.top
         if self.collapsingBorder < 0.0 {
           self.collapsingBorder = 0.0
         }
@@ -174,7 +180,7 @@ class CollapsingHeaderHandler {
         .distinctUntilChanged()
         .skip(1)
         .map {
-          return CGPoint(x: 0, y: -$0 - self.headerInset.value)
+          return CGPoint(x: 0, y: -$0 - self.headerInset.value - collapsingItem.extraInset.top)
         }.drive(collapsingItem.scrollView.rx.contentOffset)
     }
   }
