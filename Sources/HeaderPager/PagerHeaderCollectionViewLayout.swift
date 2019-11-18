@@ -137,7 +137,11 @@ open class PagerHeaderCollectionViewLayout: PlainCollectionViewLayout {
                                                    y: 0.0,
                                                    width: collectionView.frame.width,
                                                    height: headerHeight.value)
-    сollapsingHeaderViewAttributes.progress = (headerHeight.value - minHeaderHeight.value) / (maxHeaderHeight.value - minHeaderHeight.value)
+    if maxHeaderHeight.value == minHeaderHeight.value {
+      сollapsingHeaderViewAttributes.progress = 0.0
+    } else {
+      сollapsingHeaderViewAttributes.progress = (headerHeight.value - minHeaderHeight.value) / (maxHeaderHeight.value - minHeaderHeight.value)
+    }
     return сollapsingHeaderViewAttributes
   }
 
