@@ -118,3 +118,13 @@ extension Int {
     return Swift.min(Swift.max(range.lowerBound, self), range.upperBound)
   }
 }
+
+extension UIScrollView {
+  var scrollingToTop: Bool {
+    guard responds(to: NSSelectorFromString("_isScrollingToTop")) else { return false }
+    if let value = value(forKey: "_isScrollingToTop") as? Bool {
+      return value
+    }
+    return false
+  }
+}

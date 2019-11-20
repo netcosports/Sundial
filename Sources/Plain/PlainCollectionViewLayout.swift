@@ -5,7 +5,7 @@
 //  Created by Dmitry Duleba on 8/24/18.
 //
 
-import Foundation
+import UIKit
 import Astrolabe
 import RxSwift
 import RxCocoa

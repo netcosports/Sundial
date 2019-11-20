@@ -1,7 +1,7 @@
 Pod::Spec.new do |s|
 
   s.name = 'Sundial'
-  s.version = '5.0.2'
+  s.version = '5.1.0'
   s.summary = 'Collection view layout for pager header'
 
   s.homepage = 'https://github.com/netcosports/Sundial'
@@ -14,6 +14,6 @@ Pod::Spec.new do |s|
   s.ios.deployment_target = '9.0'
   s.dependency 'Astrolabe/Core'
   s.swift_versions = ['5.0', '5.1']
-  s.source_files = ['Sources/**/*.swift', 'Sources/Collapsing/UIScrollView+ScrollingToTop.{h,m}']
+  s.source_files = ['Sources/**/*.swift']
 
 end
