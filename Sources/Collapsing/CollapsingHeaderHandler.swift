@@ -114,15 +114,11 @@ class CollapsingHeaderHandler {
         guard let `self` = self else { return false }
         let scrollView = collapsingItem.scrollView
 
-        let isScrollingToTop = scrollView.responds(to: NSSelectorFromString("_isScrollingToTop"))
-          ? scrollView._isScrollingToTop
-          : false
-
         return scrollView.panGestureRecognizer.state != .possible
           || scrollView.isDecelerating
           || scrollView.isDragging
           || scrollView.isTracking
-          || isScrollingToTop
+          || scrollView.scrollingToTop
           || self.followOffsetChanges.value != false
       }
       .map { [unowned self, weak collapsingItem] input in

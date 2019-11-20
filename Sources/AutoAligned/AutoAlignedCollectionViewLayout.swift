@@ -5,6 +5,8 @@
 //  Created by Sergei Mikhan on 8/14/19.
 //
 
+import UIKit
+
 open class AutoAlignedCollectionViewLayout: EmptyViewCollectionViewLayout {
 
   public struct Settings {
