@@ -97,9 +97,16 @@ open class GenericDecorationView<T: CollectionViewCell, M: CollectionViewCell, A
   fileprivate var titles: [ViewModel] = [] {
     willSet(newTitles) {
 
-      if newTitles.map({ $0.id }) == titles.map({ $0.id }) { return }
+      let adjustedTitlesSet: [ViewModel]
+      if UIView.userInterfaceLayoutDirection(for: decorationContainerView.semanticContentAttribute) == .rightToLeft {
+        adjustedTitlesSet = newTitles.reversed()
+      } else {
+        adjustedTitlesSet = newTitles
+      }
 
-      let cells: [Cellable] = newTitles.map { title in
+      if adjustedTitlesSet.map({ $0.id }) == titles.map({ $0.id }) { return }
+
+      let cells: [Cellable] = adjustedTitlesSet.map { title in
         let item = Item(data: title) { [weak self] in
           if let index = self?.titles.index(where: { $0.id == title.id }) {
             self?.currentLayoutAttributes?.selectionClosure?(index)
@@ -110,7 +117,7 @@ open class GenericDecorationView<T: CollectionViewCell, M: CollectionViewCell, A
       }
 
       if let layout = layout {
-        layout.titles = newTitles
+        layout.titles = adjustedTitlesSet
 
         invalidateTabFrames(nil)
       }

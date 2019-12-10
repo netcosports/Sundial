@@ -28,7 +28,12 @@ open class PlainCollectionViewLayout: EmptyViewCollectionViewLayout {
     guard let source = hostPagerSource, let collectionView = collectionView,
       collectionView.bounds.size.width > 0.0 else { return nil }
 
-    let index = Int(collectionView.contentOffset.x / collectionView.bounds.size.width)
+    let index: Int
+    if UIView.userInterfaceLayoutDirection(for: collectionView.semanticContentAttribute) == .rightToLeft {
+      index = Int((collectionView.contentSize.width - collectionView.bounds.size.width - collectionView.contentOffset.x) / collectionView.bounds.size.width)
+    } else {
+      index = Int(collectionView.contentOffset.x / collectionView.bounds.size.width)
+    }
     let pagesCount = source.sections.first?.cells.count ?? 0
     let result = max(0, min(index, pagesCount - 1))
     return result
@@ -231,8 +236,8 @@ open class PlainCollectionViewLayout: EmptyViewCollectionViewLayout {
 
     let sourceIndex = IndexPath(item: source, section: 0)
     let targetIndex = IndexPath(item: target, section: 0)
-    guard let sourceLayoutAttributes = layoutAttributesForItem(at: sourceIndex)?.copy() as? UICollectionViewLayoutAttributes,
-      let targetLayoutAttributes = layoutAttributesForItem(at: targetIndex)?.copy() as? UICollectionViewLayoutAttributes else {
+    guard let sourceLayoutAttributes = self.layoutAttributesForItem(at: sourceIndex)?.copy() as? UICollectionViewLayoutAttributes,
+      let targetLayoutAttributes = self.layoutAttributesForItem(at: targetIndex)?.copy() as? UICollectionViewLayoutAttributes else {
         return
     }
 

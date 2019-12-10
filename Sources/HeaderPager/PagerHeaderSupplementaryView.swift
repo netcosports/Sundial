@@ -54,13 +54,21 @@ open class PagerHeaderSupplementaryView<T: CollectionViewCell, M: CollectionView
 
   fileprivate var titles: [ViewModel] = [] {
     willSet(newTitles) {
+      
+      let adjustedTitlesSet: [ViewModel]
+      if UIView.userInterfaceLayoutDirection(for: pagerHeaderContainerView.semanticContentAttribute) == .rightToLeft {
+        adjustedTitlesSet = newTitles.reversed()
+      } else {
+        adjustedTitlesSet = newTitles
+      }
 
-      if newTitles.map({ $0.id }) == titles.map({ $0.id }) { return }
+      if adjustedTitlesSet.map({ $0.id }) == titles.map({ $0.id }) { return }
 
-      let cells: [Cellable] = newTitles.map { title in
+      let cells: [Cellable] = adjustedTitlesSet.map { title in
         let item = Item(data: title) { [weak self] in
-          if let index = self?.titles.index(where: { $0.active && $0.id == title.id }) {
-            self?.currentLayoutAttributes?.selectionClosure?(index)
+          guard let self = self else { return }
+          if let index = self.titles.firstIndex(where: { $0.active && $0.id == title.id }) {
+            self.currentLayoutAttributes?.selectionClosure?(index)
           }
         }
         item.id = title.title
@@ -68,7 +76,7 @@ open class PagerHeaderSupplementaryView<T: CollectionViewCell, M: CollectionView
       }
 
       if let layout = layout {
-        layout.titles = newTitles
+        layout.titles = adjustedTitlesSet
         invalidateTabFrames(nil)
       }
       pagerHeaderContainerView.source.sections = [Section(cells: cells)]

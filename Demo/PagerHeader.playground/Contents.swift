@@ -31,12 +31,12 @@ public  class CollapsingCell: CollectionViewCell, Reusable {
     title.text = "HEADER height is \(Int(self.frame.height))"
   }
 
-  public override func apply(_ layoutAttributes: UICollectionViewLayoutAttributes) {
-    super.apply(layoutAttributes)
-    if let collapsingHeaderViewAttributes = layoutAttributes as? CollapsingHeaderViewAttributes {
-      print("progress is \(collapsingHeaderViewAttributes.progress)")
-    }
-  }
+//  public override func apply(_ layoutAttributes: UICollectionViewLayoutAttributes) {
+//    super.apply(layoutAttributes)
+//    if let collapsingHeaderViewAttributes = layoutAttributes as? CollapsingHeaderViewAttributes {
+//      print("progress is \(collapsingHeaderViewAttributes.progress)")
+//    }
+//  }
 
   public static func size(for data: Void, containerSize: CGSize) -> CGSize {
     return CGSize(width: containerSize.width, height: 276)
@@ -81,7 +81,8 @@ class ColoredViewController: UIViewController, ReusedPageData, CollapsingItem {
 
   var data: UIColor? {
     didSet {
-      view.backgroundColor = data
+      //containerView.backgroundColor = data
+      //print(data)
     }
   }
 
@@ -163,13 +164,13 @@ class ViewControllerInner: UIViewController {
 
     let settings = Settings(stripHeight: 80.0,
                             markerHeight: 5.5,
-                            itemMargin: margin,
+                            itemMargin: 0.0,
                             bottomStripSpacing: 0.0,
                             backgroundColor: .white,
                             anchor: anchor,
                             inset: UIEdgeInsets(top: 0, left: margin, bottom: 0, right: margin),
                             numberOfTitlesWhenHidden: 1,
-                            pagerIndependentScrolling: true)
+                            pagerIndependentScrolling: false)
 
     let layout = Layout(hostPagerSource: collectionView.source, settings: settings)
     collectionView.collectionViewLayout = layout
@@ -180,7 +181,7 @@ class ViewControllerInner: UIViewController {
     }
 
     let colors: [UIColor] = [
-      .blue, .black, .green, .gray, .orange
+      .blue, .black, .green, .gray, .orange, .gray, .orange
     ]
 
     let cells: [Cellable] = colors.map {
@@ -204,16 +205,17 @@ extension ViewControllerInner {
 
   var titles: [TitleCollectionViewCell.TitleViewModel] {
     return Array([
-      TitleCollectionViewCell.TitleViewModel(title: "Mid Blue", id: "Inverted Mid Blue", indicatorColor: .magenta),
-      TitleCollectionViewCell.TitleViewModel(title: "Super Long Black", indicatorColor: .black),
-      TitleCollectionViewCell.TitleViewModel(title: "Green", indicatorColor: .green),
-      TitleCollectionViewCell.TitleViewModel(title: "Gray", indicatorColor: .gray),
-      TitleCollectionViewCell.TitleViewModel(title: "Orange", indicatorColor: .orange),
+      TitleCollectionViewCell.TitleViewModel(title: "     1     ", id: "Inverted Mid Blue", indicatorColor: .magenta),
+      TitleCollectionViewCell.TitleViewModel(title: "     2     ", indicatorColor: .black),
+      TitleCollectionViewCell.TitleViewModel(title: "     3     ", indicatorColor: .green),
+      TitleCollectionViewCell.TitleViewModel(title: "     4     ", indicatorColor: .gray),
+      TitleCollectionViewCell.TitleViewModel(title: "     5     ", indicatorColor: .orange),
 
-      TitleCollectionViewCell.TitleViewModel(title: "Black", active: false, indicatorColor: .black),
-      TitleCollectionViewCell.TitleViewModel(title: "Green", active: false, indicatorColor: .green)
+      TitleCollectionViewCell.TitleViewModel(title: "     6     ", indicatorColor: .black),
+      TitleCollectionViewCell.TitleViewModel(title: "     7     ", indicatorColor: .green)
     ])
   }
 }
 
+UIView.appearance().semanticContentAttribute = .forceRightToLeft
 PlaygroundPage.current.liveView = ViewControllerInner(.content(Distribution.center))

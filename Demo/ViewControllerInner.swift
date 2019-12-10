@@ -34,13 +34,6 @@ public  class CollapsingCell: CollectionViewCell, Reusable {
     title.text = "HEADER height is \(Int(self.frame.height))"
   }
 
-  public override func apply(_ layoutAttributes: UICollectionViewLayoutAttributes) {
-    super.apply(layoutAttributes)
-    if let collapsingHeaderViewAttributes = layoutAttributes as? CollapsingHeaderViewAttributes {
-      print("progress is \(collapsingHeaderViewAttributes.progress)")
-    }
-  }
-
   public static func size(for data: Void, containerSize: CGSize) -> CGSize {
     return CGSize(width: containerSize.width, height: 276)
   }
@@ -84,7 +77,7 @@ class ColoredViewController: UIViewController, ReusedPageData, CollapsingItem {
 
   var data: UIColor? {
     didSet {
-      view.backgroundColor = data
+      containerView.backgroundColor = data
     }
   }
 
@@ -164,11 +157,12 @@ class ViewControllerInner: UIViewController {
 
     let settings = Settings(stripHeight: 80.0,
                             markerHeight: 5.5,
-                            itemMargin: margin,
+                            itemMargin: 0.0,
                             bottomStripSpacing: 0.0,
                             backgroundColor: .white,
                             anchor: anchor,
                             inset: UIEdgeInsets(top: 0, left: margin, bottom: 0, right: margin),
+                            jumpingPolicy: .skip(pages: 1),
                             numberOfTitlesWhenHidden: 1)
 
     let layout = PagerHeaderCollectionViewLayout(hostPagerSource: collectionView.source, settings: settings)
@@ -207,11 +201,11 @@ extension ViewControllerInner {
 
   var titles: [TitleCollectionViewCell.TitleViewModel] {
     return Array([
-      TitleCollectionViewCell.TitleViewModel(title: "Mid Blue", id: "Inverted Mid Blue", indicatorColor: .magenta),
-      TitleCollectionViewCell.TitleViewModel(title: "Super Long Black", indicatorColor: .black),
-      TitleCollectionViewCell.TitleViewModel(title: "Green", indicatorColor: .green),
-      TitleCollectionViewCell.TitleViewModel(title: "Gray", indicatorColor: .gray),
-      TitleCollectionViewCell.TitleViewModel(title: "Orange", indicatorColor: .orange)
+      TitleCollectionViewCell.TitleViewModel(title: "1111111", id: "Inverted Mid Blue", indicatorColor: .magenta),
+      TitleCollectionViewCell.TitleViewModel(title: "2222222", indicatorColor: .black),
+      TitleCollectionViewCell.TitleViewModel(title: "3333333", indicatorColor: .green),
+      TitleCollectionViewCell.TitleViewModel(title: "4444444", indicatorColor: .gray),
+      TitleCollectionViewCell.TitleViewModel(title: "5555555", indicatorColor: .orange)
     ].prefix(count))
   }
 }
