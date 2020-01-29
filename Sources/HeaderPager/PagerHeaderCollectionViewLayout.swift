@@ -186,7 +186,7 @@ open class PagerHeaderCollectionViewLayout: PlainCollectionViewLayout {
     } else {
       guard let collectionView = collectionView, let cell = collectionView.visibleCells.first else { return }
 
-      func verticallyOrientedContainerView(in views: [UIView], closure: (ContainerView) -> Void) {
+      func verticallyOrientedContainerView(in views: [UIView], closure: (UIScrollView) -> Void) {
         for view in views {
           if let collectionView = view as? UICollectionView,
           (collectionView.collectionViewLayout as? UICollectionViewFlowLayout)?.scrollDirection == .vertical {
