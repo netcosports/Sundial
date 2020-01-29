@@ -169,6 +169,42 @@ open class PagerHeaderCollectionViewLayout: PlainCollectionViewLayout {
                   height: settings.stripHeight)
   }
 
+  open func scrollToTop() {
+    if let connectedItem = connectedItem {
+      let point = CGPoint(x: 0.0, y: -connectedItem.scrollView.contentInset.top)
+      connectedItem.scrollView.setContentOffset(point, animated: true)
+
+      followOffsetChanges.accept(true)
+      let updateHeightDisposeBag = DisposeBag()
+      connectedItem.scrollView.rx.didEndScrollingAnimation.asDriver().drive(onNext: { [weak self] in
+        guard let `self` = self else { return }
+        self.headerHeight.accept(self.maxHeaderHeight.value)
+        self.updateHeightDisposeBag = nil
+        self.followOffsetChanges.accept(false)
+      }).disposed(by: updateHeightDisposeBag)
+      self.updateHeightDisposeBag = updateHeightDisposeBag
+    } else {
+      guard let collectionView = collectionView, let cell = collectionView.visibleCells.first else { return }
+
+      func verticallyOrientedContainerView(in views: [UIView], closure: (ContainerView) -> Void) {
+        for view in views {
+          if let collectionView = view as? UICollectionView,
+          (collectionView.collectionViewLayout as? UICollectionViewFlowLayout)?.scrollDirection == .vertical {
+            closure(collectionView)
+          }
+          if let tableView = view as? UITableView {
+            closure(tableView)
+          }
+          verticallyOrientedContainerView(in: view.subviews, closure: closure)
+        }
+      }
+
+      verticallyOrientedContainerView(in: cell.subviews) { containerView in
+        containerView.scroll(to: IndexPath(item: 0, section: 0), at: .start, animated: true)
+      }
+    }
+  }
+
   open func update(maxHeight: CGFloat, animated: Bool = true) {
     guard let connectedItem = connectedItem else { return }
     guard connectedItem.scrollView.contentOffset.y < 0 else { return }

@@ -74,6 +74,8 @@ public class TestCell: CollectionViewCell, Reusable {
 
 class ColoredViewController: UIViewController, ReusedPageData, CollapsingItem {
 
+  var action: PublishSubject<Void>?
+
   var scrollView: UIScrollView {
     return containerView
   }
@@ -104,7 +106,9 @@ class ColoredViewController: UIViewController, ReusedPageData, CollapsingItem {
 
     view.addSubview(containerView)
 
-    var cells: [Cellable] = (1...50).map { "Item \($0)" }.map { CollectionCell<TestCell>(data: $0) }
+    var cells: [Cellable] = (1...50).map { "Item \($0)" }.map { CollectionCell<TestCell>(data: $0) { [weak self] in
+      self?.action?.onNext(())
+      } }
     containerView.source.sections = [Section(cells: []), Section(cells: cells), Section(cells: []),]
   }
 
@@ -149,6 +153,9 @@ class ViewControllerInner: UIViewController {
 
   typealias Layout = PagerHeaderCollectionViewLayout
 
+  let action = PublishSubject<Void>()
+  let disposeBag = DisposeBag()
+
   override func viewDidLoad() {
     super.viewDidLoad()
 
@@ -184,8 +191,13 @@ class ViewControllerInner: UIViewController {
       .blue, .black, .green, .gray, .orange, .gray, .orange
     ]
 
+    action.subscribe(onNext: { [weak layout] in
+      layout?.scrollToTop()
+    }).disposed(by: disposeBag)
+
     let cells: [Cellable] = colors.map {
-      CollectionCell<ReusedPagerCollectionViewCell<ColoredViewController>>(data: $0, setup: { [weak layout] cellView in
+      CollectionCell<ReusedPagerCollectionViewCell<ColoredViewController>>(data: $0, setup: { [weak layout, weak self] cellView in
+        cellView.viewController.action = self?.action
         layout?.append(collapsingItems: [cellView.viewController])
       })
     }
@@ -195,7 +207,7 @@ class ViewControllerInner: UIViewController {
                                                            type: .custom(kind:  PagerHeaderSupplementaryViewKind), setup: nil)
     let supplementaryCollapsing = CollectionCell<CollapsingCell>(data: (), id: "", click: nil,
                                                                  type: .custom(kind:  PagerHeaderCollapsingSupplementaryViewKind), setup: nil)
-    let section = MultipleSupplementariesSection(supplementaries: [supplementaryPager, supplementaryCollapsing], cells: cells)
+    let section = MultipleSupplementariesSection(supplementaries: [supplementaryPager/*, supplementaryCollapsing*/], cells: cells)
     collectionView.source.sections = [section]
     collectionView.reloadData()
   }
@@ -217,5 +229,4 @@ extension ViewControllerInner {
   }
 }
 
-UIView.appearance().semanticContentAttribute = .forceRightToLeft
 PlaygroundPage.current.liveView = ViewControllerInner(.content(Distribution.center))
