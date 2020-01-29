@@ -200,7 +200,7 @@ open class PagerHeaderCollectionViewLayout: PlainCollectionViewLayout {
       }
 
       verticallyOrientedContainerView(in: cell.subviews) { containerView in
-        containerView.scroll(to: IndexPath(item: 0, section: 0), at: .start, animated: true)
+        containerView.setContentOffset(CGPoint(x: 0.0, y: -containerView.contentInset.top), animated: true)
       }
     }
   }
