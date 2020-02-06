@@ -9,7 +9,7 @@ PODS:
     - RxSwift (~> 5)
   - RxSwift (5.0.1)
   - SnapKit (4.2.0)
-  - Sundial (5.1.2):
+  - Sundial (5.1.3):
     - Astrolabe/Core
 
 DEPENDENCIES:
@@ -41,7 +41,7 @@ SPEC CHECKSUMS:
   RxRelay: 89d54507f4fd4d969e6ec1d4bd7f3673640b4640
   RxSwift: e2dc62b366a3adf6a0be44ba9f405efd4c94e0c4
   SnapKit: fe8a619752f3f27075cc9a90244d75c6c3f27e2a
-  Sundial: 024b7665f36c78140fe6e72a3c69bc50ce248d10
+  Sundial: 5ac810c00c3f45ae91a73e8346e8f02cc740b59c
 
 PODFILE CHECKSUM: fba797873eaa0b322b45a1f9248e80a92755faf2
 
