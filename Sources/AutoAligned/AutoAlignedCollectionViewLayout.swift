@@ -24,11 +24,13 @@ open class AutoAlignedCollectionViewLayout: EmptyViewCollectionViewLayout {
 
     public let alignment: Alignment
     public let inset: CGFloat
+    public let fillWithSideInsets: Bool
     public let target: ScrollTarget
 
-    public init(alignment: Alignment, inset: CGFloat = 0.0, target: ScrollTarget = .closest) {
+    public init(alignment: Alignment, inset: CGFloat = 0.0, fillWithSideInsets: Bool = true, target: ScrollTarget = .closest) {
       self.alignment = alignment
       self.inset = inset
+      self.fillWithSideInsets = fillWithSideInsets
       self.target = target
     }
   }
@@ -77,7 +79,8 @@ open class AutoAlignedCollectionViewLayout: EmptyViewCollectionViewLayout {
     let currentAttributes = closestAttributes(in: cellsAttributes, to: currentStart)
 
     var targetAttributes = candidateAttributes
-    if candidateAttributes?.indexPath == currentAttributes?.indexPath, velocityValue != 0.0,
+    if candidateAttributes?.indexPath == currentAttributes?.indexPath,
+      velocityValue != 0.0,
       let attributes = candidateAttributes {
       let targetIndex = nextIndexPath(for: attributes.indexPath, forward: velocityValue > 0.0)
       targetAttributes = cellsAttributes.first(where: { $0.indexPath == targetIndex })
@@ -225,11 +228,11 @@ private extension AutoAlignedCollectionViewLayout {
   }
 
   var startInset: CGFloat {
-    guard let collectionView = collectionView,
-      let firstItemIndex = firstItemIndex else { return 0.0 }
+    guard settings.fillWithSideInsets, let collectionView = collectionView,
+      let firstItemIndex = firstItemIndex else { return settings.inset }
     guard let delegate = collectionView.delegate as? UICollectionViewDelegateFlowLayout,
       let firstItemSize = delegate.collectionView?(collectionView, layout: self, sizeForItemAt: firstItemIndex) else {
-        return 0.0
+        return settings.inset
     }
     let area = scrollDirection == .horizontal ? collectionView.frame.width : collectionView.frame.height
     let size = scrollDirection == .horizontal ? firstItemSize.width : firstItemSize.height
@@ -244,12 +247,12 @@ private extension AutoAlignedCollectionViewLayout {
   }
 
   var endInset: CGFloat {
-    guard let collectionView = collectionView, let lastItemIndex = lastItemIndex else {
-      return 0.0
+    guard settings.fillWithSideInsets, let collectionView = collectionView, let lastItemIndex = lastItemIndex else {
+      return settings.inset
     }
     guard let delegate = collectionView.delegate as? UICollectionViewDelegateFlowLayout,
       let lastItemSize = delegate.collectionView?(collectionView, layout: self, sizeForItemAt: lastItemIndex) else {
-        return 0.0
+        return settings.inset
     }
     let area = scrollDirection == .horizontal ? collectionView.frame.width : collectionView.frame.height
     let size = scrollDirection == .horizontal ? lastItemSize.width : lastItemSize.height
