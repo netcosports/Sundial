@@ -30,6 +30,6 @@ open class EmptyViewAttributes<Data: Equatable>: UICollectionViewLayoutAttribute
       return false
     }
 
-    return typedObject.data != self.data
+    return typedObject.data == self.data
   }
 }
