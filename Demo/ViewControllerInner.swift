@@ -142,6 +142,10 @@ class ViewControllerInner: UIViewController {
 
   let collectionView = CollectionView<CollectionViewReusedPagerSource>()
 
+  class TestDeccoration: DecorationCollectionViewCell<String> {
+
+  }
+
   override func viewDidLoad() {
     super.viewDidLoad()
 
@@ -166,6 +170,7 @@ class ViewControllerInner: UIViewController {
                             numberOfTitlesWhenHidden: 1)
 
     let layout = PagerHeaderCollectionViewLayout(hostPagerSource: collectionView.source, settings: settings)
+    layout.register(emptyViewDecoration: TestDeccoration.self, emptyViewData: "", showEmptyView: BehaviorSubject<Bool>(value: true))
     layout.headerHeight.accept(320.0)
     layout.minHeaderHeight.accept(80.0)
     layout.maxHeaderHeight.accept(320.0)

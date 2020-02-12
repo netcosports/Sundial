@@ -14,6 +14,34 @@ public protocol Decorationable {
   static var zIndex: Int { get }
 }
 
+open class DecorationCollectionViewCell<T: Equatable>: CollectionViewCell, Reusable, Decorationable {
+
+  open class var zIndex: Int {
+    return Int.max
+  }
+
+  open class var kind: String {
+    "EmptyDecorationView"
+  }
+
+  public typealias Data = T
+
+  open func setup(with data: Data) {
+
+  }
+
+  open class func size(for data: Data, containerSize: CGSize) -> CGSize {
+    return .zero
+  }
+
+  open override func apply(_ layoutAttributes: UICollectionViewLayoutAttributes) {
+    super.apply(layoutAttributes)
+    if let data = (layoutAttributes as? EmptyViewAttributes<T>)?.data {
+      self.setup(with: data)
+    }
+  }
+}
+
 open class EmptyViewCollectionViewLayout: UICollectionViewFlowLayout, PreparedLayout {
 
   public struct EmptyViewSettings {
@@ -37,9 +65,9 @@ open class EmptyViewCollectionViewLayout: UICollectionViewFlowLayout, PreparedLa
   private var loaderDecoration: LoaderDecoration.Type?
   private var showEmptyView: BehaviorSubject<Bool>?
   private var showLoaderView: BehaviorSubject<Bool>?
-  private var reloadSubject: PublishSubject<Void>?
   private var emptyViewDisposeBag: DisposeBag?
   private var loaderDisposeBag: DisposeBag?
+  private var createEmptyViewAttributes: ((IndexPath) -> UICollectionViewLayoutAttributes?)?
 
   open override func prepare() {
     super.prepare()
@@ -138,13 +166,13 @@ extension EmptyViewCollectionViewLayout {
 
 extension EmptyViewCollectionViewLayout {
 
-  public func register<T: LoaderDecoration>(emptyViewDecoration: T.Type,
-                                            showEmptyView: BehaviorSubject<Bool>,
-                                            reloadSubject: PublishSubject<Void>) {
+  public func register<T: CollectionViewCell & Reusable & Decorationable>(emptyViewDecoration: T.Type,
+                                                                          emptyViewData: T.Data,
+                                                                          showEmptyView: BehaviorSubject<Bool>) where T.Data: Equatable {
+
     register(emptyViewDecoration, forDecorationViewOfKind: emptyViewDecoration.kind)
     self.emptyViewDecoration = emptyViewDecoration
     self.showEmptyView = showEmptyView
-    self.reloadSubject = reloadSubject
 
     let emptyViewDisposeBag = DisposeBag()
     showEmptyView.asObservable()
@@ -153,16 +181,20 @@ extension EmptyViewCollectionViewLayout {
         self?.invalidateLayout()
       }).disposed(by: disposeBag)
     self.emptyViewDisposeBag = emptyViewDisposeBag
+
+    createEmptyViewAttributes = { decorationIndexPath in
+      let attributes = EmptyViewAttributes<T.Data>(forDecorationViewOfKind: T.kind, with: decorationIndexPath)
+      attributes.data = emptyViewData
+      return attributes
+    }
   }
 
-  func emptyViewDecorationAttributes() -> EmptyViewAttributes? {
+  func emptyViewDecorationAttributes() -> UICollectionViewLayoutAttributes? {
     guard let emptyViewDecoration = emptyViewDecoration else { return nil }
     guard let collectionView = collectionView else { return nil }
     let decorationIndexPath = IndexPath(index: 0)
-    let decorationAttributes = EmptyViewAttributes(forDecorationViewOfKind: emptyViewDecoration.kind,
-                                                   with: decorationIndexPath)
+    guard let decorationAttributes = self.createEmptyViewAttributes?(decorationIndexPath) else { return nil }
     decorationAttributes.zIndex = emptyViewDecoration.zIndex
-    decorationAttributes.reloadSubject = reloadSubject
     decorationAttributes.isHidden = !needToShowEmptyView
     let width = collectionView.frame.width - collectionView.contentInset.left - collectionView.contentInset.right
     let height = collectionView.frame.height - collectionView.contentInset.top

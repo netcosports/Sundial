@@ -8,16 +8,16 @@
 import UIKit
 import RxSwift
 
-open class EmptyViewAttributes: UICollectionViewLayoutAttributes {
+open class EmptyViewAttributes<Data: Equatable>: UICollectionViewLayoutAttributes {
 
-  public var reloadSubject: PublishSubject<Void>?
+  public var data: Data?
 
   open override func copy(with zone: NSZone? = nil) -> Any {
     let copy = super.copy(with: zone)
-    guard let typedCopy = copy as? EmptyViewAttributes else {
+    guard let typedCopy = copy as? EmptyViewAttributes<Data> else {
       return copy
     }
-    typedCopy.reloadSubject = reloadSubject
+    typedCopy.data = data
     return typedCopy
   }
 
@@ -26,14 +26,10 @@ open class EmptyViewAttributes: UICollectionViewLayoutAttributes {
       return false
     }
 
-    guard let typedObject = object as? EmptyViewAttributes else {
+    guard let typedObject = object as? EmptyViewAttributes<Data> else {
       return false
     }
 
-    if typedObject.reloadSubject == nil && self.reloadSubject == nil {
-      return true
-    }
-
-    return typedObject.reloadSubject === self.reloadSubject
+    return typedObject.data != self.data
   }
 }
