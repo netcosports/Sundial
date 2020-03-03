@@ -134,10 +134,12 @@ open class ShadowCollectionViewLayout<DecorationView: UICollectionReusableView>:
       let sections = Dictionary(grouping: cellsAttributes, by: { $0.indexPath.section })
       sections.forEach {
         if let attribute = $0.value.first,
-          let cellWidth = $0.value.filter({ $0.frame.width != collectionView?.frame.width }).compactMap({ $0.frame.width }).max() {
+          let cellWidth = $0.value.filter({ $0.frame.width != collectionView?.frame.width }).compactMap({ $0.frame.width }).max(),
+          let sectionOptions = options.first(where: { attribute.indexPath.section == $0.section }) {
           let height = $0.value.reduce(0) { $0 + $1.frame.height }
-          let decorationAttributes = UICollectionViewLayoutAttributes(forDecorationViewOfKind: DecorationView.kind,
+          let decorationAttributes = ShadowDecorationViewLayoutAttributes(forDecorationViewOfKind: DecorationView.kind,
           with: attribute.indexPath)
+          decorationAttributes.shadowOptions = sectionOptions.shadowOptions
           decorationAttributes.frame = CGRect(x: attribute.frame.origin.x,
                                               y: attribute.frame.origin.y,
                                               width: cellWidth,
