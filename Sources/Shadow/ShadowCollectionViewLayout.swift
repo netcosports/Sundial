@@ -29,7 +29,7 @@ public struct ShadowLayoutOptions {
   public let section: Int
 	public let shadowOptions: ShadowOptions?
 
-  public init(section: Int, isNeedShowShadow: Bool = false, insets: UIEdgeInsets = .zero, shadowOptions: ShadowOptions? = .init()) {
+  public init(section: Int, shadowOptions: ShadowOptions? = .init()) {
     self.section = section
 		self.shadowOptions = shadowOptions
   }
