@@ -16,6 +16,7 @@ class ViewController: UIViewController {
 
   let collapsing = CollapsingHeaderViewController()
   let inners = [
+    CalendarViewController(),
     ViewControllerInner(.equal(size: 120), count: 5, margin: 10),
     ViewControllerInner(.content(.right), count: 3, margin: 10),
     ViewControllerInner(.content(.center), count: 3, margin: 10),
@@ -90,6 +91,7 @@ extension ViewController {
 
   var titles: [TitleCollectionViewCell.TitleViewModel] {
     return [
+      TitleCollectionViewCell.TitleViewModel(title: "CALENDAR", indicatorColor: .red),
       TitleCollectionViewCell.TitleViewModel(title: "collapsing", indicatorColor: .blue),
       TitleCollectionViewCell.TitleViewModel(title: "content(.left)", indicatorColor: .blue),
       TitleCollectionViewCell.TitleViewModel(title: "content(.right)", indicatorColor: .gray),

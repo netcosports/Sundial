@@ -11,7 +11,7 @@ Pod::Spec.new do |s|
   }
   s.source = { :git => 'https://github.com/netcosports/Sundial.git', :tag => s.version.to_s }
 
-  s.ios.deployment_target = '9.0'
+  s.ios.deployment_target = '10.0'
   s.dependency 'Astrolabe/Core'
   s.swift_versions = ['5.0', '5.1']
   s.source_files = ['Sources/**/*.swift']
