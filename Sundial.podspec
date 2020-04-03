@@ -1,7 +1,7 @@
 Pod::Spec.new do |s|
 
   s.name = 'Sundial'
-  s.version = '5.1.7'
+  s.version = '5.1.8'
   s.summary = 'Collection view layout for pager header'
 
   s.homepage = 'https://github.com/netcosports/Sundial'
