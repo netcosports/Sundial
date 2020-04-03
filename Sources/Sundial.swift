@@ -195,7 +195,3 @@ public struct Settings: Equatable {
     self.pagerIndependentScrolling = pagerIndependentScrolling
   }
 }
-
-public typealias DecorationView = GenericDecorationView<TitleCollectionViewCell, MarkerDecorationView<TitleCollectionViewCell.Data>, DecorationViewAttributes<TitleCollectionViewCell.Data>>
-public typealias CollectionViewLayout = GenericCollectionViewLayout<DecorationView>
-public typealias CollapsingCollectionViewLayout = GenericCollapsingCollectionViewLayout<DecorationView>

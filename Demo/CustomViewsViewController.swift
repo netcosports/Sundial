@@ -20,7 +20,7 @@ class CustomViewsViewController: UIViewController {
 
   let collectionView = CollectionView<CollectionViewPagerSource>()
 
-  typealias Layout = GenericCollectionViewLayout<GenericDecorationView<CustomTitleCollectionViewCell, CustomMarkerDecorationView, DecorationViewAttributes<CustomTitleCollectionViewCell.Data>>>
+  typealias Layout = PagerHeaderCollectionViewLayout
 
   override func viewDidLoad() {
     super.viewDidLoad()
@@ -35,9 +35,7 @@ class CustomViewsViewController: UIViewController {
                             inset: .zero,
                             jumpingPolicy: .skip(pages: 1))
 
-    collectionView.collectionViewLayout = Layout(hostPagerSource: collectionView.source, settings: settings) { [weak self] in
-      return self?.titles ?? []
-    }
+    collectionView.collectionViewLayout = Layout(hostPagerSource: collectionView.source, settings: settings)
 
     view.addSubview(collectionView)
     collectionView.snp.remakeConstraints {
@@ -65,17 +63,26 @@ extension CustomViewsViewController: CollectionViewPager {
       Page(controller: controller5, id: "Title 5")
     ]
   }
+
+  typealias Supplementary = CustomPagerHeaderSupplementaryView<TitleCollectionViewCell,     MarkerDecorationView<TitleCollectionViewCell.Data>>
+
+  func section(with cells: [Cellable]) -> Sectionable {
+    let pagerSupplementary = CollectionCell<Supplementary>(data: titles,
+                                                           type: .custom(kind: PagerHeaderSupplementaryViewKind))
+
+    return MultipleSupplementariesSection(supplementaries: [pagerSupplementary], cells: cells)
+  }
 }
 
 extension CustomViewsViewController {
 
-  var titles: [CustomTitleCollectionViewCell.CustomTitleViewModel] {
+  var titles: [TitleCollectionViewCell.TitleViewModel] {
     return [
-      CustomTitleCollectionViewCell.CustomTitleViewModel(title: "Blue", indicatorColor: .blue),
-      CustomTitleCollectionViewCell.CustomTitleViewModel(title: "Black", indicatorColor: .black),
-      CustomTitleCollectionViewCell.CustomTitleViewModel(title: "Green", indicatorColor: .green),
-      CustomTitleCollectionViewCell.CustomTitleViewModel(title: "Gray", indicatorColor: .gray),
-      CustomTitleCollectionViewCell.CustomTitleViewModel(title: "Orange", indicatorColor: .orange)
+      TitleCollectionViewCell.TitleViewModel(title: "Blue", indicatorColor: .blue),
+      TitleCollectionViewCell.TitleViewModel(title: "Black", indicatorColor: .black),
+      TitleCollectionViewCell.TitleViewModel(title: "Loader", indicatorColor: .orange),
+      TitleCollectionViewCell.TitleViewModel(title: "Green", indicatorColor: .green),
+      TitleCollectionViewCell.TitleViewModel(title: "Gray", indicatorColor: .gray)
     ]
   }
 }

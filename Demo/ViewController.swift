@@ -40,9 +40,7 @@ class ViewController: UIViewController {
     collectionView.source.hostViewController = self
     collectionView.source.pager = self
 
-    let layout = CollectionViewLayout(hostPagerSource: collectionView.source) { [weak self] in
-      return self?.titles ?? []
-    }
+    let layout = PagerHeaderCollectionViewLayout(hostPagerSource: collectionView.source)
 
     layout.rx.ready.subscribe(onNext: {
       print("Rx: layout is ready")
@@ -79,11 +77,19 @@ class ViewController: UIViewController {
 extension ViewController: CollectionViewPager {
 
   var pages: [Page] {
-    var controllers: [UIViewController] = inners
-    controllers.insert(collapsing, at: 1)
-    controllers.append(customViews)
-
+    var controllers: [UIViewController] = [customViews]
+    controllers.append(collapsing)
+    controllers.append(contentsOf: inners)
     return controllers.enumerated().map { Page(controller: $1, id: "Title \($0)") }
+  }
+
+  typealias Supplementary = PagerHeaderSupplementaryView<TitleCollectionViewCell, MarkerDecorationView<TitleCollectionViewCell.Data>>
+
+  func section(with cells: [Cellable]) -> Sectionable {
+    let pagerSupplementary = CollectionCell<Supplementary>(data: titles,
+                                                           type: .custom(kind: PagerHeaderSupplementaryViewKind))
+
+    return MultipleSupplementariesSection(supplementaries: [pagerSupplementary], cells: cells)
   }
 }
 
@@ -91,8 +97,9 @@ extension ViewController {
 
   var titles: [TitleCollectionViewCell.TitleViewModel] {
     return [
-      TitleCollectionViewCell.TitleViewModel(title: "CALENDAR", indicatorColor: .red),
+      TitleCollectionViewCell.TitleViewModel(title: "Custom Views", indicatorColor: .brown),
       TitleCollectionViewCell.TitleViewModel(title: "collapsing", indicatorColor: .blue),
+      TitleCollectionViewCell.TitleViewModel(title: "CALENDAR", indicatorColor: .red),
       TitleCollectionViewCell.TitleViewModel(title: "content(.left)", indicatorColor: .blue),
       TitleCollectionViewCell.TitleViewModel(title: "content(.right)", indicatorColor: .gray),
       TitleCollectionViewCell.TitleViewModel(title: "content(.center)", indicatorColor: .orange),
@@ -104,7 +111,6 @@ extension ViewController {
       TitleCollectionViewCell.TitleViewModel(title: "equal(size: 120)", indicatorColor: .gray),
       TitleCollectionViewCell.TitleViewModel(title: "left(offset: 80)", indicatorColor: .orange),
       TitleCollectionViewCell.TitleViewModel(title: "right(offset: 80)", indicatorColor: .brown),
-      TitleCollectionViewCell.TitleViewModel(title: "Custom Views", indicatorColor: .brown),
     ]
   }
 }

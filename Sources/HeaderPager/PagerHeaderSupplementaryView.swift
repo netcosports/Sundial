@@ -33,7 +33,7 @@ open class PagerHeaderSupplementaryView<T: CollectionViewCell, M: CollectionView
 
   open class var layoutType: HeaderPagerContentLayout.Type { return HeaderPagerContentLayout.self }
 
-  fileprivate let disposeBag = DisposeBag()
+  public let disposeBag = DisposeBag()
   fileprivate var currentLayoutAttributes: Attributes? {
     didSet {
       if let settings = currentLayoutAttributes?.settings, let layout = layout {
@@ -102,6 +102,10 @@ open class PagerHeaderSupplementaryView<T: CollectionViewCell, M: CollectionView
 
   open override func layoutSubviews() {
     super.layoutSubviews()
+    layoutPagerHeaderContainerView()
+  }
+
+  open func layoutPagerHeaderContainerView() {
     pagerHeaderContainerView.frame = contentView.bounds
   }
 
