@@ -54,7 +54,7 @@ open class PagerHeaderSupplementaryView<T: CollectionViewCell, M: CollectionView
 
   fileprivate var titles: [ViewModel] = [] {
     willSet(newTitles) {
-      
+
       let adjustedTitlesSet: [ViewModel]
       if UIView.userInterfaceLayoutDirection(for: pagerHeaderContainerView.semanticContentAttribute) == .rightToLeft {
         adjustedTitlesSet = newTitles.reversed()
@@ -127,9 +127,7 @@ open class PagerHeaderSupplementaryView<T: CollectionViewCell, M: CollectionView
     super.apply(layoutAttributes)
 
     if let pagerHeaderViewAttributes = layoutAttributes as? Attributes {
-      guard let hostViewController = pagerHeaderViewAttributes.hostPagerSource?.hostViewController else {
-        return
-      }
+      let hostViewController = pagerHeaderViewAttributes.hostPagerSource?.hostViewController
       if pagerHeaderContainerView.source.hostViewController == nil {
         setupSource(for: pagerHeaderViewAttributes, in: hostViewController)
       }
@@ -160,7 +158,7 @@ private extension PagerHeaderSupplementaryView {
     return layout
   }
 
-  func setupSource(for layoutAttributes: Attributes, in hostViewController: UIViewController) {
+  func setupSource(for layoutAttributes: Attributes, in hostViewController: UIViewController?) {
     self.hostPagerSource = layoutAttributes.hostPagerSource
     self.containerViewController = hostViewController
     pagerHeaderContainerView.source.hostViewController = hostViewController
