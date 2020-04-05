@@ -55,6 +55,12 @@ open class PagerHeaderSupplementaryView<T: CollectionViewCell, M: CollectionView
   fileprivate var titles: [ViewModel] = [] {
     willSet(newTitles) {
 
+      #if DEBUG
+      let ids = newTitles.map { $0.id }
+      let set = Set<String>(ids)
+      assert(ids.count == set.count, "provideds titles must have unique IDs")
+      #endif
+
       let adjustedTitlesSet: [ViewModel]
       if UIView.userInterfaceLayoutDirection(for: pagerHeaderContainerView.semanticContentAttribute) == .rightToLeft {
         adjustedTitlesSet = newTitles.reversed()

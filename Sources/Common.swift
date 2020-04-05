@@ -16,31 +16,6 @@ public protocol Markerable {
   func apply(currentTitle: ViewModel?, nextTitle: ViewModel?, progress: CGFloat)
 }
 
-@available(*, deprecated, message: "Please use PagerHeaderCollectionViewLayout")
-public protocol Attributable: class {
-
-  associatedtype TitleViewModel: Titleable
-
-  var titles: [TitleViewModel] { get set }
-  var selectionClosure: ((Int) -> Void)?  { get set }
-  var settings: Settings?  { get set }
-  var hostPagerSource: CollectionViewSource?  { get set }
-  var invalidateTabFrames: Bool { get set }
-//  var newCollectionViewWidth: CGFloat? { get set }
-
-}
-
-@available(*, deprecated, message: "Please use PagerHeaderCollectionViewLayout")
-public let DecorationViewId = "DecorationView"
-
-@available(*, deprecated, message: "Please use PagerHeaderCollectionViewLayout")
-public protocol DecorationViewPageable {
-
-  associatedtype TitleCell: CollectionViewCell, Reusable
-  associatedtype MarkerCell: CollectionViewCell
-  associatedtype Attributes: UICollectionViewLayoutAttributes, Attributable where TitleCell.Data == Attributes.TitleViewModel
-}
-
 public protocol CollapsingItem: class {
 
   var scrollView: UIScrollView { get }
