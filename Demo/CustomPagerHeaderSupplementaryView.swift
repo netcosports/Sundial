@@ -9,7 +9,11 @@
 import Sundial
 import Astrolabe
 
-class CustomPagerHeaderSupplementaryView<T: CollectionViewCell, M: CollectionViewCell>: PagerHeaderSupplementaryView<T, M> where T: Reusable, T.Data: Titleable, T.Data: Indicatorable {
+struct SomeData<T>: PagerHeaderSupplementaryViewModel {
+  var titles: [T]
+}
+
+class CustomPagerHeaderSupplementaryView<T: CollectionViewCell, M: CollectionViewCell>: GenericPagerHeaderSupplementaryView<SomeData<T.Data>, T, M> where T: Reusable, T.Data: Titleable, T.Data: Indicatorable {
 
   let label: UILabel = {
     let label = UILabel()

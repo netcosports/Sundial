@@ -67,7 +67,7 @@ extension CustomViewsViewController: CollectionViewPager {
   typealias Supplementary = CustomPagerHeaderSupplementaryView<TitleCollectionViewCell,     MarkerDecorationView<TitleCollectionViewCell.Data>>
 
   func section(with cells: [Cellable]) -> Sectionable {
-    let pagerSupplementary = CollectionCell<Supplementary>(data: titles,
+    let pagerSupplementary = CollectionCell<Supplementary>(data: .init(titles: titles),
                                                            type: .custom(kind: PagerHeaderSupplementaryViewKind))
 
     return MultipleSupplementariesSection(supplementaries: [pagerSupplementary], cells: cells)
