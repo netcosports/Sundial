@@ -106,6 +106,7 @@ private extension CalendarCollectionViewLayout {
     (0..<sections).forEach { section in
       let totalDays = collectionView.numberOfItems(inSection: section)
       let month = monthLayoutClosure?(section) ?? MonthLayout(startDayIndex: 0)
+      let numberOfRows = Int(ceil(Double(month.startDayIndex + totalDays) / Double(daysAWeek)))
       let dayCellWidth = (width
         - settings.insets.left
         - settings.insets.right
@@ -114,7 +115,7 @@ private extension CalendarCollectionViewLayout {
       let dayCellHeight = (height
         - settings.insets.top
         - settings.insets.bottom
-        - CGFloat(daysAWeek - 1) * settings.verticalMargin) / CGFloat(daysAWeek)
+        - CGFloat(numberOfRows - 1) * settings.verticalMargin) / CGFloat(numberOfRows)
 
       let dayWidthWithMargin = dayCellWidth + settings.horizontalMargin
       let dayHeightWithMargin = dayCellHeight + settings.verticalMargin
