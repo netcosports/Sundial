@@ -1,13 +1,13 @@
 PODS:
-  - Astrolabe/Core (5.1.0):
+  - Astrolabe/Core (5.1.1):
     - RxCocoa (~> 5)
     - RxSwift (~> 5)
-  - RxCocoa (5.0.1):
+  - RxCocoa (5.1.1):
     - RxRelay (~> 5)
     - RxSwift (~> 5)
-  - RxRelay (5.0.1):
+  - RxRelay (5.1.1):
     - RxSwift (~> 5)
-  - RxSwift (5.0.1)
+  - RxSwift (5.1.1)
   - SnapKit (4.2.0)
   - Sundial (5.1.11):
     - Astrolabe/Core
@@ -32,14 +32,14 @@ EXTERNAL SOURCES:
 
 CHECKOUT OPTIONS:
   Astrolabe:
-    :commit: c67a86495d96e5879275cd105a8c4b23d717f989
+    :commit: 34e95b21fb80d9c39916d2029521d523374fd0b1
     :git: "git@github.com:netcosports/Astrolabe.git"
 
 SPEC CHECKSUMS:
-  Astrolabe: 4da23a9da1a934fd8854765e79f53674c4ac19dd
-  RxCocoa: e741b9749968e8a143e2b787f1dfbff2b63d0a5c
-  RxRelay: 89d54507f4fd4d969e6ec1d4bd7f3673640b4640
-  RxSwift: e2dc62b366a3adf6a0be44ba9f405efd4c94e0c4
+  Astrolabe: e46b18931367195a49a9df4b2f88ed845044f09e
+  RxCocoa: 32065309a38d29b5b0db858819b5bf9ef038b601
+  RxRelay: d77f7d771495f43c556cbc43eebd1bb54d01e8e9
+  RxSwift: 81470a2074fa8780320ea5fe4102807cb7118178
   SnapKit: fe8a619752f3f27075cc9a90244d75c6c3f27e2a
   Sundial: 5ebd099944dfd32ab04ac4b71ed81a8011cfb962
 
