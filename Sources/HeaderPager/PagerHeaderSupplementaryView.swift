@@ -181,7 +181,7 @@ private extension GenericPagerHeaderSupplementaryView {
 
   func setupSource(for layoutAttributes: Attributes, in hostViewController: UIViewController?) {
     self.hostPagerSource = layoutAttributes.hostPagerSource
-    self.containerViewController = hostViewController
+    self.hostViewController = hostViewController
     pagerHeaderContainerView.source.hostViewController = hostViewController
 
     guard let layout = layout else { return }
