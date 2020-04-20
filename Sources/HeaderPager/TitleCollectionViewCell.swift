@@ -80,7 +80,7 @@ open class TitleCollectionViewCell: CollectionViewCell, Reusable {
   }
 
   public typealias Data = TitleViewModel
-  var data: Data? {
+  public var data: Data? {
     didSet {
       updateFade()
     }

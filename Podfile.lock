@@ -18,7 +18,7 @@ DEPENDENCIES:
   - Sundial (from `.`)
 
 SPEC REPOS:
-  https://github.com/cocoapods/specs.git:
+  https://github.com/CocoaPods/Specs.git:
     - RxCocoa
     - RxRelay
     - RxSwift
@@ -36,7 +36,7 @@ CHECKOUT OPTIONS:
     :git: "git@github.com:netcosports/Astrolabe.git"
 
 SPEC CHECKSUMS:
-  Astrolabe: 6a761ba8bba7e0f15a1a9853db77e2fbe304b6b8
+  Astrolabe: e46b18931367195a49a9df4b2f88ed845044f09e
   RxCocoa: 32065309a38d29b5b0db858819b5bf9ef038b601
   RxRelay: d77f7d771495f43c556cbc43eebd1bb54d01e8e9
   RxSwift: 81470a2074fa8780320ea5fe4102807cb7118178
@@ -45,4 +45,4 @@ SPEC CHECKSUMS:
 
 PODFILE CHECKSUM: 23963bc0fc934d8c57eeca98d546a42487eb3e04
 
-COCOAPODS: 1.7.5
+COCOAPODS: 1.9.1
