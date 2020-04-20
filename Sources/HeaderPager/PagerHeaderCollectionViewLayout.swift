@@ -273,7 +273,7 @@ open class PagerHeaderCollectionViewLayout: PlainCollectionViewLayout {
 extension PagerHeaderCollectionViewLayout {
 
   var hasPagerSupplementary: Bool {
-    return hostPagerSource?.sections.first?.supplementary(for: .custom(kind: PagerHeaderSupplementaryViewKind)) != nil
+    return hostPagerSource?.sections.first?.supplementaries(for: .custom(kind: PagerHeaderSupplementaryViewKind)).isEmpty == false
   }
 
   func adjustItem(frame: CGRect) -> CGRect {
@@ -312,7 +312,7 @@ public extension Reactive where Base: PagerHeaderCollectionViewLayout {
 fileprivate extension PagerHeaderCollectionViewLayout {
 
   var hasCollapsingSupplementary: Bool {
-    return hostPagerSource?.sections.first?.supplementary(for: .custom(kind: PagerHeaderCollapsingSupplementaryViewKind)) != nil
+    return hostPagerSource?.sections.first?.supplementaries(for: .custom(kind: PagerHeaderCollapsingSupplementaryViewKind)).isEmpty == false
   }
 
   func handler(for collapsingItem: CollapsingItem) -> CollapsingHeaderHandler {

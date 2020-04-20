@@ -69,7 +69,7 @@ class CalendarViewController: UIViewController {
     let monthFormatter = DateFormatter()
     monthFormatter.dateFormat = "MMMM"
 
-    let results = Sundial.callendarBuilder(input: .init(monthsForwardCount: 1, monthsBackwardCount: 1, startDate: Date()), cellClosure: { date in
+    let results = Sundial.callendarFactory(input: .init(monthsForwardCount: 1, monthsBackwardCount: 1, startDate: Date()), cellClosure: { date in
       let data = (day: dayFormatter.string(from: date), month: monthFormatter.string(from: date))
       return CollectionCell<DayCell>(data: data)
     })
@@ -88,12 +88,6 @@ class CalendarViewController: UIViewController {
       $0.edges.equalToSuperview()
     }
 
-//    let cellsMarch: [Cellable] = (1...31).map {
-//      CollectionCell<DayCell>(data: "\($0)")
-//    }
-//    let cellsApril: [Cellable] = (1...30).map {
-//      CollectionCell<DayCell>(data: "\($0)")
-//    }
     collectionView.source.sections = results.map { $0.section }
     collectionView.isPagingEnabled = true
     collectionView.reloadData()

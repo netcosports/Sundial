@@ -16,6 +16,7 @@ class ViewController: UIViewController {
 
   let collapsing = CollapsingHeaderViewController()
   let inners = [
+    CalendarDayViewController(),
     CalendarViewController(),
     ViewControllerInner(.equal(size: 120), count: 5, margin: 10),
     ViewControllerInner(.content(.right), count: 3, margin: 10),
@@ -77,9 +78,9 @@ class ViewController: UIViewController {
 extension ViewController: CollectionViewPager {
 
   var pages: [Page] {
-    var controllers: [UIViewController] = [customViews]
+    var controllers: [UIViewController] = inners
     controllers.append(collapsing)
-    controllers.append(contentsOf: inners)
+    controllers.append(contentsOf: [customViews])
     return controllers.enumerated().map { Page(controller: $1, id: "Title \($0)") }
   }
 
@@ -97,9 +98,10 @@ extension ViewController {
 
   var titles: [TitleCollectionViewCell.TitleViewModel] {
     return [
+      TitleCollectionViewCell.TitleViewModel(title: "CALENDAR DAY", indicatorColor: .red),
+      TitleCollectionViewCell.TitleViewModel(title: "CALENDAR", indicatorColor: .red),
       TitleCollectionViewCell.TitleViewModel(title: "Custom Views", indicatorColor: .brown),
       TitleCollectionViewCell.TitleViewModel(title: "collapsing", indicatorColor: .blue),
-      TitleCollectionViewCell.TitleViewModel(title: "CALENDAR", indicatorColor: .red),
       TitleCollectionViewCell.TitleViewModel(title: "content(.left)", indicatorColor: .blue),
       TitleCollectionViewCell.TitleViewModel(title: "content(.right)", indicatorColor: .gray),
       TitleCollectionViewCell.TitleViewModel(title: "content(.center)", indicatorColor: .orange),

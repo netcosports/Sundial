@@ -1,5 +1,5 @@
 //
-//  CallendarBuilder.swift
+//  CallendarFactory.swift
 //  Sundial
 //
 //  Created by Sergei Mikhan on 3/19/20.
@@ -9,9 +9,9 @@ import Astrolabe
 
 public typealias CellClosure = (Date) -> Cellable
 public typealias SectionClosure = (Date, [Cellable]) -> Sectionable
-public typealias CalendarBuilderResult = (monthLayout: CalendarCollectionViewLayout.MonthLayout, section: Sectionable)
+public typealias CalendarFactoryResult = (monthLayout: CalendarCollectionViewLayout.MonthLayout, section: Sectionable)
 
-public struct CallendarBuilderInput {
+public struct CallendarFactoryInput {
   let monthsForwardCount: Int
   let monthsBackwardCount: Int
   let startDate: Date
@@ -23,13 +23,13 @@ public struct CallendarBuilderInput {
   }
 }
 
-public func callendarBuilder(input: CallendarBuilderInput,
+public func callendarFactory(input: CallendarFactoryInput,
                              cellClosure: CellClosure,
-                             sectionClosure: SectionClosure? = nil) -> [CalendarBuilderResult] {
+                             sectionClosure: SectionClosure? = nil) -> [CalendarFactoryResult] {
   var startOfMonth = input.startDate.monthesBefore(input.monthsBackwardCount).startOfMonth
   var endOfMonth = startOfMonth.endOfMonth
   var date = startOfMonth
-  var results: [CalendarBuilderResult] = []
+  var results: [CalendarFactoryResult] = []
   (0..<(input.monthsBackwardCount + input.monthsForwardCount + 1)).forEach { _ in
     var cells: [Cellable] = []
 
@@ -64,6 +64,10 @@ extension Date {
 
   var startOfDay: Date {
     Calendar.current.startOfDay(for: self)
+  }
+
+  var endOfDay: Date {
+    Calendar.current.dateInterval(of: .day, for: self)?.end ?? self
   }
 
   func monthesBefore(_ count: Int) -> Date {
