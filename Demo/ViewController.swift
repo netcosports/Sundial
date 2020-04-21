@@ -78,8 +78,8 @@ class ViewController: UIViewController {
 extension ViewController: CollectionViewPager {
 
   var pages: [Page] {
-    var controllers: [UIViewController] = inners
-    controllers.append(collapsing)
+    var controllers: [UIViewController] = [collapsing]
+    controllers.append(contentsOf: inners)
     controllers.append(contentsOf: [customViews])
     return controllers.enumerated().map { Page(controller: $1, id: "Title \($0)") }
   }
@@ -98,10 +98,10 @@ extension ViewController {
 
   var titles: [TitleCollectionViewCell.TitleViewModel] {
     return [
+      TitleCollectionViewCell.TitleViewModel(title: "collapsing", indicatorColor: .blue),
       TitleCollectionViewCell.TitleViewModel(title: "CALENDAR DAY", indicatorColor: .red),
       TitleCollectionViewCell.TitleViewModel(title: "CALENDAR", indicatorColor: .red),
       TitleCollectionViewCell.TitleViewModel(title: "Custom Views", indicatorColor: .brown),
-      TitleCollectionViewCell.TitleViewModel(title: "collapsing", indicatorColor: .blue),
       TitleCollectionViewCell.TitleViewModel(title: "content(.left)", indicatorColor: .blue),
       TitleCollectionViewCell.TitleViewModel(title: "content(.right)", indicatorColor: .gray),
       TitleCollectionViewCell.TitleViewModel(title: "content(.center)", indicatorColor: .orange),

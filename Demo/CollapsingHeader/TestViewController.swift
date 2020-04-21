@@ -51,7 +51,7 @@ class TestLoaderViewController: UIViewController, Accessor, CollapsingItem, Load
     return containerView
   }
   var followDirection: Bool {
-    return true
+    return false
   }
   var sections: [Sectionable] {
     get {
@@ -120,7 +120,7 @@ class TestViewController: UIViewController, Accessor, CollapsingItem {
 
   let color: UIColor
   let numberOfItems: Int
-  init(_ color: UIColor, numberOfItems: Int = 3) {
+  init(_ color: UIColor, numberOfItems: Int = 10) {
     self.color = color
     self.numberOfItems = numberOfItems
     super.init(nibName: nil, bundle: nil)

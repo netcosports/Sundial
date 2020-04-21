@@ -73,6 +73,8 @@ class CollapsingHeaderViewController: UIViewController {
     let layout = Layout(hostPagerSource: collectionView.source, settings: settings)
     layout.maxHeaderHeight.accept(300)
     layout.minHeaderHeight.accept(100)
+    layout.maxFooterHeight.accept(300)
+    layout.minFooterHeight.accept(0.0)
     layout.headerHeight.accept(layout.maxHeaderHeight.value)
     layout.headerHeight.asDriver()
       .map { $0 + 80.0 }
@@ -119,17 +121,20 @@ extension CollapsingHeaderViewController: CollectionViewPager {
     ]
   }
 
-  typealias CollapsingHeader = CollectionCell<Header>
   typealias Supplementary = PagerHeaderSupplementaryView<TitleCollectionViewCell, MarkerDecorationView<TitleCollectionViewCell.Data>>
 
   func section(with cells: [Cellable]) -> Sectionable {
     let pagerSupplementary = CollectionCell<Supplementary>(data: titles,
                                                            type: .custom(kind: PagerHeaderSupplementaryViewKind))
 
-    let collapsingSupplementary = CollapsingHeader(data: "Customizable Header title",
-                                                   type: .custom(kind: PagerHeaderCollapsingSupplementaryViewKind))
+    let collapsingSupplementary = CollectionCell<Header>(data: "Customizable Header title",
+                                                         type: .custom(kind: PagerHeaderCollapsingSupplementaryViewKind))
 
-    return MultipleSupplementariesSection(supplementaries: [pagerSupplementary, collapsingSupplementary], cells: cells)
+    let pagerFooter = CollectionCell<Header>(data: "Customizable Footer title",
+                                             type: .custom(kind: PagerHeaderCollapsingFooterViewKind))
+
+
+    return MultipleSupplementariesSection(supplementaries: [pagerSupplementary, collapsingSupplementary, pagerFooter], cells: cells)
   }
 }
 

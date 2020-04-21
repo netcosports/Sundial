@@ -12,13 +12,19 @@ import RxCocoa
 
 public let PagerHeaderSupplementaryViewKind = "PagerHeaderSupplementaryViewKind"
 public let PagerHeaderCollapsingSupplementaryViewKind = "PagerHeaderCollapsingSupplementaryViewKind"
+public let PagerHeaderCollapsingFooterViewKind = "PagerHeaderCollapsingFooterViewKind"
 
 open class PagerHeaderCollectionViewLayout: PlainCollectionViewLayout {
 
   public let minHeaderHeight = BehaviorRelay<CGFloat>(value: 0)
   public let maxHeaderHeight = BehaviorRelay<CGFloat>(value: 240)
-  public let headerInset = BehaviorRelay<CGFloat>(value: 0)
   public let headerHeight = BehaviorRelay<CGFloat>(value: 120)
+
+  public let minFooterHeight = BehaviorRelay<CGFloat>(value: 0)
+  public let maxFooterHeight = BehaviorRelay<CGFloat>(value: 0)
+  public let footerHeight = BehaviorRelay<CGFloat>(value: 0)
+
+  public let headerInset = BehaviorRelay<CGFloat>(value: 0)
   public var expanded: Observable<Bool> { return expandedSubject.asObservable() }
   public let followOffsetChanges = BehaviorRelay<Bool>(value: false)
 
@@ -27,10 +33,11 @@ open class PagerHeaderCollectionViewLayout: PlainCollectionViewLayout {
 
   static let headerIndex = IndexPath(index: 0)
   static let collapsingIndex = IndexPath(index: 0)
+  static let collapsingFooterIndex = IndexPath(index: 0)
 
   fileprivate let expandedSubject = BehaviorSubject<Bool>(value: true)
   fileprivate var handlers: [CollapsingHeaderHandler] = []
-  fileprivate var pengingCollapsingItems: [CollapsingItem] = []
+  fileprivate var pendingCollapsingItems: [CollapsingItem] = []
   fileprivate weak var connectedItem: CollapsingItem?
   fileprivate var updateHeightDisposeBag: DisposeBag?
   fileprivate var updateMaxHeightDisposeBag: DisposeBag?
@@ -42,8 +49,13 @@ open class PagerHeaderCollectionViewLayout: PlainCollectionViewLayout {
     let observable: Observable<Void> = Observable.from([
       minHeaderHeight.asObservable().skip(1).distinctUntilChanged().map { _ in () },
       maxHeaderHeight.asObservable().skip(1).distinctUntilChanged().map { _ in () },
-      headerInset.asObservable().skip(1).distinctUntilChanged().map { _ in () },
       headerHeight.asObservable().skip(1).distinctUntilChanged().map { _ in () },
+
+      minFooterHeight.asObservable().skip(1).distinctUntilChanged().map { _ in () },
+      maxFooterHeight.asObservable().skip(1).distinctUntilChanged().map { _ in () },
+      footerHeight.asObservable().skip(1).distinctUntilChanged().map { _ in () },
+
+      headerInset.asObservable().skip(1).distinctUntilChanged().map { _ in () }
     ]).merge()
 
     observable.subscribe(onNext: { [weak self] _ in
@@ -68,9 +80,9 @@ open class PagerHeaderCollectionViewLayout: PlainCollectionViewLayout {
   open override func prepare() {
     super.prepare()
 
-    if hasCollapsingSupplementary && !pengingCollapsingItems.isEmpty {
-      append(collapsingItems: pengingCollapsingItems)
-      pengingCollapsingItems = []
+    if (hasCollapsingHeader || hasCollapsingFooter) && !pendingCollapsingItems.isEmpty {
+      append(collapsingItems: pendingCollapsingItems)
+      pendingCollapsingItems = []
     }
   }
 
@@ -81,6 +93,7 @@ open class PagerHeaderCollectionViewLayout: PlainCollectionViewLayout {
     var attributes = sourceAttributes.compactMap { $0.copy() as? UICollectionViewLayoutAttributes }
     addPagerHeaderAttributes(to: &attributes)
     addCollapsingHeaderAttributes(to: &attributes)
+    addCollapsingFooterAttributes(to: &attributes)
     addJumpAttributes(to: &attributes)
     return attributes
   }
@@ -106,7 +119,20 @@ open class PagerHeaderCollectionViewLayout: PlainCollectionViewLayout {
       return collapsingHeaderAttributes()
     }
 
+    if elementKind == PagerHeaderCollapsingFooterViewKind,
+      indexPath == PagerHeaderCollectionViewLayout.collapsingFooterIndex {
+      return collapsingFooterAttributes()
+    }
+
     return super.layoutAttributesForSupplementaryView(ofKind: elementKind, at: indexPath)
+  }
+}
+
+// MARK: strip heaader
+extension PagerHeaderCollectionViewLayout {
+
+  var hasPagerSupplementary: Bool {
+    return hostPagerSource?.sections.first?.supplementaries(for: .custom(kind: PagerHeaderSupplementaryViewKind)).isEmpty == false
   }
 
   open func pagerHeaderViewAttributes() -> PagerHeaderViewAttributes? {
@@ -124,31 +150,10 @@ open class PagerHeaderCollectionViewLayout: PlainCollectionViewLayout {
     return pagerHeaderAttributes
   }
 
-  open func collapsingHeaderAttributes() -> CollapsingHeaderViewAttributes? {
-    guard hasCollapsingSupplementary else { return nil }
-
-    let сollapsingHeaderViewAttributes = CollapsingHeaderViewAttributes(forSupplementaryViewOfKind: PagerHeaderCollapsingSupplementaryViewKind,
-                                                                        with: PagerHeaderCollectionViewLayout.collapsingIndex)
-    сollapsingHeaderViewAttributes.zIndex = type(of: self).headerZIndex
-
-    guard let collectionView = collectionView else { return сollapsingHeaderViewAttributes }
-
-    сollapsingHeaderViewAttributes.frame = CGRect(x: collectionView.contentOffset.x,
-                                                   y: 0.0,
-                                                   width: collectionView.frame.width,
-                                                   height: headerHeight.value)
-    if maxHeaderHeight.value == minHeaderHeight.value {
-      сollapsingHeaderViewAttributes.progress = 0.0
-    } else {
-      сollapsingHeaderViewAttributes.progress = (headerHeight.value - minHeaderHeight.value) / (maxHeaderHeight.value - minHeaderHeight.value)
-    }
-    return сollapsingHeaderViewAttributes
-  }
-
   open var pagerHeaderFrame: CGRect {
     guard let collectionView = collectionView else { return .zero }
 
-    if hasCollapsingSupplementary {
+    if hasCollapsingHeader {
       return CGRect(x: collectionView.contentOffset.x,
                     y: headerHeight.value,
                     width: collectionView.frame.width,
@@ -168,6 +173,107 @@ open class PagerHeaderCollectionViewLayout: PlainCollectionViewLayout {
                   width: collectionView.frame.width,
                   height: settings.stripHeight)
   }
+
+  func adjustItem(frame: CGRect) -> CGRect {
+    if hasCollapsingHeader {
+      return frame
+    }
+
+    let bottom = settings.bottomStripSpacing
+    let height = settings.stripHeight
+
+    return CGRect(x: frame.origin.x,
+                  y: height + bottom,
+                  width: frame.width,
+                  height: frame.height - height - bottom)
+  }
+
+  func addPagerHeaderAttributes(to attributes: inout [UICollectionViewLayoutAttributes]) {
+    guard attributes.count > settings.numberOfTitlesWhenHidden else { return }
+    guard let pagerHeaderViewAttributes = self.pagerHeaderViewAttributes() else { return }
+
+    attributes.forEach {
+      $0.frame = adjustItem(frame: $0.frame)
+    }
+    attributes.append(pagerHeaderViewAttributes)
+  }
+}
+
+// MARK: collapsing header
+extension PagerHeaderCollectionViewLayout {
+
+  var hasCollapsingHeader: Bool {
+    return hostPagerSource?.sections.first?.supplementaries(for: .custom(kind: PagerHeaderCollapsingSupplementaryViewKind)).isEmpty == false
+  }
+
+  open func collapsingHeaderAttributes() -> CollapsingHeaderViewAttributes? {
+    guard hasCollapsingHeader else { return nil }
+
+    let сollapsingHeaderViewAttributes = CollapsingHeaderViewAttributes(forSupplementaryViewOfKind: PagerHeaderCollapsingSupplementaryViewKind,
+                                                                        with: PagerHeaderCollectionViewLayout.collapsingIndex)
+    сollapsingHeaderViewAttributes.zIndex = type(of: self).headerZIndex
+
+    guard let collectionView = collectionView else { return сollapsingHeaderViewAttributes }
+
+    сollapsingHeaderViewAttributes.frame = CGRect(x: collectionView.contentOffset.x,
+                                                   y: 0.0,
+                                                   width: collectionView.frame.width,
+                                                   height: headerHeight.value)
+    if maxHeaderHeight.value == minHeaderHeight.value {
+      сollapsingHeaderViewAttributes.progress = 0.0
+    } else {
+      сollapsingHeaderViewAttributes.progress = (headerHeight.value - minHeaderHeight.value) / (maxHeaderHeight.value - minHeaderHeight.value)
+    }
+    return сollapsingHeaderViewAttributes
+  }
+
+  func addCollapsingHeaderAttributes(to attributes: inout [UICollectionViewLayoutAttributes]) {
+    guard attributes.count > settings.numberOfTitlesWhenHidden else { return }
+    guard let collapsingHeaderAttributes = self.collapsingHeaderAttributes() else { return }
+    attributes.append(collapsingHeaderAttributes)
+  }
+}
+
+
+extension PagerHeaderCollectionViewLayout {
+
+  var hasCollapsingFooter: Bool {
+    return hostPagerSource?.sections.first?.supplementaries(for: .custom(kind: PagerHeaderCollapsingFooterViewKind)).isEmpty == false
+  }
+
+  open func collapsingFooterAttributes() -> CollapsingHeaderViewAttributes? {
+    guard hasCollapsingFooter else { return nil }
+
+    let сollapsingFooterViewAttributes = CollapsingHeaderViewAttributes(
+      forSupplementaryViewOfKind: PagerHeaderCollapsingFooterViewKind,
+      with: PagerHeaderCollectionViewLayout.collapsingFooterIndex)
+    сollapsingFooterViewAttributes.zIndex = type(of: self).headerZIndex
+    guard let collectionView = collectionView else {
+      return сollapsingFooterViewAttributes
+    }
+    let x = collectionView.contentOffset.x
+    let y = collectionView.contentOffset.y + collectionView.frame.height - footerHeight.value
+    сollapsingFooterViewAttributes.frame = CGRect(x: x,
+                                                  y: y,
+                                                  width: collectionView.frame.width,
+                                                  height: footerHeight.value)
+    if maxFooterHeight.value == minFooterHeight.value {
+      сollapsingFooterViewAttributes.progress = 0.0
+    } else {
+      let progress = (footerHeight.value - minFooterHeight.value) / (maxFooterHeight.value - minFooterHeight.value)
+      сollapsingFooterViewAttributes.progress = progress
+    }
+    return сollapsingFooterViewAttributes
+  }
+
+  func addCollapsingFooterAttributes(to attributes: inout [UICollectionViewLayoutAttributes]) {
+    guard let collapsingFooterAttributes = self.collapsingFooterAttributes() else { return }
+    attributes.append(collapsingFooterAttributes)
+  }
+}
+
+// MARK: manipulate collapsing content
+extension PagerHeaderCollectionViewLayout {
 
   open func scrollToTop() {
     if let connectedItem = connectedItem {
@@ -252,10 +358,14 @@ open class PagerHeaderCollectionViewLayout: PlainCollectionViewLayout {
     }).disposed(by: updateHeightDisposeBag)
     self.updateHeightDisposeBag = updateHeightDisposeBag
   }
+}
+
+// MARK: manage collapsing items
+extension PagerHeaderCollectionViewLayout {
 
   open func append(collapsingItems: [CollapsingItem]) {
-    guard hasCollapsingSupplementary else {
-      pengingCollapsingItems.append(contentsOf: collapsingItems)
+    guard hasCollapsingHeader || hasCollapsingFooter else {
+      pendingCollapsingItems.append(contentsOf: collapsingItems)
       return
     }
     let handlers: [CollapsingHeaderHandler] = collapsingItems.compactMap { item in
@@ -268,64 +378,20 @@ open class PagerHeaderCollectionViewLayout: PlainCollectionViewLayout {
     self.handlers = self.handlers + handlers
   }
 
-}
-
-extension PagerHeaderCollectionViewLayout {
-
-  var hasPagerSupplementary: Bool {
-    return hostPagerSource?.sections.first?.supplementaries(for: .custom(kind: PagerHeaderSupplementaryViewKind)).isEmpty == false
-  }
-
-  func adjustItem(frame: CGRect) -> CGRect {
-    if hasCollapsingSupplementary {
-      return frame
-    }
-
-    let bottom = settings.bottomStripSpacing
-    let height = settings.stripHeight
-
-    return CGRect(x: frame.origin.x,
-                  y: height + bottom,
-                  width: frame.width,
-                  height: frame.height - height - bottom)
-  }
-
-  func addPagerHeaderAttributes(to attributes: inout [UICollectionViewLayoutAttributes]) {
-    guard attributes.count > settings.numberOfTitlesWhenHidden else { return }
-    guard let pagerHeaderViewAttributes = self.pagerHeaderViewAttributes() else { return }
-
-    attributes.forEach {
-      $0.frame = adjustItem(frame: $0.frame)
-    }
-    attributes.append(pagerHeaderViewAttributes)
-  }
-}
-
-public extension Reactive where Base: PagerHeaderCollectionViewLayout {
-
-  var collapsingItem: AnyObserver<CollapsingItem> {
-    return base.collapsingItemSubject.asObserver()
-  }
-}
-
-
-fileprivate extension PagerHeaderCollectionViewLayout {
-
-  var hasCollapsingSupplementary: Bool {
-    return hostPagerSource?.sections.first?.supplementaries(for: .custom(kind: PagerHeaderCollapsingSupplementaryViewKind)).isEmpty == false
-  }
-
-  func handler(for collapsingItem: CollapsingItem) -> CollapsingHeaderHandler {
+  private func handler(for collapsingItem: CollapsingItem) -> CollapsingHeaderHandler {
     let handler = CollapsingHeaderHandler(with: collapsingItem,
                                           min: minHeaderHeight,
                                           max: maxHeaderHeight,
                                           headerInset: headerInset,
                                           headerHeight: headerHeight,
+                                          footerHeight: footerHeight,
+                                          minFooterHeight: minFooterHeight,
+                                          maxFooterHeight: maxFooterHeight,
                                           followOffsetChanges: followOffsetChanges)
 
     collapsingItem.visible.asDriver().drive(onNext: { [weak handler, weak self] visible in
       guard let self = self else { return }
-      if visible && self.hasCollapsingSupplementary {
+      if visible && self.hasCollapsingHeader {
         handler?.connect()
         self.connectedItem = collapsingItem
       } else {
@@ -334,10 +400,13 @@ fileprivate extension PagerHeaderCollectionViewLayout {
     }).disposed(by: self.disposeBag)
     return handler
   }
+}
 
-  func addCollapsingHeaderAttributes(to attributes: inout [UICollectionViewLayoutAttributes]) {
-    guard attributes.count > settings.numberOfTitlesWhenHidden else { return }
-    guard let collapsingHeaderAttributes = self.collapsingHeaderAttributes() else { return }
-    attributes.append(collapsingHeaderAttributes)
+// MARK: reactive
+public extension Reactive where Base: PagerHeaderCollectionViewLayout {
+
+  var collapsingItem: AnyObserver<CollapsingItem> {
+    return base.collapsingItemSubject.asObserver()
   }
 }
+

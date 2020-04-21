@@ -9,11 +9,17 @@ import UIKit
 import RxSwift
 import RxCocoa
 
+
 class CollapsingHeaderHandler {
 
   let headerHeight: BehaviorRelay<CGFloat>
   let minHeaderHeight: BehaviorRelay<CGFloat>
   let maxHeaderHeight: BehaviorRelay<CGFloat>
+
+  let footerHeight: BehaviorRelay<CGFloat>
+  let minFooterHeight: BehaviorRelay<CGFloat>
+  let maxFooterHeight: BehaviorRelay<CGFloat>
+
   let headerInset: BehaviorRelay<CGFloat>
   let followOffsetChanges: BehaviorRelay<Bool>
 
@@ -36,12 +42,22 @@ class CollapsingHeaderHandler {
        max: BehaviorRelay<CGFloat>,
        headerInset: BehaviorRelay<CGFloat>,
        headerHeight: BehaviorRelay<CGFloat>,
+
+       footerHeight: BehaviorRelay<CGFloat>,
+       minFooterHeight: BehaviorRelay<CGFloat>,
+       maxFooterHeight: BehaviorRelay<CGFloat>,
+
        followOffsetChanges: BehaviorRelay<Bool>) {
 
     self.collapsingItem = collapsingItem
     self.minHeaderHeight = min
     self.maxHeaderHeight = max
     self.headerHeight = headerHeight
+
+    self.footerHeight = footerHeight
+    self.minFooterHeight = minFooterHeight
+    self.maxFooterHeight = maxFooterHeight
+
     self.headerInset = headerInset
     self.followOffsetChanges = followOffsetChanges
 
@@ -81,46 +97,64 @@ class CollapsingHeaderHandler {
           bottomInset = extraInset.bottom
         }
 
-        let contentOffsetOriginal = collapsingItem.scrollView.contentOffset
-        let adjustedY = -(sself.headerHeight.value + sself.headerInset.value + extraInset.top)
-        let contentOffset = CGPoint(x: contentOffsetOriginal.x, y: adjustedY)
+        if sself.maxFooterHeight.value > 0.0 && bottomInset < sself.maxFooterHeight.value {
+          bottomInset = sself.maxFooterHeight.value
+        }
 
+        let contentOffsetOriginal = collapsingItem.scrollView.contentOffset
         collapsingItem.scrollView.contentInset = UIEdgeInsets(top: topInset, left: 0, bottom: bottomInset, right: 0)
         collapsingItem.scrollView.scrollIndicatorInsets = UIEdgeInsets(top: topInset, left: 0, bottom: 0, right: 0)
         // FIXME: we need to avoid unnecessary content offset change when content size changed
-        if collapsingItem.scrollView.contentOffset.y <= 0.0 {
+        if sself.footerHeight.value > sself.minFooterHeight.value {
+          let adjustedY = collapsingItem.scrollView.contentSize.height
+            - collapsingItem.scrollView.bounds.height
+            + footerHeight.value
+          let contentOffset = CGPoint(x: contentOffsetOriginal.x, y: adjustedY)
+          collapsingItem.scrollView.contentOffset = contentOffset
+        } else if collapsingItem.scrollView.contentOffset.y <= 0.0 {
+          let adjustedY = -(sself.headerHeight.value + sself.headerInset.value + extraInset.top)
+          let contentOffset = CGPoint(x: contentOffsetOriginal.x, y: adjustedY)
           collapsingItem.scrollView.contentOffset = contentOffset
         }
       }).disposed(by: disposeBag)
   }
 
+  // OK
   func connect() {
     guard connection != .connected else { return }
     connection = .connected
 
     guard let collapsingItem = collapsingItem else { return }
-    let targetContentOffset = -headerHeight.value - headerInset.value - collapsingItem.extraInset.top
-    if collapsingItem.scrollView.contentOffset.y <= 0.0 {
-      collapsingItem.scrollView.contentOffset = CGPoint(x: 0, y: targetContentOffset)
+
+    if footerHeight.value > minFooterHeight.value {
+      let y = collapsingItem.scrollView.contentSize.height
+        - collapsingItem.scrollView.bounds.height
+        + footerHeight.value
+      collapsingItem.scrollView.contentOffset = CGPoint(x: 0.0, y: y)
+    } else if collapsingItem.scrollView.contentOffset.y <= 0.0 {
+      let y = -headerHeight.value - headerInset.value - collapsingItem.extraInset.top
+      collapsingItem.scrollView.contentOffset = CGPoint(x: 0, y: y)
     }
     activeDispose?.dispose()
     nonActiveDispose?.dispose()
 
-    let headerHeightDispose = collapsingItem.scrollView.rx.contentOffset
-      .asObservable()
-      .skip(1)
-      .distinctUntilChanged()
-      .filter { [weak self] _ in
-        guard let `self` = self else { return false }
-        let scrollView = collapsingItem.scrollView
+    let contentOffset = collapsingItem.scrollView.rx.contentOffset
+    .asObservable()
+    .skip(1)
+    .distinctUntilChanged()
+    .filter { [weak self] _ in
+      guard let `self` = self else { return false }
+      let scrollView = collapsingItem.scrollView
 
-        return scrollView.panGestureRecognizer.state != .possible
-          || scrollView.isDecelerating
-          || scrollView.isDragging
-          || scrollView.isTracking
-          || scrollView.scrollingToTop
-          || self.followOffsetChanges.value != false
-      }
+      return scrollView.panGestureRecognizer.state != .possible
+        || scrollView.isDecelerating
+        || scrollView.isDragging
+        || scrollView.isTracking
+        || scrollView.scrollingToTop
+        || self.followOffsetChanges.value != false
+    }
+
+    let headerHeightDispose = contentOffset
       .map { [unowned self, weak collapsingItem] input in
         guard let collapsingItem = collapsingItem else { return 0.0 }
         let offset = self.collapsingBorder - input.y - self.headerInset.value - collapsingItem.extraInset.top
@@ -128,6 +162,22 @@ class CollapsingHeaderHandler {
       }.asDriver(onErrorJustReturn: maxHeaderHeight.value)
       .distinctUntilChanged()
       .drive(headerHeight)
+
+    // FIXME: we do need this only in case when footer is requared
+    // FIXME: we need to handle max footer height
+    let footerHeightDispose = contentOffset
+      .map { [unowned self, weak collapsingItem] input in
+        guard let collapsingItem = collapsingItem else { return 0.0 }
+        var offset = collapsingItem.scrollView.contentSize.height - collapsingItem.scrollView.bounds.maxY
+        if offset > self.minFooterHeight.value {
+          offset = self.minFooterHeight.value
+        } else {
+          offset = abs(offset)
+        }
+        return min(max(self.minFooterHeight.value, offset), self.maxFooterHeight.value)
+      }.asDriver(onErrorJustReturn: maxFooterHeight.value)
+      .distinctUntilChanged()
+      .drive(footerHeight)
 
     let maxHeaderHeightDispose = maxHeaderHeight
       .asDriver()
@@ -158,12 +208,15 @@ class CollapsingHeaderHandler {
           self.collapsingBorder = 0.0
         }
       })
-      activeDispose = Disposables.create(headerHeightDispose, maxHeaderHeightDispose, directionChangeDispose)
+      activeDispose = Disposables.create(headerHeightDispose, maxHeaderHeightDispose,
+                                         directionChangeDispose, footerHeightDispose)
     } else {
-      activeDispose = Disposables.create(headerHeightDispose, maxHeaderHeightDispose)
+      activeDispose = Disposables.create(headerHeightDispose, maxHeaderHeightDispose,
+                                         footerHeightDispose)
     }
   }
 
+  // OK
   func disconnect() {
     guard connection != .disconnected else { return }
     connection = .disconnected
@@ -171,13 +224,24 @@ class CollapsingHeaderHandler {
     activeDispose?.dispose()
     nonActiveDispose?.dispose()
     if let collapsingItem = collapsingItem {
-      nonActiveDispose = headerHeight
+      let headerDispose = headerHeight
         .asDriver()
         .distinctUntilChanged()
         .skip(1)
         .map {
           return CGPoint(x: 0, y: -$0 - self.headerInset.value - collapsingItem.extraInset.top)
         }.drive(collapsingItem.scrollView.rx.contentOffset)
+
+      let footerDispose = footerHeight
+        .asDriver()
+        .distinctUntilChanged()
+        .skip(1)
+        .map {
+          let y = collapsingItem.scrollView.contentSize.height - collapsingItem.scrollView.bounds.height + $0
+          return CGPoint(x: 0, y: y)
+        }.drive(collapsingItem.scrollView.rx.contentOffset)
+
+      activeDispose = Disposables.create(headerDispose, footerDispose)
     }
   }
 
@@ -197,7 +261,7 @@ class CollapsingHeaderHandler {
     let previous = current.skip(1)
     return Observable.zip(current, previous).map { offsets -> Direction in
       return offsets.0 > offsets.1 ? .topToBottom : .bottomToTop
-    }.buffer(timeSpan: 1.0, count: 5, scheduler: MainScheduler.instance)
+    }.buffer(timeSpan: .seconds(1), count: 5, scheduler: MainScheduler.instance)
     .flatMap { directions -> Observable<Direction> in
       guard !directions.isEmpty else { return .empty() }
       if directions.filter({ $0 == .topToBottom }).isEmpty {
