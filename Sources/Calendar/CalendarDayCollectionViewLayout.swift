@@ -102,7 +102,7 @@ open class CalendarDayCollectionViewLayout: EmptyViewCollectionViewLayout {
 private extension CalendarDayCollectionViewLayout {
 
   private func reload() {
-    guard let collectionView = collectionView else { return }
+    guard let collectionView = collectionView, collectionView.numberOfSections > 0 else { return }
 
     let width = collectionView.frame.width
     let totalHours = 24
