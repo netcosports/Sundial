@@ -58,6 +58,7 @@ open class AutoAlignedCollectionViewLayout: EmptyViewCollectionViewLayout {
     case .vertical:
       collectionView?.contentInset = UIEdgeInsets(top: startInset, left: sectionInset.left,
                                                   bottom: endInset, right: sectionInset.right)
+    @unknown default: break
     }
     super.prepare()
   }
@@ -80,13 +81,19 @@ open class AutoAlignedCollectionViewLayout: EmptyViewCollectionViewLayout {
 
     var targetAttributes = candidateAttributes
     if candidateAttributes?.indexPath == currentAttributes?.indexPath,
-      velocityValue != 0.0,
-      let attributes = candidateAttributes {
-      let targetIndex = nextIndexPath(for: attributes.indexPath, forward: velocityValue > 0.0)
-      targetAttributes = cellsAttributes.first(where: { $0.indexPath == targetIndex })
-      if targetAttributes == nil {
-        targetAttributes = layoutAttributesForItem(at: targetIndex)
-      }
+      velocityValue != 0.0, let attributes = candidateAttributes {
+      var targetIndex = attributes.indexPath
+      repeat {
+        if let index = nextIndexPath(for: targetIndex, forward: velocityValue > 0.0) {
+          targetIndex = index
+        } else {
+          break
+        }
+        targetAttributes = cellsAttributes.first(where: { $0.indexPath == targetIndex })
+        if targetAttributes == nil {
+          targetAttributes = layoutAttributesForItem(at: targetIndex)
+        }
+      } while !isSameLine(layoutAttributes: targetAttributes, with: attributes)
     }
 
     if let attributes = targetAttributes {
@@ -105,15 +112,30 @@ open class AutoAlignedCollectionViewLayout: EmptyViewCollectionViewLayout {
 
 private extension AutoAlignedCollectionViewLayout {
 
-  func nextIndexPath(for index: IndexPath, forward: Bool) -> IndexPath {
-    guard let collectionView = collectionView else { return index }
+  func isSameLine(layoutAttributes: UICollectionViewLayoutAttributes?,
+                  with anotherLayoutAttributes: UICollectionViewLayoutAttributes?) -> Bool {
+    guard let lhs = layoutAttributes, let rhs = anotherLayoutAttributes else {
+      return false
+    }
+    switch scrollDirection {
+    case .horizontal:
+      return lhs.frame.midX != rhs.frame.midX
+    case .vertical:
+      return lhs.frame.midY != rhs.frame.midY
+    @unknown default:
+      return false
+    }
+  }
+
+  func nextIndexPath(for index: IndexPath, forward: Bool) -> IndexPath? {
+    guard let collectionView = collectionView else { return nil }
     if forward {
       if (index.item + 1) < collectionView.numberOfItems(inSection: index.section) {
         return IndexPath(item: index.item + 1, section: index.section)
       } else if (index.section + 1) < collectionView.numberOfSections {
         return IndexPath(item: 0, section: index.section + 1)
       } else {
-        return index
+        return nil
       }
     } else {
       if index.item > 0 {
@@ -121,7 +143,7 @@ private extension AutoAlignedCollectionViewLayout {
       } else if index.section > 0 {
         return IndexPath(item: 0, section: index.section - 1)
       } else {
-        return index
+        return nil
       }
     }
   }
@@ -174,6 +196,8 @@ private extension AutoAlignedCollectionViewLayout {
         adjustedOffset = CGPoint(x: contentOffset.x + CGFloat(factor) * (proposedOffset.x - contentOffset.x), y: proposedOffset.y)
       case .vertical:
         adjustedOffset = CGPoint(x: proposedOffset.x, y: contentOffset.y + CGFloat(factor) * (proposedOffset.y - contentOffset.y))
+      @unknown default:
+        adjustedOffset = .zero
       }
 
       let target: CGRect
@@ -182,6 +206,8 @@ private extension AutoAlignedCollectionViewLayout {
         target = CGRect(x: adjustedOffset.x - horizontalOffset, y: adjustedOffset.y, width: 2.0 * horizontalOffset, height: bounds.height)
       case .vertical:
         target = CGRect(x: adjustedOffset.x, y: adjustedOffset.y - verticalOffset, width: bounds.width, height: 2.0 * verticalOffset)
+      @unknown default:
+        target = .zero
       }
       return target
     }
