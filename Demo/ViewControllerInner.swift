@@ -166,6 +166,7 @@ class ViewControllerInner: UIViewController {
                             backgroundColor: .white,
                             anchor: anchor,
                             inset: UIEdgeInsets(top: 0, left: margin, bottom: 0, right: margin),
+                            alignment: .bottom,
                             jumpingPolicy: .skip(pages: 1),
                             numberOfTitlesWhenHidden: 1)
 

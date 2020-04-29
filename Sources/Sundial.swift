@@ -93,18 +93,21 @@ public enum Anchor: Equatable {
   case right(offset: CGFloat)
 }
 
-// MARK: - DecorationAlignment
+// MARK: - PagerHeaderSupplementaryAlignment
 
-public enum DecorationAlignment: Equatable {
+public enum PagerHeaderSupplementaryAlignment: Equatable {
   case top
+  case bottom
   case topOffset(behaviorRelay: BehaviorRelay<CGFloat>)
 
-  public static func == (lhs: DecorationAlignment, rhs: DecorationAlignment) -> Bool {
+  public static func == (lhs: PagerHeaderSupplementaryAlignment, rhs: PagerHeaderSupplementaryAlignment) -> Bool {
     switch (lhs, rhs) {
     case (.top, .top):
       return true
     case (.topOffset(let lBehaviorRelay), .topOffset(let rBehaviorRelay)):
       return lBehaviorRelay === rBehaviorRelay
+    case (.bottom, .bottom):
+      return true
     default: return false
     }
   }
@@ -150,7 +153,7 @@ public struct Settings: Equatable {
   public var backgroundColor: UIColor
   public var anchor: Anchor
   public var inset: UIEdgeInsets
-  public var alignment: DecorationAlignment
+  public var alignment: PagerHeaderSupplementaryAlignment
   public var pagesOnScreen: Int {
     willSet {
       assert(newValue > 0, "number of pages on screen should be greater than 0")
@@ -172,7 +175,7 @@ public struct Settings: Equatable {
               backgroundColor: UIColor = .clear,
               anchor: Anchor = .centered,
               inset: UIEdgeInsets = .zero,
-              alignment: DecorationAlignment = .top,
+              alignment: PagerHeaderSupplementaryAlignment = .top,
               pagesOnScreen: Int = 1,
               jumpingPolicy: JumpingPolicy = .disabled,
               shouldKeepFocusOnBoundsChange: Bool = false,

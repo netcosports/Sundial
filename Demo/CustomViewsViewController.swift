@@ -33,6 +33,7 @@ class CustomViewsViewController: UIViewController {
                             bottomStripSpacing: 0.0,
                             anchor: .equal(size: 140),
                             inset: .zero,
+                            alignment: .bottom,
                             jumpingPolicy: .skip(pages: 1))
 
     collectionView.collectionViewLayout = Layout(hostPagerSource: collectionView.source, settings: settings)

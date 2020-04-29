@@ -70,7 +70,9 @@ open class PagerHeaderCollectionViewLayout: PlainCollectionViewLayout {
       self?.append(collapsingItems: [collapsingItem])
     }).disposed(by: disposeBag)
 
-    headerInset.accept(self.settings.stripHeight)
+    if settings?.alignment != .bottom {
+      headerInset.accept(self.settings.stripHeight)
+    }
   }
 
   required public init?(coder aDecoder: NSCoder) {
@@ -153,19 +155,23 @@ extension PagerHeaderCollectionViewLayout {
   open var pagerHeaderFrame: CGRect {
     guard let collectionView = collectionView else { return .zero }
 
-    if hasCollapsingHeader {
-      return CGRect(x: collectionView.contentOffset.x,
-                    y: headerHeight.value,
-                    width: collectionView.frame.width,
-                    height: settings.stripHeight)
-    }
-
     let topOffset: CGFloat
-    switch settings.alignment {
-    case .top:
-      topOffset = 0.0
-    case .topOffset(let variable):
-      topOffset = variable.value
+    if hasCollapsingHeader {
+      switch settings.alignment {
+      case .bottom:
+        topOffset = collectionView.frame.height - settings.stripHeight - settings.bottomStripSpacing
+      default:
+        topOffset = headerHeight.value
+      }
+    } else {
+      switch settings.alignment {
+      case .top:
+        topOffset = 0.0
+      case .topOffset(let variable):
+        topOffset = variable.value
+      case .bottom:
+        topOffset = collectionView.frame.height - settings.stripHeight - settings.bottomStripSpacing
+      }
     }
 
     return CGRect(x: collectionView.contentOffset.x,
@@ -182,8 +188,16 @@ extension PagerHeaderCollectionViewLayout {
     let bottom = settings.bottomStripSpacing
     let height = settings.stripHeight
 
+    let y: CGFloat
+    switch settings.alignment {
+    case .bottom:
+      y = 0.0
+    default:
+      y = height + bottom
+    }
+
     return CGRect(x: frame.origin.x,
-                  y: height + bottom,
+                  y: y,
                   width: frame.width,
                   height: frame.height - height - bottom)
   }

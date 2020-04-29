@@ -52,7 +52,7 @@ public struct Settings {
   public var backgroundColor: UIColor
   public var anchor: Anchor
   public var inset: UIEdgeInsets
-  public var alignment: DecorationAlignment
+  public var alignment: PagerHeaderSupplementaryAlignment
   public var pagesOnScreen: Int
   public var jumpingPolicy: JumpingPolicy
  }
