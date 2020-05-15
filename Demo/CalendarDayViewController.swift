@@ -22,6 +22,29 @@ extension CollectionCell: CalendarDayIntervalContainer where Data: CalendarDayIn
   }
 }
 
+public class NowIndicatorCell: CollectionViewCell, Reusable {
+
+  public struct ViewModel: CalendarDayIntervalContainer {
+    public var start: CalendarDayOffset
+    public var end: CalendarDayOffset
+  }
+
+  public typealias Data = ViewModel
+
+  public override func setup() {
+    super.setup()
+    backgroundColor = .red
+  }
+
+  public func setup(with data: ViewModel) {
+
+  }
+
+  public static func size(for data: Data, containerSize: CGSize) -> CGSize {
+    return CGSize(width: containerSize.width, height: 10.0)
+  }
+}
+
 public class EventCell: CollectionViewCell, Reusable {
 
   public struct ViewModel: CalendarDayIntervalContainer {
@@ -130,9 +153,16 @@ class CalendarDayViewController: UIViewController {
     ]
 
     let input = Sundial.CallendarDayFactoryInput<DateInterval>(startDate: Date(), events: events)
-    let sections = Sundial.callendarDayFactory(input: input, supplementaryClosure: { date in
-      return CollectionCell<TimestampCell>(data: timestampFormatter.string(from: date),
-                                           type: .custom(kind: SupplementaryViewKind.calendayDayTimestamp))
+    let sections = Sundial.callendarDayFactory(input: input, supplementaryClosure: { type in
+      switch type {
+      case .nowIndicator(let date):
+        let data = NowIndicatorCell.ViewModel(start: date, end: date)
+        return CollectionCell<NowIndicatorCell>(data: data,
+                                                type: .custom(kind: SupplementaryViewKind.currentTimeIndicator))
+      case .timestamp(let date):
+        return CollectionCell<TimestampCell>(data: timestampFormatter.string(from: date),
+                                             type: .custom(kind: SupplementaryViewKind.calendayDayTimestamp))
+      }
     }, cellClosure: { interval, start, end -> (Cellable & CalendarDayIntervalContainer) in
       let data = EventCell.ViewModel(start: start, end: end,
                                      title: timestampFormatter.string(from: interval.start))

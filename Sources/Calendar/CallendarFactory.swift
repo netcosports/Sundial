@@ -82,6 +82,10 @@ extension Date {
     Calendar.current.date(byAdding: .day, value: 1, to: self) ?? self
   }
 
+  var isToday: Bool {
+    Calendar.current.isDateInToday(self)
+  }
+
   var dayWeekIndex: Int {
     let weekDay = Calendar.current.dateComponents([.weekday], from: self).weekday ?? 0
     if weekDay == 1 {

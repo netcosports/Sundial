@@ -16,6 +16,7 @@ public protocol CalendarDayIntervalContainer {
 
 public enum SupplementaryViewKind {
   public static let calendayDayTimestamp = "SupplementaryViewKind.calendayDayTimestamp"
+  public static let currentTimeIndicator = "SupplementaryViewKind.currentTimeIndicator"
 }
 
 open class CalendarDayCollectionViewLayout: EmptyViewCollectionViewLayout {
@@ -123,6 +124,22 @@ private extension CalendarDayCollectionViewLayout {
       y += settings.timestampHeight + settings.horizontalMargin
     }
     contentSize = CGSize(width: width, height: y + settings.insets.bottom)
+    guard let section = hostPagerSource?.sections[safe: 0] else { return }
+    let type = CellType.custom(kind: SupplementaryViewKind.currentTimeIndicator)
+    if section.supplementaryTypes.contains(type),
+      let cell = section.supplementaries(for: type).first,
+      let start = (cell as? CalendarDayIntervalContainer)?.start {
+      let indexPath = IndexPath(index: 0)
+      let supplementaryAttribute = Attributes(forSupplementaryViewOfKind: SupplementaryViewKind.currentTimeIndicator,
+                                              with: indexPath)
+      let y = CGFloat(start.timestamps) * (settings.timestampHeight + settings.horizontalMargin) +
+              start.relative * settings.timestampHeight
+      supplementaryAttribute.frame = CGRect(x: x, y: y,
+                                            width: supplementaryWidth,
+                                            height: settings.timestampHeight)
+      supplementaryAttribute.zIndex = Int.max
+      supplementaryAttributes[indexPath] = supplementaryAttribute
+    }
     (0..<numberOfCells).forEach { cellIndex in
       let cell = hostPagerSource?.sections[safe: 0]?.cells[safe: cellIndex] as? CalendarDayIntervalContainer
       guard let start = cell?.start, let end = cell?.end else { return }

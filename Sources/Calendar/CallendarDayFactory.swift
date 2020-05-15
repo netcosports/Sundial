@@ -41,16 +41,29 @@ public struct CallendarDayFactoryInput<Data: DateIntervalContainer> {
   }
 }
 
-public func callendarDayFactory<T: DateIntervalContainer>(input: CallendarDayFactoryInput<T>,
-                                                          supplementaryClosure: (Date) -> (Cellable),
-                                                          cellClosure: (T, CalendarDayOffset, CalendarDayOffset) -> (Cellable & CalendarDayIntervalContainer),
-                                                          sectionClosure: (([Cellable], [Cellable]) -> (Sectionable))? = nil) -> [Sectionable] {
+public enum SupplementaryRequest {
+  case timestamp(Date)
+  case nowIndicator(CalendarDayOffset)
+}
+
+public func callendarDayFactory<T: DateIntervalContainer>(
+  input: CallendarDayFactoryInput<T>,
+  supplementaryClosure: (SupplementaryRequest) -> (Cellable?),
+  cellClosure: (T, CalendarDayOffset, CalendarDayOffset) -> (Cellable & CalendarDayIntervalContainer),
+  sectionClosure: (([Cellable], [Cellable]) -> (Sectionable))? = nil
+) -> [Sectionable] {
   let startOfDay = input.startDate.startOfDay
   var supplementaries: [Cellable] = []
   let timestampInterval = 60.0 * 60.0
   (0...24).forEach { index in
     let timestampDate = startOfDay.addingTimeInterval(TimeInterval(index) * timestampInterval)
-    let supplementary = supplementaryClosure(timestampDate)
+    if let supplementary = supplementaryClosure(.timestamp(timestampDate)) {
+      supplementaries.append(supplementary)
+    }
+  }
+
+  if startOfDay.isToday,
+    let supplementary = supplementaryClosure(.nowIndicator(Date().offset(from: startOfDay, timestampInterval: timestampInterval))) {
     supplementaries.append(supplementary)
   }
 
