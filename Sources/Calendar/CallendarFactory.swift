@@ -15,11 +15,16 @@ public struct CallendarFactoryInput {
   let monthsForwardCount: Int
   let monthsBackwardCount: Int
   let startDate: Date
+  let firstWeekday: Int // Sun 1, Mon 2, Tue 3, Wed 4, Fri 5, Sat 6
 
-  public init(monthsForwardCount: Int, monthsBackwardCount: Int, startDate: Date) {
+  public init(monthsForwardCount: Int,
+              monthsBackwardCount: Int,
+              startDate: Date,
+              firstWeekday: Int = Calendar.current.firstWeekday) {
     self.monthsForwardCount = monthsForwardCount
     self.monthsBackwardCount = monthsBackwardCount
     self.startDate = startDate
+    self.firstWeekday = firstWeekday
   }
 }
 
@@ -44,7 +49,11 @@ public func callendarFactory(input: CallendarFactoryInput,
     } else {
       section = Section(cells: cells)
     }
-    results.append((monthLayout: .init(startDayIndex: startOfMonth.dayWeekIndex), section: section))
+    var startDayIndex = startOfMonth.weekDay - input.firstWeekday
+    if startDayIndex < 0 {
+      startDayIndex = 7 + startDayIndex
+    }
+    results.append((monthLayout: .init(startDayIndex: startDayIndex), section: section))
     startOfMonth = startOfMonth.nextMonth.startOfMonth
     endOfMonth = startOfMonth.endOfMonth
     date = startOfMonth
@@ -86,12 +95,7 @@ extension Date {
     Calendar.current.isDateInToday(self)
   }
 
-  var dayWeekIndex: Int {
-    let weekDay = Calendar.current.dateComponents([.weekday], from: self).weekday ?? 0
-    if weekDay == 1 {
-      return 6
-    } else {
-      return weekDay - 2
-    }
+  var weekDay: Int {
+    return Calendar.current.dateComponents([.weekday], from: self).weekday ?? 0
   }
 }
