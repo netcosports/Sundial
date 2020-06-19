@@ -151,7 +151,7 @@ private extension CalendarDayCollectionViewLayout {
       guard let start = cell?.start, let end = cell?.end else { return }
       let indexPath = IndexPath(item: cellIndex, section: 0)
       let cellAttribute = Attributes(forCellWith: indexPath)
-      let y = CGFloat(start.timestamps) * (settings.timestampHeight + settings.horizontalMargin) +
+      let y = CGFloat(start.timestamps - settings.startHour) * (settings.timestampHeight + settings.horizontalMargin) +
               start.relative * settings.timestampHeight
       let relativeHeight = (CGFloat(end.timestamps) + end.relative - (CGFloat(start.timestamps) + start.relative))
       let height = settings.timestampHeight * relativeHeight
