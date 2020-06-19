@@ -171,7 +171,7 @@ class CalendarDayViewController: UIViewController {
 
     let layout = CalendarDayCollectionViewLayout(
       hostPagerSource: collectionView.source,
-      settings: .init(timestampHeight: 120.0)
+      settings: .init(timestampHeight: 120.0, startHour: 8, finishHour: 23)
     )
     collectionView.collectionViewLayout = layout
 

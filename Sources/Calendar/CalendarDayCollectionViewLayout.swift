@@ -26,13 +26,20 @@ open class CalendarDayCollectionViewLayout: EmptyViewCollectionViewLayout {
     public let insets: UIEdgeInsets
     public let horizontalMargin: CGFloat
     public let timestampHeight: CGFloat
+    public let startHour: Int
+    public let finishHour: Int
 
     public init(insets: UIEdgeInsets = .zero,
                 horizontalMargin: CGFloat = 0.0,
-                timestampHeight: CGFloat = 0.0) {
+                timestampHeight: CGFloat = 0.0,
+                startHour: Int = 0,
+                finishHour: Int = 24
+                ) {
       self.insets = insets
       self.horizontalMargin = horizontalMargin
       self.timestampHeight = timestampHeight
+      self.startHour = startHour
+      self.finishHour = finishHour
     }
   }
 
@@ -106,13 +113,12 @@ private extension CalendarDayCollectionViewLayout {
     guard let collectionView = collectionView, collectionView.numberOfSections > 0 else { return }
 
     let width = collectionView.frame.width
-    let totalHours = 24
 
     let x: CGFloat = 0.0
     var y: CGFloat = settings.insets.top
     let supplementaryWidth = width - settings.insets.left - settings.insets.right
     let numberOfCells = collectionView.numberOfItems(inSection: 0)
-    (0..<totalHours).forEach { supplementary in
+    (settings.startHour..<settings.finishHour).forEach { supplementary in
       let indexPath = IndexPath(item: supplementary, section: 0)
       let supplementaryAttribute = Attributes(forSupplementaryViewOfKind: SupplementaryViewKind.calendayDayTimestamp,
                                               with: indexPath)
