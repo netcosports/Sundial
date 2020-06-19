@@ -138,7 +138,7 @@ private extension CalendarDayCollectionViewLayout {
       let indexPath = IndexPath(index: 0)
       let supplementaryAttribute = Attributes(forSupplementaryViewOfKind: SupplementaryViewKind.currentTimeIndicator,
                                               with: indexPath)
-      let y = CGFloat(start.timestamps) * (settings.timestampHeight + settings.horizontalMargin) +
+      let y = CGFloat(start.timestamps - settings.startHour) * (settings.timestampHeight + settings.horizontalMargin) +
               start.relative * settings.timestampHeight
       supplementaryAttribute.frame = CGRect(x: x, y: y,
                                             width: supplementaryWidth,
