@@ -9,7 +9,7 @@ PODS:
     - RxSwift (~> 5)
   - RxSwift (5.1.1)
   - SnapKit (4.2.0)
-  - Sundial (5.1.19):
+  - Sundial (5.1.20):
     - Astrolabe/Core
 
 DEPENDENCIES:
@@ -18,7 +18,7 @@ DEPENDENCIES:
   - Sundial (from `.`)
 
 SPEC REPOS:
-  https://github.com/CocoaPods/Specs.git:
+  https://github.com/cocoapods/specs.git:
     - RxCocoa
     - RxRelay
     - RxSwift
@@ -41,8 +41,8 @@ SPEC CHECKSUMS:
   RxRelay: d77f7d771495f43c556cbc43eebd1bb54d01e8e9
   RxSwift: 81470a2074fa8780320ea5fe4102807cb7118178
   SnapKit: fe8a619752f3f27075cc9a90244d75c6c3f27e2a
-  Sundial: 8bee57e790b6d69ca9eb2d42c922440810599126
+  Sundial: bbba0f5a7e537765c7008c12aa7c923c91f59652
 
 PODFILE CHECKSUM: 23963bc0fc934d8c57eeca98d546a42487eb3e04
 
-COCOAPODS: 1.9.1
+COCOAPODS: 1.7.5
