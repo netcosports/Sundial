@@ -376,6 +376,7 @@ extension PagerHeaderContentCollectionViewLayout {
                                                collectionView: UICollectionView) {
     let target = CGPoint(x: decorationAttributes.frame.midX - (collectionView.frame.width) * 0.5, y: 0)
     collectionView.setContentOffset(target, animated: false)
+    collectionView.contentInset = .init(top: 0.0, left: -target.x, bottom: 0.0, right: 0.0)
   }
 
   fileprivate func adjustLeftContentOffset(for decorationAttributes: MarkerAttributes,
@@ -390,4 +391,3 @@ extension PagerHeaderContentCollectionViewLayout {
     collectionView.setContentOffset(target, animated: false)
   }
 }
-
