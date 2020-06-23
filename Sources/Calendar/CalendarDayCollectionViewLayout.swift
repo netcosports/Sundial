@@ -166,9 +166,10 @@ private extension CalendarDayCollectionViewLayout {
         let y = CGFloat(start.timestamps - settings.startHour) * (settings.timestampHeight + settings.horizontalMargin) +
           start.relative * settings.timestampHeight
         let relativeHeight = (CGFloat(end.timestamps) + end.relative - (CGFloat(start.timestamps) + start.relative))
+        let height = settings.timestampHeight * relativeHeight
         supplementaryAttribute.frame = CGRect(x: x, y: y,
                                               width: supplementaryWidth,
-                                              height: relativeHeight)
+                                              height: height)
         supplementaryAttribute.zIndex = Int.max
         overlaySupplementaryAttributes[indexPath] = supplementaryAttribute
       }

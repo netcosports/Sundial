@@ -176,21 +176,25 @@ class CalendarDayViewController: UIViewController {
       DateInterval(start: date.addingTimeInterval(hour * 20.0), duration: 20.0 * minute),
     ]
 
-    let input = Sundial.CallendarDayFactoryInput<DateInterval>(startDate: Date(), events: events)
+    let overlays: [DateInterval] = [
+      DateInterval(start: date.addingTimeInterval(hour * 10.0), duration: 70 * minute)
+    ]
+
+    let input = Sundial.CallendarDayFactoryInput<DateInterval>(startDate: Date(),
+                                                               events: events,
+                                                               overlays: overlays)
     let sections = Sundial.callendarDayFactory(input: input, supplementaryClosure: { type in
       switch type {
       case .nowIndicator(let date):
         let data = NowIndicatorCell.ViewModel(start: date, end: date)
-        return [CollectionCell<NowIndicatorCell>(data: data,
-                                                type: .custom(kind: SupplementaryViewKind.currentTimeIndicator))]
+        return CollectionCell<NowIndicatorCell>(data: data,
+                                                type: .custom(kind: SupplementaryViewKind.currentTimeIndicator))
       case .timestamp(let date):
-        return [CollectionCell<TimestampCell>(data: timestampFormatter.string(from: date),
-                                             type: .custom(kind: SupplementaryViewKind.calendayDayTimestamp))]
-      case .customOverlay:
-        let start = DateInterval(start: date.addingTimeInterval(hour * 10.0), duration: 70.0 * minute)
-
-        return [CollectionCell<OverlayCell>(data: data,
-                                              type: .custom(kind: SupplementaryViewKind.customOverlay))]
+        return CollectionCell<TimestampCell>(data: timestampFormatter.string(from: date),
+                                             type: .custom(kind: SupplementaryViewKind.calendayDayTimestamp))
+      case .customOverlay(let start, let end):
+        let viewModel = OverlayCell.ViewModel(start: start, end: end)
+        return CollectionCell<OverlayCell>(data: viewModel, type: .custom(kind: SupplementaryViewKind.customOverlay))
       }
     }, cellClosure: { interval, start, end -> (Cellable & CalendarDayIntervalContainer) in
       let data = EventCell.ViewModel(start: start, end: end,

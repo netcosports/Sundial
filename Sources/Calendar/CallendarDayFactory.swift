@@ -34,22 +34,24 @@ public extension Date {
 public struct CallendarDayFactoryInput<Data: DateIntervalContainer> {
   let startDate: Date
   let events: [Data]
+  let overlays: [Data]
 
-  public init(startDate: Date, events: [Data]) {
+  public init(startDate: Date, events: [Data], overlays: [Data]) {
     self.startDate = startDate
     self.events = events
+    self.overlays = overlays
   }
 }
 
 public enum SupplementaryRequest {
   case timestamp(Date)
   case nowIndicator(CalendarDayOffset)
-  case customOverlay
+  case customOverlay(start: CalendarDayOffset, end: CalendarDayOffset)
 }
 
 public func callendarDayFactory<T: DateIntervalContainer>(
   input: CallendarDayFactoryInput<T>,
-  supplementaryClosure: (SupplementaryRequest) -> ([Cellable]),
+  supplementaryClosure: (SupplementaryRequest) -> (Cellable?),
   cellClosure: (T, CalendarDayOffset, CalendarDayOffset) -> (Cellable & CalendarDayIntervalContainer),
   sectionClosure: (([Cellable], [Cellable]) -> (Sectionable))? = nil
 ) -> [Sectionable] {
@@ -58,17 +60,23 @@ public func callendarDayFactory<T: DateIntervalContainer>(
   let timestampInterval = 60.0 * 60.0
   (0...24).forEach { index in
     let timestampDate = startOfDay.addingTimeInterval(TimeInterval(index) * timestampInterval)
-    let supplementary = supplementaryClosure(.timestamp(timestampDate))
-    supplementaries += supplementary
+    if let supplementary = supplementaryClosure(.timestamp(timestampDate)) {
+      supplementaries.append(supplementary)
+    }
   }
 
   if startOfDay.isToday {
-    let supplementary = supplementaryClosure(.nowIndicator(Date().offset(from: startOfDay, timestampInterval: timestampInterval)))
-    supplementaries += supplementary
+    if let supplementary = supplementaryClosure(.nowIndicator(Date().offset(from: startOfDay, timestampInterval: timestampInterval))) {
+      supplementaries.append(supplementary)
+    }
   }
 
-  let customOverlays = supplementaryClosure(.customOverlay)
-  supplementaries += customOverlays
+  input.overlays.forEach { interval in
+    let offsets = interval.offsets(from: startOfDay, timestampInterval: timestampInterval)
+    if let customOverlay = supplementaryClosure(.customOverlay(start: offsets.start, end: offsets.end)) {
+      supplementaries.append(customOverlay)
+    }
+  }
 
   let cells: [Cellable] = input.events.map { event in
     let offsets = event.offsets(from: startOfDay, timestampInterval: timestampInterval)
