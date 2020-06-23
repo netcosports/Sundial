@@ -31,12 +31,12 @@ public extension Date {
   }
 }
 
-public struct CallendarDayFactoryInput<Data: DateIntervalContainer> {
+public struct CallendarDayFactoryInput<Event: DateIntervalContainer, Overlay: DateIntervalContainer> {
   let startDate: Date
-  let events: [Data]
-  let overlays: [Data]
+  let events: [Event]
+  let overlays: [Overlay]
 
-  public init(startDate: Date, events: [Data], overlays: [Data]) {
+  public init(startDate: Date, events: [Event], overlays: [Overlay]) {
     self.startDate = startDate
     self.events = events
     self.overlays = overlays
@@ -49,10 +49,10 @@ public enum SupplementaryRequest {
   case customOverlay(start: CalendarDayOffset, end: CalendarDayOffset)
 }
 
-public func callendarDayFactory<T: DateIntervalContainer>(
-  input: CallendarDayFactoryInput<T>,
+public func callendarDayFactory<Event: DateIntervalContainer, Overlay: DateIntervalContainer>(
+  input: CallendarDayFactoryInput<Event, Overlay>,
   supplementaryClosure: (SupplementaryRequest) -> (Cellable?),
-  cellClosure: (T, CalendarDayOffset, CalendarDayOffset) -> (Cellable & CalendarDayIntervalContainer),
+  cellClosure: (Event, CalendarDayOffset, CalendarDayOffset) -> (Cellable & CalendarDayIntervalContainer),
   sectionClosure: (([Cellable], [Cellable]) -> (Sectionable))? = nil
 ) -> [Sectionable] {
   let startOfDay = input.startDate.startOfDay

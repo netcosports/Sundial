@@ -180,7 +180,7 @@ class CalendarDayViewController: UIViewController {
       DateInterval(start: date.addingTimeInterval(hour * 10.0), duration: 70 * minute)
     ]
 
-    let input = Sundial.CallendarDayFactoryInput<DateInterval>(startDate: Date(),
+    let input = Sundial.CallendarDayFactoryInput<DateInterval, DateInterval>(startDate: Date(),
                                                                events: events,
                                                                overlays: overlays)
     let sections = Sundial.callendarDayFactory(input: input, supplementaryClosure: { type in
