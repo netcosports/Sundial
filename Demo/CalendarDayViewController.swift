@@ -123,6 +123,30 @@ public class TimestampCell: CollectionViewCell, Reusable {
   }
 }
 
+
+public class OverlayCell: CollectionViewCell, Reusable {
+
+  public struct ViewModel: CalendarDayIntervalContainer {
+    public var start: CalendarDayOffset
+    public var end: CalendarDayOffset
+  }
+
+  open override func setup() {
+    super.setup()
+    contentView.backgroundColor = .orange
+  }
+
+  public typealias Data = ViewModel
+
+  open func setup(with data: Data) {
+
+  }
+
+  public static func size(for data: Data, containerSize: CGSize) -> CGSize {
+    return containerSize
+  }
+}
+
 extension DateInterval: DateIntervalContainer {
 
   public var interval: DateInterval {
@@ -157,11 +181,16 @@ class CalendarDayViewController: UIViewController {
       switch type {
       case .nowIndicator(let date):
         let data = NowIndicatorCell.ViewModel(start: date, end: date)
-        return CollectionCell<NowIndicatorCell>(data: data,
-                                                type: .custom(kind: SupplementaryViewKind.currentTimeIndicator))
+        return [CollectionCell<NowIndicatorCell>(data: data,
+                                                type: .custom(kind: SupplementaryViewKind.currentTimeIndicator))]
       case .timestamp(let date):
-        return CollectionCell<TimestampCell>(data: timestampFormatter.string(from: date),
-                                             type: .custom(kind: SupplementaryViewKind.calendayDayTimestamp))
+        return [CollectionCell<TimestampCell>(data: timestampFormatter.string(from: date),
+                                             type: .custom(kind: SupplementaryViewKind.calendayDayTimestamp))]
+      case .customOverlay:
+        let start = DateInterval(start: date.addingTimeInterval(hour * 10.0), duration: 70.0 * minute)
+
+        return [CollectionCell<OverlayCell>(data: data,
+                                              type: .custom(kind: SupplementaryViewKind.customOverlay))]
       }
     }, cellClosure: { interval, start, end -> (Cellable & CalendarDayIntervalContainer) in
       let data = EventCell.ViewModel(start: start, end: end,

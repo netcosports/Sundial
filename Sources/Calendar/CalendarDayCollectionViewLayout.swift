@@ -17,6 +17,7 @@ public protocol CalendarDayIntervalContainer {
 public enum SupplementaryViewKind {
   public static let calendayDayTimestamp = "SupplementaryViewKind.calendayDayTimestamp"
   public static let currentTimeIndicator = "SupplementaryViewKind.currentTimeIndicator"
+  public static let customOverlay = "SupplementaryViewKind.customOverlay"
 }
 
 open class CalendarDayCollectionViewLayout: EmptyViewCollectionViewLayout {
@@ -53,6 +54,7 @@ open class CalendarDayCollectionViewLayout: EmptyViewCollectionViewLayout {
 
   private var itemsAttributes: [IndexPath: Attributes] = [:]
   private var supplementaryAttributes: [IndexPath: Attributes] = [:]
+  private var overlaySupplementaryAttributes: [IndexPath: Attributes] = [:]
   private var contentSize = CGSize.zero
   private var hostPagerSource: CollectionViewSource?
 
@@ -76,7 +78,7 @@ open class CalendarDayCollectionViewLayout: EmptyViewCollectionViewLayout {
     super.prepare()
     guard let collectionView = collectionView,
       !collectionView.bounds.isEmpty,
-      itemsAttributes.isEmpty || supplementaryAttributes.isEmpty else { return }
+      itemsAttributes.isEmpty || supplementaryAttributes.isEmpty || overlaySupplementaryAttributes.isEmpty else { return }
     reload()
   }
 
@@ -88,6 +90,7 @@ open class CalendarDayCollectionViewLayout: EmptyViewCollectionViewLayout {
     super.invalidateLayout(with: context)
     itemsAttributes.removeAll()
     supplementaryAttributes.removeAll()
+    overlaySupplementaryAttributes.removeAll()
     contentSize = .zero
   }
 
@@ -98,8 +101,11 @@ open class CalendarDayCollectionViewLayout: EmptyViewCollectionViewLayout {
     let supplementaries = supplementaryAttributes
       .filter { $0.value.frame.intersects(rect) }
       .map { $0.value }
+    let overlaySupplementaries = overlaySupplementaryAttributes
+      .filter { $0.value.frame.intersects(rect) }
+      .map { $0.value }
 
-    return items + supplementaries
+    return items + supplementaries + overlaySupplementaries
   }
 
   override open func layoutAttributesForItem(at indexPath: IndexPath) -> UICollectionViewLayoutAttributes? {
@@ -143,9 +149,31 @@ private extension CalendarDayCollectionViewLayout {
       supplementaryAttribute.frame = CGRect(x: x, y: y,
                                             width: supplementaryWidth,
                                             height: settings.timestampHeight)
-      supplementaryAttribute.zIndex = Int.max
+      supplementaryAttribute.zIndex = Int.max-1
       supplementaryAttributes[indexPath] = supplementaryAttribute
     }
+
+    let customType = CellType.custom(kind: SupplementaryViewKind.customOverlay)
+    if section.supplementaryTypes.contains(customType) {
+      let cells = section.supplementaries(for: customType)
+      cells.enumerated().forEach { offset, cell in
+        guard let container = (cell as? CalendarDayIntervalContainer) else { return }
+        let start = container.start
+        let end = container.end
+        let indexPath = IndexPath(item: offset, section: 0)
+        let supplementaryAttribute = Attributes(forSupplementaryViewOfKind: SupplementaryViewKind.customOverlay,
+                                                with: indexPath)
+        let y = CGFloat(start.timestamps - settings.startHour) * (settings.timestampHeight + settings.horizontalMargin) +
+          start.relative * settings.timestampHeight
+        let relativeHeight = (CGFloat(end.timestamps) + end.relative - (CGFloat(start.timestamps) + start.relative))
+        supplementaryAttribute.frame = CGRect(x: x, y: y,
+                                              width: supplementaryWidth,
+                                              height: relativeHeight)
+        supplementaryAttribute.zIndex = Int.max
+        overlaySupplementaryAttributes[indexPath] = supplementaryAttribute
+      }
+    }
+
     (0..<numberOfCells).forEach { cellIndex in
       let cell = hostPagerSource?.sections[safe: 0]?.cells[safe: cellIndex] as? CalendarDayIntervalContainer
       guard let start = cell?.start, let end = cell?.end else { return }
