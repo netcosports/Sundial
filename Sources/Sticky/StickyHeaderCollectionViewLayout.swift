@@ -14,12 +14,14 @@ open class StickyHeaderCollectionViewLayout: EmptyViewCollectionViewLayout {
     public var minHeight: CGFloat
     public var sticky: Bool
     public var alignToEdges: Bool
+    public var headerZIndex: Int
 
-    public init(collapsing: Bool = true, sticky: Bool = false, minHeight: CGFloat = 0.0, alignToEdges: Bool = false) {
+    public init(collapsing: Bool = true, sticky: Bool = false, minHeight: CGFloat = 0.0, alignToEdges: Bool = false, headerZIndex: Int = .max) {
       self.minHeight = minHeight
       self.sticky = sticky
       self.alignToEdges = alignToEdges
       self.collapsing = collapsing
+      self.headerZIndex = headerZIndex
     }
   }
 
@@ -68,7 +70,7 @@ open class StickyHeaderCollectionViewLayout: EmptyViewCollectionViewLayout {
     let frame = CGRect(origin: CGPoint(x: 0.0, y: originY), size: size)
     let stickyLayoutAttributes = StickyHeaderCollectionViewLayoutAttributes(forCellWith: topIndexPath)
     stickyLayoutAttributes.frame = frame
-    stickyLayoutAttributes.zIndex = Int.max
+    stickyLayoutAttributes.zIndex = settings.headerZIndex
     stickyLayoutAttributes.progress = (height - settings.minHeight) / (topLayoutAttributes.frame.height - settings.minHeight)
     stickyLayoutAttributes.alpha = topLayoutAttributes.alpha
     stickyLayoutAttributes.transform3D = topLayoutAttributes.transform3D
