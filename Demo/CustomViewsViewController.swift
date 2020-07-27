@@ -30,7 +30,7 @@ class CustomViewsViewController: UIViewController {
     let settings = Settings(stripHeight: 80.0,
                             markerHeight: 5.5,
                             itemMargin: 12.0,
-                            bottomStripSpacing: 0.0,
+                            stripInsets: .init(top: 0.0, left: 0.0, bottom: 44.0, right: 0.0),
                             anchor: .equal(size: 140),
                             inset: .zero,
                             alignment: .bottom,

@@ -159,18 +159,18 @@ extension PagerHeaderCollectionViewLayout {
     if hasCollapsingHeader {
       switch settings.alignment {
       case .bottom:
-        topOffset = collectionView.frame.height - settings.stripHeight - settings.bottomStripSpacing
+        topOffset = collectionView.frame.height - settings.stripHeight - settings.stripInsets.bottom
       default:
-        topOffset = headerHeight.value
+        topOffset = headerHeight.value + settings.stripInsets.top
       }
     } else {
       switch settings.alignment {
       case .top:
-        topOffset = 0.0
+        topOffset = settings.stripInsets.top
       case .topOffset(let variable):
-        topOffset = variable.value
+        topOffset = variable.value + settings.stripInsets.top
       case .bottom:
-        topOffset = collectionView.frame.height - settings.stripHeight - settings.bottomStripSpacing
+        topOffset = collectionView.frame.height - settings.stripHeight - settings.stripInsets.bottom
       }
     }
 
@@ -185,7 +185,7 @@ extension PagerHeaderCollectionViewLayout {
       return frame
     }
 
-    let bottom = settings.bottomStripSpacing
+    let insets = settings.stripInsets.top + settings.stripInsets.bottom
     let height = settings.stripHeight
 
     let y: CGFloat
@@ -193,13 +193,13 @@ extension PagerHeaderCollectionViewLayout {
     case .bottom:
       y = 0.0
     default:
-      y = height + bottom
+      y = height + insets
     }
 
     return CGRect(x: frame.origin.x,
                   y: y,
                   width: frame.width,
-                  height: frame.height - height - bottom)
+                  height: frame.height - height - insets)
   }
 
   func addPagerHeaderAttributes(to attributes: inout [UICollectionViewLayoutAttributes]) {

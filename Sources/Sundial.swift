@@ -149,7 +149,7 @@ public struct Settings: Equatable {
   public var stripHeight: CGFloat
   public var markerHeight: CGFloat
   public var itemMargin: CGFloat
-  public var bottomStripSpacing: CGFloat
+  public var stripInsets: UIEdgeInsets
   public var backgroundColor: UIColor
   public var anchor: Anchor
   public var inset: UIEdgeInsets
@@ -171,7 +171,7 @@ public struct Settings: Equatable {
   public init(stripHeight: CGFloat = 80.0,
               markerHeight: CGFloat = 5.5,
               itemMargin: CGFloat = 12.0,
-              bottomStripSpacing: CGFloat = 0.0,
+              stripInsets: UIEdgeInsets = .zero,
               backgroundColor: UIColor = .clear,
               anchor: Anchor = .centered,
               inset: UIEdgeInsets = .zero,
@@ -184,7 +184,7 @@ public struct Settings: Equatable {
     self.stripHeight = stripHeight
     self.markerHeight = markerHeight
     self.itemMargin = itemMargin
-    self.bottomStripSpacing = bottomStripSpacing
+    self.stripInsets = stripInsets
     self.backgroundColor = backgroundColor
     self.anchor = anchor
     self.inset = inset
