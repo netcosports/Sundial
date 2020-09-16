@@ -7,6 +7,36 @@
 
 import UIKit
 
+
+open class AutoAlignedCollectionViewLayoutAttributes: UICollectionViewLayoutAttributes {
+
+  open var progress: CGFloat = 0
+
+  open override func copy(with zone: NSZone? = nil) -> Any {
+    let copy = super.copy(with: zone)
+    guard let typedCopy = copy as? AutoAlignedCollectionViewLayoutAttributes else {
+      return copy
+    }
+
+    typedCopy.progress = self.progress
+    return typedCopy
+  }
+
+  open override func isEqual(_ object: Any?) -> Bool {
+    if super.isEqual(object) == false {
+      return false
+    }
+
+    if let other = object as? AutoAlignedCollectionViewLayoutAttributes {
+      if self.progress != other.progress {
+        return false
+      }
+    }
+    return true
+  }
+}
+
+
 open class AutoAlignedCollectionViewLayout: EmptyViewCollectionViewLayout {
 
   public struct Settings {
@@ -61,6 +91,46 @@ open class AutoAlignedCollectionViewLayout: EmptyViewCollectionViewLayout {
     @unknown default: break
     }
     super.prepare()
+  }
+
+  open override class var layoutAttributesClass: AnyClass {
+    return AutoAlignedCollectionViewLayoutAttributes.self
+  }
+
+  open override func layoutAttributesForElements(in rect: CGRect) -> [UICollectionViewLayoutAttributes]? {
+    guard  let collectionView = self.collectionView,
+      let attributes = super.layoutAttributesForElements(in: rect) as? [AutoAlignedCollectionViewLayoutAttributes] else {
+      return nil
+    }
+    let horizontal = self.scrollDirection == .horizontal
+    let offset = horizontal ? collectionView.contentOffset.x : collectionView.contentOffset.y
+    let side = horizontal ? collectionView.frame.width : collectionView.frame.height
+    let targetOffset: CGFloat
+    switch settings.alignment {
+    case .start:
+      targetOffset = offset + settings.inset
+    case .center:
+      targetOffset = offset + settings.inset + 0.5 * side
+    case .end:
+      targetOffset = offset + settings.inset + side
+    }
+    attributes.forEach { attributes in
+      let currentItemOffset: CGFloat
+      var size = horizontal ? attributes.frame.width : attributes.frame.height
+      size += horizontal ? minimumInteritemSpacing : minimumLineSpacing
+      guard size > 0.0 else { return }
+      switch settings.alignment {
+      case .start:
+        currentItemOffset = horizontal ? attributes.frame.minX : attributes.frame.minY
+      case .center:
+        currentItemOffset = horizontal ? attributes.frame.midX : attributes.frame.midY
+      case .end:
+        currentItemOffset = horizontal ? attributes.frame.maxX : attributes.frame.maxY
+      }
+      let distance = abs(currentItemOffset - targetOffset)
+      attributes.progress = max(0.0, 1.0 - distance / size)
+    }
+    return attributes
   }
 
   open override func targetContentOffset(forProposedContentOffset proposedContentOffset: CGPoint,

@@ -315,6 +315,7 @@ open class PlainCollectionViewLayout: EmptyViewCollectionViewLayout {
             switch scrollDirection {
             case .horizontal: x += size.width
             case .vertical: y += size.height
+            @unknown default: break
             }
             contentSize.width = max(contentSize.width, attributes.frame.maxX)
             contentSize.height = max(contentSize.height, attributes.frame.maxY)
