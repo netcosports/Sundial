@@ -43,7 +43,7 @@ open class PagerHeaderSupplementaryView<T: CollectionViewCell, M: CollectionView
         layout.anchor = settings.anchor
         layout.markerHeight = settings.markerHeight
         pagerHeaderContainerView.isScrollEnabled = settings.pagerIndependentScrolling
-        pagerHeaderContainerView.showsHorizontalScrollIndicator = settings.pagerIndependentScrolling
+        pagerHeaderContainerView.showsHorizontalScrollIndicator = false
 
         if settings.pagerIndependentScrolling, let recognizer = hostPagerSource?.containerView?.panGestureRecognizer {
           recognizer.require(toFail: pagerHeaderContainerView.panGestureRecognizer)

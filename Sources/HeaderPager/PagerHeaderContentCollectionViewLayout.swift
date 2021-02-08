@@ -14,6 +14,7 @@ open class PagerHeaderContentCollectionViewLayout<TitleViewModel: ViewModelable,
 
   open class InvalidationContext: UICollectionViewFlowLayoutInvalidationContext {
     public var newCollectionViewWidth: CGFloat?
+    var updatedByProgressChange: Bool = true
   }
 
   public let progress = BehaviorRelay<Progress>(value: .init(pages: 0 ... 0, progress: 0))
@@ -30,7 +31,12 @@ open class PagerHeaderContentCollectionViewLayout<TitleViewModel: ViewModelable,
   private var size = CGSize.zero
 
   private var setupFrames = true
+  private var updatedByProgressChange = true
   private var newCollectionViewWidth: CGFloat?
+
+  open override class var invalidationContextClass: AnyClass {
+    return InvalidationContext.self
+  }
 
   required override public init() {
     super.init()
@@ -212,6 +218,16 @@ open class PagerHeaderContentCollectionViewLayout<TitleViewModel: ViewModelable,
     }
   }
 
+  open override func shouldInvalidateLayout(forBoundsChange newBounds: CGRect) -> Bool {
+    return true
+  }
+
+  open override func invalidationContext(forBoundsChange newBounds: CGRect) -> UICollectionViewLayoutInvalidationContext {
+    let context = InvalidationContext()
+    context.updatedByProgressChange = false
+    return context
+  }
+
   override open func layoutAttributesForElements(in rect: CGRect) -> [UICollectionViewLayoutAttributes]? {
     let titleAttributes: [TitleAttributes] = cellFrames.enumerated().filter { $0.element.intersects(rect) }.map {
       let indexPath = IndexPath(item: $0.offset, section: 0)
@@ -294,6 +310,7 @@ open class PagerHeaderContentCollectionViewLayout<TitleViewModel: ViewModelable,
     if let context = context as? InvalidationContext {
       setupFrames = context.invalidateFlowLayoutDelegateMetrics
       newCollectionViewWidth = context.newCollectionViewWidth
+      updatedByProgressChange = context.updatedByProgressChange
     }
   }
 
@@ -347,19 +364,21 @@ extension PagerHeaderContentCollectionViewLayout {
       return CGRect(x: x, y: y, width: width, height: height)
     }()
 
-    switch anchor {
-    case .content, .equal:
-      // FIXME: temporary workaround for the issue with autoscroll, MUST be fixed in correct way
-      DispatchQueue.main.async {
-        self.adjustContentOffset(for: decorationAttributes, collectionView: collectionView)
+    if updatedByProgressChange {
+      switch anchor {
+      case .content, .equal:
+        // FIXME: temporary workaround for the issue with autoscroll, MUST be fixed in correct way
+        DispatchQueue.main.async {
+          self.adjustContentOffset(for: decorationAttributes, collectionView: collectionView)
+        }
+      case .centered:
+        adjustCenteredContentOffset(for: decorationAttributes, collectionView: collectionView)
+      case .left(let offset):
+        adjustLeftContentOffset(for: decorationAttributes, collectionView: collectionView, offset: offset)
+      case .right(let offset):
+        adjustRightContentOffset(for: decorationAttributes, collectionView: collectionView, offset: offset)
+      default: break
       }
-    case .centered:
-      adjustCenteredContentOffset(for: decorationAttributes, collectionView: collectionView)
-    case .left(let offset):
-      adjustLeftContentOffset(for: decorationAttributes, collectionView: collectionView, offset: offset)
-    case .right(let offset):
-      adjustRightContentOffset(for: decorationAttributes, collectionView: collectionView, offset: offset)
-    default: break
     }
 
     return decorationAttributes
