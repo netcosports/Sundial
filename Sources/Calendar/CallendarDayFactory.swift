@@ -5,15 +5,19 @@
 //  Created by Sergei Mikhan on 4/20/20.
 //
 
+import Foundation
+import struct UIKit.CGFloat
 import Astrolabe
 
 public protocol DateIntervalContainer {
-  var interval: DateInterval { get }
+	@available(iOS 10.0, *)
+	var interval: DateInterval { get }
 }
 
 extension DateIntervalContainer {
 
-  func offsets(from date: Date, timestampInterval: Double) -> (start: CalendarDayOffset, end: CalendarDayOffset) {
+	@available(iOS 10.0, *)
+	func offsets(from date: Date, timestampInterval: Double) -> (start: CalendarDayOffset, end: CalendarDayOffset) {
     return (
       interval.start.offset(from: date, timestampInterval: timestampInterval),
       interval.end.offset(from: date, timestampInterval: timestampInterval)
@@ -49,6 +53,7 @@ public enum SupplementaryRequest {
   case customOverlay(start: CalendarDayOffset, end: CalendarDayOffset)
 }
 
+@available(iOS 10.0, *)
 public func callendarDayFactory<Event: DateIntervalContainer, Overlay: DateIntervalContainer>(
   input: CallendarDayFactoryInput<Event, Overlay>,
   supplementaryClosure: (SupplementaryRequest) -> (Cellable?),

@@ -5,6 +5,7 @@
 //  Created by Sergei Mikhan on 3/19/20.
 //
 
+import Foundation
 import Astrolabe
 
 public typealias CellClosure = (Date) -> Cellable
@@ -28,6 +29,7 @@ public struct CallendarFactoryInput {
   }
 }
 
+@available(iOS 10.0, *)
 public func callendarFactory(input: CallendarFactoryInput,
                              cellClosure: CellClosure,
                              sectionClosure: SectionClosure? = nil) -> [CalendarFactoryResult] {
@@ -63,11 +65,13 @@ public func callendarFactory(input: CallendarFactoryInput,
 
 extension Date {
 
-  var startOfMonth: Date {
+	@available(iOS 10.0, *)
+	var startOfMonth: Date {
     Calendar.current.dateInterval(of: .month, for: self)?.start ?? self
   }
 
-  var endOfMonth: Date {
+	@available(iOS 10.0, *)
+	var endOfMonth: Date {
     Calendar.current.dateInterval(of: .month, for: self)?.end ?? self
   }
 
@@ -75,7 +79,8 @@ extension Date {
     Calendar.current.startOfDay(for: self)
   }
 
-  var endOfDay: Date {
+	@available(iOS 10.0, *)
+	var endOfDay: Date {
     Calendar.current.dateInterval(of: .day, for: self)?.end ?? self
   }
 

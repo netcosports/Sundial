@@ -4,6 +4,7 @@
 //  Created by Eugen Filipkov on 2/10/20.
 //
 
+import UIKit
 import Astrolabe
 
 public struct ShadowLayoutOptions {
