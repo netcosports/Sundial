@@ -31,7 +31,7 @@ public extension Date {
     let offset = self.timeIntervalSince(date)
     let timestamps = Int(offset / timestampInterval)
     let relative = CGFloat((offset - Double(timestamps) * timestampInterval) / timestampInterval)
-    return (timestamps, relative)
+    return .init(timestamps: timestamps, relative: relative)
   }
 }
 

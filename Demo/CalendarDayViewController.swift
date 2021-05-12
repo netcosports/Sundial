@@ -24,7 +24,7 @@ extension CollectionCell: CalendarDayIntervalContainer where Data: CalendarDayIn
 
 public class NowIndicatorCell: CollectionViewCell, Reusable {
 
-  public struct ViewModel: CalendarDayIntervalContainer {
+  public struct ViewModel: CalendarDayIntervalContainer, Hashable {
     public var start: CalendarDayOffset
     public var end: CalendarDayOffset
   }
@@ -47,7 +47,7 @@ public class NowIndicatorCell: CollectionViewCell, Reusable {
 
 public class EventCell: CollectionViewCell, Reusable {
 
-  public struct ViewModel: CalendarDayIntervalContainer {
+  public struct ViewModel: CalendarDayIntervalContainer, Hashable {
     public var start: CalendarDayOffset
     public var end: CalendarDayOffset
     var title: String
@@ -126,7 +126,7 @@ public class TimestampCell: CollectionViewCell, Reusable {
 
 public class OverlayCell: CollectionViewCell, Reusable {
 
-  public struct ViewModel: CalendarDayIntervalContainer {
+  public struct ViewModel: CalendarDayIntervalContainer, Hashable {
     public var start: CalendarDayOffset
     public var end: CalendarDayOffset
   }

@@ -8,7 +8,16 @@
 import UIKit
 import Astrolabe
 
-public typealias CalendarDayOffset = (timestamps: Int, relative: CGFloat)
+public struct CalendarDayOffset: Hashable {
+  public init(timestamps: Int, relative: CGFloat) {
+    self.timestamps = timestamps
+    self.relative = relative
+  }
+
+  let timestamps: Int
+  let relative: CGFloat
+}
+
 public protocol CalendarDayIntervalContainer {
   var start: CalendarDayOffset { get }
   var end: CalendarDayOffset { get }

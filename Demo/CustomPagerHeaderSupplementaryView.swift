@@ -9,7 +9,7 @@
 import Sundial
 import Astrolabe
 
-struct SomeData<T>: PagerHeaderSupplementaryViewModel {
+struct SomeData<T: Hashable>: PagerHeaderSupplementaryViewModel, Hashable {
   var titles: [T]
 }
 

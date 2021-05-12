@@ -29,7 +29,7 @@ pod 'Sundial'
 Sundial layout integrated in the same with regular UICollectionViewLayout:
 
 ```swift
-  let collectionView = CollectionView<CollectionViewPagerSource>()
+  let collectionView = CollectionView<CollectionViewReusedPagerSource>()
 
   collectionView.source.pager = self
   collectionView.collectionViewLayout = CollectionViewLayout(hostPagerSource: collectionView.source) { [weak self] in
@@ -111,7 +111,7 @@ As you can see here is possible to configure default decoration view itself prov
 Sundial also has layout for collapsing header - ```CollapsingCollectionViewLayout```. Creation is almost the same with ```CollectionViewLayout```. The only difference, that you need to provide implemenetations of ```CollapsingItem``` protocol.
 
 ```swift
-  let collectionView = CollectionView<CollectionViewPagerSource>()
+  let collectionView = CollectionView<CollectionViewReusedPagerSource>()
   typealias Layout = CollapsingCollectionViewLayout
   
   let items = [controller1, controller2, controllerLoader, controller4, controller5]

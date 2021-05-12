@@ -18,7 +18,7 @@ class CustomViewsViewController: UIViewController {
   let controller4 = UIViewController()
   let controller5 = UIViewController()
 
-  let collectionView = CollectionView<CollectionViewPagerSource>()
+  let collectionView = CollectionView<CollectionViewReusedPagerSource>()
 
   typealias Layout = PagerHeaderCollectionViewLayout
 
@@ -26,7 +26,7 @@ class CustomViewsViewController: UIViewController {
     super.viewDidLoad()
 
     collectionView.source.hostViewController = self
-    collectionView.source.pager = self
+    //collectionView.source.pager = self
     let settings = Settings(stripHeight: 80.0,
                             markerHeight: 5.5,
                             itemMargin: 12.0,
@@ -49,31 +49,31 @@ class CustomViewsViewController: UIViewController {
     controller4.view.backgroundColor = .gray
     controller5.view.backgroundColor = .orange
 
-    collectionView.source.reloadData()
+    collectionView.reloadData()
   }
 }
 
-extension CustomViewsViewController: CollectionViewPager {
-
-  var pages: [Page] {
-    return [
-      Page(controller: controller1, id: "Title 1"),
-      Page(controller: controller2, id: "Title 2"),
-      Page(controller: controller3, id: "Title 3"),
-      Page(controller: controller4, id: "Title 4"),
-      Page(controller: controller5, id: "Title 5")
-    ]
-  }
-
-  typealias Supplementary = CustomPagerHeaderSupplementaryView<TitleCollectionViewCell,     MarkerDecorationView<TitleCollectionViewCell.Data>>
-
-  func section(with cells: [Cellable]) -> Sectionable {
-    let pagerSupplementary = CollectionCell<Supplementary>(data: .init(titles: titles),
-                                                           type: .custom(kind: PagerHeaderSupplementaryViewKind))
-
-    return MultipleSupplementariesSection(supplementaries: [pagerSupplementary], cells: cells)
-  }
-}
+//extension CustomViewsViewController: CollectionViewPager {
+//
+//  var pages: [Page] {
+//    return [
+//      Page(controller: controller1, id: "Title 1"),
+//      Page(controller: controller2, id: "Title 2"),
+//      Page(controller: controller3, id: "Title 3"),
+//      Page(controller: controller4, id: "Title 4"),
+//      Page(controller: controller5, id: "Title 5")
+//    ]
+//  }
+//
+//  typealias Supplementary = CustomPagerHeaderSupplementaryView<TitleCollectionViewCell,     MarkerDecorationView<TitleCollectionViewCell.Data>>
+//
+//  func section(with cells: [Cellable]) -> Sectionable {
+//    let pagerSupplementary = CollectionCell<Supplementary>(data: .init(titles: titles),
+//                                                           type: .custom(kind: PagerHeaderSupplementaryViewKind))
+//
+//    return MultipleSupplementariesSection(supplementaries: [pagerSupplementary], cells: cells)
+//  }
+//}
 
 extension CustomViewsViewController {
 

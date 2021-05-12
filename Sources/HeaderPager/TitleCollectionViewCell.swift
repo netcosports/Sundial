@@ -9,6 +9,16 @@
 import UIKit
 import Astrolabe
 
+extension UIEdgeInsets: Hashable {
+
+  public func hash(into hasher: inout Hasher) {
+    hasher.combine(top)
+    hasher.combine(bottom)
+    hasher.combine(left)
+    hasher.combine(right)
+  }
+}
+
 open class TitleCollectionViewCell: CollectionViewCell, Reusable {
 
   public let titleLabel: UILabel = {
@@ -45,7 +55,7 @@ open class TitleCollectionViewCell: CollectionViewCell, Reusable {
     titleInsets = .zero
   }
 
-  public struct TitleViewModel: Titleable, Indicatorable {
+  public struct TitleViewModel: Titleable, Indicatorable, Hashable {
 
     public let title: String
     public let id: String

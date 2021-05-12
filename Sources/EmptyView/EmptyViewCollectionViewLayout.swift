@@ -14,7 +14,7 @@ public protocol Decorationable {
   static var zIndex: Int { get }
 }
 
-open class DecorationCollectionViewCell<T: Equatable>: CollectionViewCell, Reusable, Decorationable {
+open class DecorationCollectionViewCell<T: Hashable>: CollectionViewCell, Reusable, Decorationable {
 
   open class var zIndex: Int {
     return Int.max

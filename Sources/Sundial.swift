@@ -40,15 +40,6 @@ public protocol Selectable: class {
   func select(item: Int, animated: Bool)
 }
 
-extension CollectionViewPagerSource: Selectable {
-
-  public var selectedItem: ControlProperty<Int> { return rx.selectedItem }
-
-  public func select(item: Int, animated: Bool) {
-    (self.containerView?.collectionViewLayout as? PlainCollectionViewLayout)?.select(item: item, animated: animated)
-  }
-}
-
 extension CollectionViewReusedPagerSource: Selectable {
 
   public var selectedItem: ControlProperty<Int> { return rx.selectedItem }

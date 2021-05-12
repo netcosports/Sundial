@@ -34,7 +34,13 @@ public  class CollapsingCell: CollectionViewCell, Reusable {
     title.text = "HEADER height is \(Int(self.frame.height))"
   }
 
-  public static func size(for data: Void, containerSize: CGSize) -> CGSize {
+  public typealias Data = String
+
+  public func setup(with data: Data) {
+
+  }
+
+  public static func size(for data: Data, containerSize: CGSize) -> CGSize {
     return CGSize(width: containerSize.width, height: 276)
   }
 }
@@ -195,7 +201,7 @@ class ViewControllerInner: UIViewController {
 
     let supplementaryPager = CollectionCell<Supplementary>(data: titles, id: "", click: nil,
                                                            type: .custom(kind:  PagerHeaderSupplementaryViewKind), setup: nil)
-    let supplementaryCollapsing = CollectionCell<CollapsingCell>(data: (), id: "", click: nil,
+    let supplementaryCollapsing = CollectionCell<CollapsingCell>(data: "", id: "", click: nil,
                                                                  type: .custom(kind:  PagerHeaderCollapsingSupplementaryViewKind), setup: nil)
     let section = MultipleSupplementariesSection(supplementaries: [supplementaryPager, supplementaryCollapsing], cells: cells)
     collectionView.source.sections = [section]

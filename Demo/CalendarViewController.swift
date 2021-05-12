@@ -44,7 +44,17 @@ public class DayCell: CollectionViewCell, Reusable {
     }
   }
 
-  public typealias Data = (day: String, month: String)
+  public struct ViewModel: Hashable {
+    public init(day: String, month: String) {
+      self.day = day
+      self.month = month
+    }
+
+    let day: String
+    let month: String
+  }
+
+  public typealias Data = ViewModel
 
   open func setup(with data: Data) {
     day.text = data.day
@@ -70,7 +80,7 @@ class CalendarViewController: UIViewController {
     monthFormatter.dateFormat = "MMMM"
 
     let results = Sundial.callendarFactory(input: .init(monthsForwardCount: 1, monthsBackwardCount: 1, startDate: Date()), cellClosure: { date in
-      let data = (day: dayFormatter.string(from: date), month: monthFormatter.string(from: date))
+      let data = DayCell.ViewModel(day: dayFormatter.string(from: date), month: monthFormatter.string(from: date))
       return CollectionCell<DayCell>(data: data)
     })
     let monthes = results.map { $0.monthLayout }

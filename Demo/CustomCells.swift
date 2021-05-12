@@ -101,7 +101,7 @@ open class CustomTitleCollectionViewCell: CollectionViewCell, Reusable {
     }
   }
 
-  public struct CustomTitleViewModel: Titleable, Indicatorable {
+  public struct CustomTitleViewModel: Titleable, Indicatorable, Hashable {
 
     public let title: String
     public let textColor: UIColor

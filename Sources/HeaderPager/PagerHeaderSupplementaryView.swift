@@ -34,7 +34,12 @@ extension Array: PagerHeaderSupplementaryViewModel {
 
 public typealias PagerHeaderSupplementaryView<T: CollectionViewCell, M: CollectionViewCell> = GenericPagerHeaderSupplementaryView<[T.Data], T, M> where T: Reusable, T.Data: Titleable, T.Data: Indicatorable
 
-open class GenericPagerHeaderSupplementaryView<ViewModel: PagerHeaderSupplementaryViewModel, T: CollectionViewCell, M: CollectionViewCell>: CollectionViewCell, Reusable where T: Reusable, T.Data: Titleable, T.Data: Indicatorable, ViewModel.TitleCellViewModel == T.Data {
+open class GenericPagerHeaderSupplementaryView<
+  ViewModel: PagerHeaderSupplementaryViewModel & Hashable,
+  T: CollectionViewCell,
+  M: CollectionViewCell
+>: CollectionViewCell, Reusable
+where T: Reusable, T.Data: Titleable, T.Data: Indicatorable, ViewModel.TitleCellViewModel == T.Data {
 
   public typealias TitleCell                     = T
   public typealias MarkerCell                    = M

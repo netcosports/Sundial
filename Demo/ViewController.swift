@@ -32,14 +32,14 @@ class ViewController: UIViewController {
   ]
   let customViews = CustomViewsViewController()
 
-  let collectionView = CollectionView<CollectionViewPagerSource>()
+  let collectionView = CollectionView<CollectionViewReusedPagerSource>()
   private let disposeBag = DisposeBag()
 
   override func viewDidLoad() {
     super.viewDidLoad()
 
     collectionView.source.hostViewController = self
-    collectionView.source.pager = self
+    //collectionView.source.pager = self
 
     let layout = PagerHeaderCollectionViewLayout(hostPagerSource: collectionView.source)
 
@@ -71,28 +71,28 @@ class ViewController: UIViewController {
 
     customViews.view.backgroundColor = .red
 
-    collectionView.source.reloadData()
+    collectionView.reloadData()
   }
 }
 
-extension ViewController: CollectionViewPager {
-
-  var pages: [Page] {
-    var controllers: [UIViewController] = [collapsing]
-    controllers.append(contentsOf: inners)
-    controllers.append(contentsOf: [customViews])
-    return controllers.enumerated().map { Page(controller: $1, id: "Title \($0)") }
-  }
-
-  typealias Supplementary = PagerHeaderSupplementaryView<TitleCollectionViewCell, MarkerDecorationView<TitleCollectionViewCell.Data>>
-
-  func section(with cells: [Cellable]) -> Sectionable {
-    let pagerSupplementary = CollectionCell<Supplementary>(data: titles,
-                                                           type: .custom(kind: PagerHeaderSupplementaryViewKind))
-
-    return MultipleSupplementariesSection(supplementaries: [pagerSupplementary], cells: cells)
-  }
-}
+//extension ViewController: CollectionViewPager {
+//
+//  var pages: [Page] {
+//    var controllers: [UIViewController] = [collapsing]
+//    controllers.append(contentsOf: inners)
+//    controllers.append(contentsOf: [customViews])
+//    return controllers.enumerated().map { Page(controller: $1, id: "Title \($0)") }
+//  }
+//
+//  typealias Supplementary = PagerHeaderSupplementaryView<TitleCollectionViewCell, MarkerDecorationView<TitleCollectionViewCell.Data>>
+//
+//  func section(with cells: [Cellable]) -> Sectionable {
+//    let pagerSupplementary = CollectionCell<Supplementary>(data: titles,
+//                                                           type: .custom(kind: PagerHeaderSupplementaryViewKind))
+//
+//    return MultipleSupplementariesSection(supplementaries: [pagerSupplementary], cells: cells)
+//  }
+//}
 
 extension ViewController {
 

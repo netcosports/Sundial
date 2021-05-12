@@ -48,12 +48,12 @@ class CollapsingHeaderViewController: UIViewController {
 
   let controller1 = TestViewController(.red)
   let controller2 = TestViewController(.blue)
-  let controllerLoader = TestLoaderViewController(.orange, numberOfItems: 20)
+  let controllerLoader = TestViewController(.orange, numberOfItems: 20)
   let controller3 = TestPagerViewControllerInner()
   let controller4 = TestViewController(.lightGray)
-  let controller5 = TestLoaderViewController(.black)
+  let controller5 = TestViewController(.black)
 
-  let collectionView = CollectionView<CollectionViewPagerSource>()
+  let collectionView = CollectionView<CollectionViewReusedPagerSource>()
 
   typealias Layout = PagerHeaderCollectionViewLayout
 
@@ -86,7 +86,7 @@ class CollapsingHeaderViewController: UIViewController {
     }).disposed(by: disposeBag)
 
     collectionView.source.hostViewController = self
-    collectionView.source.pager = self
+    //collectionView.source.pager = self
     collectionView.collectionViewLayout = layout
     view.addSubview(collectionView)
     collectionView.snp.remakeConstraints {
@@ -103,40 +103,40 @@ class CollapsingHeaderViewController: UIViewController {
     controller4.view.backgroundColor = .clear
     controller5.view.backgroundColor = .clear
 
-    collectionView.source.reloadData()
+    collectionView.reloadData()
   }
 
 }
-
-extension CollapsingHeaderViewController: CollectionViewPager {
-
-  var pages: [Page] {
-    return [
-      Page(controller: controller1, id: "Title 1"),
-      Page(controller: controller2, id: "Title 2"),
-      Page(controller: controllerLoader, id: "Loader"),
-      Page(controller: controller3, id: "Title 3"),
-      Page(controller: controller4, id: "Title 4"),
-      Page(controller: controller5, id: "Title 5")
-    ]
-  }
-
-  typealias Supplementary = PagerHeaderSupplementaryView<TitleCollectionViewCell, MarkerDecorationView<TitleCollectionViewCell.Data>>
-
-  func section(with cells: [Cellable]) -> Sectionable {
-    let pagerSupplementary = CollectionCell<Supplementary>(data: titles,
-                                                           type: .custom(kind: PagerHeaderSupplementaryViewKind))
-
-    let collapsingSupplementary = CollectionCell<Header>(data: "Customizable Header title",
-                                                         type: .custom(kind: PagerHeaderCollapsingSupplementaryViewKind))
-
-    let pagerFooter = CollectionCell<Header>(data: "Customizable Footer title",
-                                             type: .custom(kind: PagerHeaderCollapsingFooterViewKind))
-
-
-    return MultipleSupplementariesSection(supplementaries: [pagerSupplementary, collapsingSupplementary, pagerFooter], cells: cells)
-  }
-}
+//
+//extension CollapsingHeaderViewController: CollectionViewPager {
+//
+//  var pages: [Page] {
+//    return [
+//      Page(controller: controller1, id: "Title 1"),
+//      Page(controller: controller2, id: "Title 2"),
+//      Page(controller: controllerLoader, id: "Loader"),
+//      Page(controller: controller3, id: "Title 3"),
+//      Page(controller: controller4, id: "Title 4"),
+//      Page(controller: controller5, id: "Title 5")
+//    ]
+//  }
+//
+//  typealias Supplementary = PagerHeaderSupplementaryView<TitleCollectionViewCell, MarkerDecorationView<TitleCollectionViewCell.Data>>
+//
+//  func section(with cells: [Cellable]) -> Sectionable {
+//    let pagerSupplementary = CollectionCell<Supplementary>(data: titles,
+//                                                           type: .custom(kind: PagerHeaderSupplementaryViewKind))
+//
+//    let collapsingSupplementary = CollectionCell<Header>(data: "Customizable Header title",
+//                                                         type: .custom(kind: PagerHeaderCollapsingSupplementaryViewKind))
+//
+//    let pagerFooter = CollectionCell<Header>(data: "Customizable Footer title",
+//                                             type: .custom(kind: PagerHeaderCollapsingFooterViewKind))
+//
+//
+//    return MultipleSupplementariesSection(supplementaries: [pagerSupplementary, collapsingSupplementary, pagerFooter], cells: cells)
+//  }
+//}
 
 extension CollapsingHeaderViewController {
 
