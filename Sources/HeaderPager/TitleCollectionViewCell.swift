@@ -9,6 +9,9 @@
 import UIKit
 import Astrolabe
 
+import RxSwift
+import RxCocoa
+
 extension UIEdgeInsets: Hashable {
 
   public func hash(into hasher: inout Hasher) {
@@ -19,7 +22,9 @@ extension UIEdgeInsets: Hashable {
   }
 }
 
-open class TitleCollectionViewCell: CollectionViewCell, Reusable {
+open class TitleCollectionViewCell: CollectionViewCell, Reusable, Eventable {
+  public typealias Event = TitleViewModel
+  public let eventSubject = PublishSubject<TitleViewModel>()
 
   public let titleLabel: UILabel = {
     let label = UILabel()

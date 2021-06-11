@@ -10,8 +10,12 @@ import UIKit
 import Astrolabe
 import Sundial
 import RxSwift
+import RxCocoa
 
-class Header: CollectionViewCell, Reusable {
+class Header: CollectionViewCell, Reusable, Eventable {
+  let eventSubject = PublishSubject<Event>()
+  typealias Event = String
+  var data: Data?
 
   typealias Data = String
 

@@ -16,6 +16,8 @@ public protocol Decorationable {
 
 open class DecorationCollectionViewCell<T: Hashable>: CollectionViewCell, Reusable, Decorationable {
 
+  public var data: T?
+
   open class var zIndex: Int {
     return Int.max
   }

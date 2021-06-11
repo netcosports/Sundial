@@ -10,7 +10,13 @@ import UIKit
 import Astrolabe
 import Sundial
 
-public class DayCell: CollectionViewCell, Reusable {
+import RxSwift
+import RxCocoa
+
+public class DayCell: CollectionViewCell, Reusable, Eventable {
+  public let eventSubject = PublishSubject<Event>()
+  public typealias Event = String
+  public var data: Data?
 
   let day: UILabel = {
     let title = UILabel()

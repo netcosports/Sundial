@@ -10,6 +10,9 @@ import UIKit
 import Astrolabe
 import Sundial
 
+import RxSwift
+import RxCocoa
+
 extension UIColor {
 
   func blended(with color: UIColor, progress: CGFloat) -> UIColor {
@@ -56,7 +59,9 @@ extension String {
   }
 }
 
-open class CustomTitleCollectionViewCell: CollectionViewCell, Reusable {
+open class CustomTitleCollectionViewCell: CollectionViewCell, Reusable, Eventable {
+  public let eventSubject = PublishSubject<Event>()
+  public typealias Event = String
 
   public let titleLabel: UILabel = {
     let label = UILabel()
@@ -127,7 +132,7 @@ open class CustomTitleCollectionViewCell: CollectionViewCell, Reusable {
   }
 
   public typealias Data = CustomTitleViewModel
-  var data: Data? {
+  public var data: Data? {
     didSet {
       updateFade()
     }

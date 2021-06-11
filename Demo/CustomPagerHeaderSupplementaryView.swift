@@ -13,7 +13,7 @@ struct SomeData<T: Hashable>: PagerHeaderSupplementaryViewModel, Hashable {
   var titles: [T]
 }
 
-class CustomPagerHeaderSupplementaryView<T: CollectionViewCell, M: CollectionViewCell>: GenericPagerHeaderSupplementaryView<SomeData<T.Data>, T, M> where T: Reusable, T.Data: Titleable, T.Data: Indicatorable {
+class CustomPagerHeaderSupplementaryView<T: CollectionViewCell, M: CollectionViewCell>: GenericPagerHeaderSupplementaryView<SomeData<T.Data>, T, M> where T: Reusable & Eventable, T.Data: Titleable, T.Data: Indicatorable, T.Data == T.Event {
 
   let label: UILabel = {
     let label = UILabel()

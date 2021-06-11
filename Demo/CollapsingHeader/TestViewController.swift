@@ -12,7 +12,10 @@ import RxCocoa
 import Astrolabe
 import Sundial
 
-class ColoredTestCell: CollectionViewCell, Reusable {
+class ColoredTestCell: CollectionViewCell, Reusable, Eventable {
+  let eventSubject = PublishSubject<Event>()
+  typealias Event = String
+  var data: Data?
 
   let title: UILabel = {
     let title = UILabel()

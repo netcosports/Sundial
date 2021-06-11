@@ -32,14 +32,21 @@ extension Array: PagerHeaderSupplementaryViewModel {
   }
 }
 
-public typealias PagerHeaderSupplementaryView<T: CollectionViewCell, M: CollectionViewCell> = GenericPagerHeaderSupplementaryView<[T.Data], T, M> where T: Reusable, T.Data: Titleable, T.Data: Indicatorable
+public typealias PagerHeaderSupplementaryView<T: CollectionViewCell, M: CollectionViewCell> = GenericPagerHeaderSupplementaryView<[T.Data], T, M> where T: Reusable & Eventable, T.Data: Titleable, T.Data: Indicatorable, T.Event == T.Data
 
 open class GenericPagerHeaderSupplementaryView<
   ViewModel: PagerHeaderSupplementaryViewModel & Hashable,
   T: CollectionViewCell,
   M: CollectionViewCell
->: CollectionViewCell, Reusable
-where T: Reusable, T.Data: Titleable, T.Data: Indicatorable, ViewModel.TitleCellViewModel == T.Data {
+>: CollectionViewCell, Reusable, Eventable
+where T: Reusable & Eventable,
+      T.Data: Titleable,
+      T.Data: Indicatorable,
+      T.Event == T.Data,
+      ViewModel.TitleCellViewModel == T.Data {
+  public var eventSubject = PublishSubject<Never>()
+  public typealias Event = Never
+  public var data: ViewModel?
 
   public typealias TitleCell                     = T
   public typealias MarkerCell                    = M
@@ -50,6 +57,8 @@ where T: Reusable, T.Data: Titleable, T.Data: Indicatorable, ViewModel.TitleCell
   public let pagerHeaderContainerView = CollectionView<CollectionViewSource>()
   public var layout: HeaderPagerContentLayout?
   public weak var hostPagerSource: CollectionViewSource?
+
+  private let titleSubject = PublishSubject<T.Data>()
 
   open class var layoutType: HeaderPagerContentLayout.Type { return HeaderPagerContentLayout.self }
 
@@ -91,12 +100,7 @@ where T: Reusable, T.Data: Titleable, T.Data: Indicatorable, ViewModel.TitleCell
       if adjustedTitlesSet.map({ $0.id }) == titles.map({ $0.id }) { return }
 
       let cells: [Cellable] = adjustedTitlesSet.map { title in
-        let item = Item(data: title) { [weak self] in
-          guard let self = self else { return }
-          if let index = self.titles.firstIndex(where: { $0.active && $0.id == title.id }) {
-            self.currentLayoutAttributes?.selectionClosure?(index)
-          }
-        }
+        let item = Item(data: title, eventsEmmiter: titleSubject.asObserver(), clickEvent: title)
         item.id = title.title
         return item
       }
@@ -112,6 +116,13 @@ where T: Reusable, T.Data: Titleable, T.Data: Indicatorable, ViewModel.TitleCell
 
   override open func setup() {
     super.setup()
+
+    titleSubject.subscribe(onNext: { [weak self] title in
+      guard let self = self else { return }
+      if let index = self.titles.firstIndex(where: { $0.active && $0.id == title.id }) {
+        self.currentLayoutAttributes?.selectionClosure?(index)
+      }
+    }).disposed(by: disposeBag)
 
     let layout = collectionViewLayout()
     self.layout = layout

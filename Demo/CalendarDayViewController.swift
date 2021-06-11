@@ -11,6 +11,9 @@ import UIKit
 import Astrolabe
 import Sundial
 
+import RxSwift
+import RxCocoa
+
 extension CollectionCell: CalendarDayIntervalContainer where Data: CalendarDayIntervalContainer {
 
   public var start: CalendarDayOffset {
@@ -22,7 +25,11 @@ extension CollectionCell: CalendarDayIntervalContainer where Data: CalendarDayIn
   }
 }
 
-public class NowIndicatorCell: CollectionViewCell, Reusable {
+public class NowIndicatorCell: CollectionViewCell, Reusable, Eventable {
+
+  public let eventSubject = PublishSubject<Event>()
+  public typealias Event = String
+  public var data: Data?
 
   public struct ViewModel: CalendarDayIntervalContainer, Hashable {
     public var start: CalendarDayOffset
@@ -45,7 +52,11 @@ public class NowIndicatorCell: CollectionViewCell, Reusable {
   }
 }
 
-public class EventCell: CollectionViewCell, Reusable {
+public class EventCell: CollectionViewCell, Reusable, Eventable {
+
+  public let eventSubject = PublishSubject<Event>()
+  public typealias Event = String
+  public var data: Data?
 
   public struct ViewModel: CalendarDayIntervalContainer, Hashable {
     public var start: CalendarDayOffset
@@ -81,7 +92,11 @@ public class EventCell: CollectionViewCell, Reusable {
   }
 }
 
-public class TimestampCell: CollectionViewCell, Reusable {
+public class TimestampCell: CollectionViewCell, Reusable, Eventable {
+
+  public let eventSubject = PublishSubject<Event>()
+  public typealias Event = String
+  public var data: Data?
 
   let title: UILabel = {
     let title = UILabel()
@@ -124,7 +139,11 @@ public class TimestampCell: CollectionViewCell, Reusable {
 }
 
 
-public class OverlayCell: CollectionViewCell, Reusable {
+public class OverlayCell: CollectionViewCell, Reusable, Eventable {
+
+  public let eventSubject = PublishSubject<Event>()
+  public typealias Event = String
+  public var data: Data?
 
   public struct ViewModel: CalendarDayIntervalContainer, Hashable {
     public var start: CalendarDayOffset
