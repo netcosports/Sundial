@@ -118,7 +118,7 @@ class ColoredViewController: UIViewController, ReusedData, Eventable, Collapsing
 
     view.addSubview(containerView)
 
-    let cells: [Cellable] = (1...50).map { "Item \($0)" }.map { CollectionCell<TestCell>(data: $0) }
+    let cells: [Cellable] = (1...50).map { "Item \($0)" }.map { CollectionCell<TestCell>(data: $0, id: "\($0)") }
     containerView.source.sections = [Section(cells: []), Section(cells: cells), Section(cells: []),]
   }
 
@@ -206,7 +206,7 @@ class ViewControllerInner: UIViewController {
     ]
 
     let cells: [Cellable] = colors.prefix(count).map {
-      CollectionCell<ReusedPagerCollectionViewCell<ColoredViewController>>(data: $0, setup: { [weak layout] cellView in
+      CollectionCell<ReusedPagerCollectionViewCell<ColoredViewController>>(data: $0, id: "inner", setup: { [weak layout] cellView in
         layout?.append(collapsingItems: [cellView.viewController])
       })
     }

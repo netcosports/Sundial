@@ -99,10 +99,8 @@ where T: Reusable & Eventable,
 
       if adjustedTitlesSet.map({ $0.id }) == titles.map({ $0.id }) { return }
 
-      let cells: [Cellable] = adjustedTitlesSet.map { title in
-        let item = Item(data: title, eventsEmmiter: titleSubject.asObserver(), clickEvent: title)
-        item.id = title.title
-        return item
+      let cells: [Cellable] = adjustedTitlesSet.map {
+        return Item(data: $0, id: $0.id, eventsEmmiter: titleSubject.asObserver(), clickEvent: $0)
       }
 
       if let layout = layout {

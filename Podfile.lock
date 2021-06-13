@@ -33,7 +33,7 @@ EXTERNAL SOURCES:
 
 CHECKOUT OPTIONS:
   Astrolabe:
-    :commit: d43e1e9b071d7cd602370b6a7957e4651108d391
+    :commit: ae0adf580ad3d52af63ff6ccd323ba4e3b3527c1
     :git: "git@github.com:netcosports/Astrolabe.git"
 
 SPEC CHECKSUMS:

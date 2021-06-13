@@ -206,19 +206,20 @@ class CalendarDayViewController: UIViewController {
       switch type {
       case .nowIndicator(let date):
         let data = NowIndicatorCell.ViewModel(start: date, end: date)
-        return CollectionCell<NowIndicatorCell>(data: data,
+        return CollectionCell<NowIndicatorCell>(data: data, id: "\(data)",
                                                 type: .custom(kind: SupplementaryViewKind.currentTimeIndicator))
       case .timestamp(let date):
         return CollectionCell<TimestampCell>(data: timestampFormatter.string(from: date),
+                                             id: "\(date)",
                                              type: .custom(kind: SupplementaryViewKind.calendayDayTimestamp))
       case .customOverlay(let start, let end):
         let viewModel = OverlayCell.ViewModel(start: start, end: end)
-        return CollectionCell<OverlayCell>(data: viewModel, type: .custom(kind: SupplementaryViewKind.customOverlay))
+        return CollectionCell<OverlayCell>(data: viewModel, id: "\(viewModel)", type: .custom(kind: SupplementaryViewKind.customOverlay))
       }
     }, cellClosure: { interval, start, end -> (Cellable & CalendarDayIntervalContainer) in
       let data = EventCell.ViewModel(start: start, end: end,
                                      title: timestampFormatter.string(from: interval.start))
-      return CollectionCell<EventCell>(data: data)
+      return CollectionCell<EventCell>(data: data, id: data.title)
     })
 
     let layout = CalendarDayCollectionViewLayout(

@@ -87,7 +87,7 @@ class CalendarViewController: UIViewController {
 
     let results = Sundial.callendarFactory(input: .init(monthsForwardCount: 1, monthsBackwardCount: 1, startDate: Date()), cellClosure: { date in
       let data = DayCell.ViewModel(day: dayFormatter.string(from: date), month: monthFormatter.string(from: date))
-      return CollectionCell<DayCell>(data: data)
+      return CollectionCell<DayCell>(data: data, id: data.day + data.month)
     })
     let monthes = results.map { $0.monthLayout }
     let layout = CalendarCollectionViewLayout()
