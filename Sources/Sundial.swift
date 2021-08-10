@@ -34,7 +34,7 @@ public typealias ViewModelable = Titleable & Indicatorable
 
 // MARK: - Selectable
 
-public protocol Selectable: class {
+public protocol Selectable: AnyObject {
   var selectedItem: ControlProperty<Int> { get }
 
   func select(item: Int, animated: Bool)
@@ -42,10 +42,11 @@ public protocol Selectable: class {
 
 extension CollectionViewReusedPagerSource: Selectable {
 
-  public var selectedItem: ControlProperty<Int> { return rx.selectedItem }
+  // FIXME: 
+  public var selectedItem: ControlProperty<Int> { fatalError() }
 
   public func select(item: Int, animated: Bool) {
-    (self.containerView?.collectionViewLayout as? PlainCollectionViewLayout)?.select(item: item, animated: animated)
+    (self.containerView?.collectionViewLayout as? PlainCollectionViewLayout<Self>)?.select(item: item, animated: animated)
   }
 }
 

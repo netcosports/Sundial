@@ -29,7 +29,7 @@ public enum SupplementaryViewKind {
   public static let customOverlay = "SupplementaryViewKind.customOverlay"
 }
 
-open class CalendarDayCollectionViewLayout: EmptyViewCollectionViewLayout {
+open class CalendarDayCollectionViewLayout<Source: ReusableSource>: EmptyViewCollectionViewLayout where Source.CellState: CalendarDayIntervalContainer {
 
   public struct Settings {
 
@@ -65,9 +65,9 @@ open class CalendarDayCollectionViewLayout: EmptyViewCollectionViewLayout {
   private var supplementaryAttributes: [IndexPath: Attributes] = [:]
   private var overlaySupplementaryAttributes: [IndexPath: Attributes] = [:]
   private var contentSize = CGSize.zero
-  private var hostPagerSource: CollectionViewSource?
+  private var hostPagerSource: Source?
 
-  public init(hostPagerSource: CollectionViewSource, settings: Settings? = nil) {
+  public init(hostPagerSource: Source, settings: Settings? = nil) {
     super.init()
     self.hostPagerSource = hostPagerSource
     if let settings = settings {
@@ -185,8 +185,8 @@ private extension CalendarDayCollectionViewLayout {
     }
 
     (0..<numberOfCells).forEach { cellIndex in
-      let cell = hostPagerSource?.sections[safe: 0]?.cells[safe: cellIndex] as? CalendarDayIntervalContainer
-      guard let start = cell?.start, let end = cell?.end else { return }
+      let state = hostPagerSource?.sections[safe: 0]?.cells[safe: cellIndex]?.state
+      guard let start = state?.start, let end = state?.end else { return }
       let indexPath = IndexPath(item: cellIndex, section: 0)
       let cellAttribute = Attributes(forCellWith: indexPath)
       let y = CGFloat(start.timestamps - settings.startHour) * (settings.timestampHeight + settings.horizontalMargin) +

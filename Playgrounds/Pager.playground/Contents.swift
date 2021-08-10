@@ -10,9 +10,15 @@ import RxCocoa
 
 import PlaygroundSupport
 
-public  class CollapsingCell: CollectionViewCell, Reusable {
+class CollapsingCell: CollectionViewCell, Reusable, Eventable {
 
-  let title: UILabel = {
+  typealias Data = String
+
+  typealias Event = String
+  var data: Data?
+  let eventSubject = PublishSubject<Event>()
+
+  private let title: UILabel = {
     let title = UILabel()
     title.textColor = .white
     title.textAlignment = .center
@@ -31,6 +37,10 @@ public  class CollapsingCell: CollectionViewCell, Reusable {
     title.text = "HEADER height is \(Int(self.frame.height))"
   }
 
+  func setup(with data: Data) {
+
+  }
+
 //  public override func apply(_ layoutAttributes: UICollectionViewLayoutAttributes) {
 //    super.apply(layoutAttributes)
 //    if let collapsingHeaderViewAttributes = layoutAttributes as? CollapsingHeaderViewAttributes {
@@ -38,48 +48,54 @@ public  class CollapsingCell: CollectionViewCell, Reusable {
 //    }
 //  }
 
-  public static func size(for data: Void, containerSize: CGSize) -> CGSize {
+  public static func size(for data: String, containerSize: CGSize) -> CGSize {
     return CGSize(width: containerSize.width, height: 276)
   }
 }
 
-public class TestCell: CollectionViewCell, Reusable {
+class TestCell: CollectionViewCell, Reusable, Eventable {
 
-  let title: UILabel = {
+  typealias Data = String
+
+  typealias Event = String
+  var data: Data?
+  let eventSubject = PublishSubject<Event>()
+
+  private let title: UILabel = {
     let title = UILabel()
     title.textColor = .white
     title.textAlignment = .center
     return title
   }()
 
-  open override func setup() {
+  override func setup() {
     super.setup()
     self.backgroundColor = .green
     contentView.addSubview(title)
   }
 
-  open override func layoutSubviews() {
+  override func layoutSubviews() {
     super.layoutSubviews()
     title.frame = contentView.bounds
   }
 
-  open func setup(with data: String) {
+  func setup(with data: Data) {
     title.text = data
   }
 
-  public static func size(for data: String, containerSize: CGSize) -> CGSize {
+  static func size(for data: Data, containerSize: CGSize) -> CGSize {
     return CGSize(width: containerSize.width, height: containerSize.width * 0.35)
   }
 }
 
-class ColoredViewController: UIViewController, ReusedPageData, CollapsingItem {
-
-  var action: PublishSubject<Void>?
-
+class ColoredViewController: UIViewController, ReusedData, Eventable, CollapsingItem {
   var scrollView: UIScrollView {
     return containerView
   }
   var visible = BehaviorRelay<Bool>(value: false)
+
+  typealias Event = String
+  let eventSubject = PublishSubject<Event>()
 
   var data: UIColor? {
     didSet {
@@ -88,7 +104,7 @@ class ColoredViewController: UIViewController, ReusedPageData, CollapsingItem {
     }
   }
 
-  let containerView = CollectionView<CollectionViewSource>()
+  let containerView = CollectionView<CollectionViewSource<String, String>>()
 
   override func viewDidLoad() {
     super.viewDidLoad()
@@ -105,11 +121,17 @@ class ColoredViewController: UIViewController, ReusedPageData, CollapsingItem {
     containerView.decelerationRate = .fast
 
     view.addSubview(containerView)
+    containerView.frame = view.bounds
 
-    var cells: [Cellable] = (1...50).map { "Item \($0)" }.map { CollectionCell<TestCell>(data: $0) { [weak self] in
-      self?.action?.onNext(())
-      } }
-    containerView.source.sections = [Section(cells: []), Section(cells: cells), Section(cells: []),]
+    let cells: [Cell<String>] = (1...50).map { "Item \($0)" }.map {
+      Cell(cell: TestCell.self, state: $0, eventsEmmiter: self.eventSubject.asObserver(), clickEvent: "")
+    }
+    let sections = [
+      Section<String, String>(cells: cells, state: "", supplementaries: [])
+    ]
+    containerView.source.apply(
+      sections: sections
+    )
   }
 
   override func viewDidLayoutSubviews() {
@@ -149,9 +171,7 @@ class ViewControllerInner: UIViewController {
     fatalError("init(coder:) has not been implemented")
   }
 
-  let collectionView = CollectionView<CollectionViewReusedPagerSource>()
-
-  typealias Layout = PagerHeaderCollectionViewLayout
+  let collectionView = CollectionView<CollectionViewReusedPagerSource<String, UIColor>>()
 
   let action = PublishSubject<Void>()
   let disposeBag = DisposeBag()
@@ -172,44 +192,56 @@ class ViewControllerInner: UIViewController {
     let settings = Settings(stripHeight: 80.0,
                             markerHeight: 5.5,
                             itemMargin: 0.0,
-                            bottomStripSpacing: 0.0,
                             backgroundColor: .white,
                             anchor: anchor,
                             inset: UIEdgeInsets(top: 0, left: margin, bottom: 0, right: margin),
                             numberOfTitlesWhenHidden: 1,
                             pagerIndependentScrolling: false)
 
-    let layout = Layout(hostPagerSource: collectionView.source, settings: settings)
+    let layout = PagerHeaderCollectionViewLayout(
+      hostPagerSource: collectionView.source,
+      settings: settings
+    )
     collectionView.collectionViewLayout = layout
-
     view.addSubview(collectionView)
-    collectionView.snp.remakeConstraints {
-      $0.edges.equalToSuperview()
-    }
 
     let colors: [UIColor] = [
-      .blue, .black, .green, .gray, .orange, .gray, .orange
+      .blue, .black, .green, .gray, .orange
     ]
 
     action.subscribe(onNext: { [weak layout] in
       layout?.scrollToTop()
     }).disposed(by: disposeBag)
 
-    let cells: [Cellable] = colors.map {
-      CollectionCell<ReusedPagerCollectionViewCell<ColoredViewController>>(data: $0, setup: { [weak layout, weak self] cellView in
-        cellView.viewController.action = self?.action
+    let cells: [Cell<UIColor>] = colors.map {
+      Cell(cell: ReusedPagerCollectionViewCell<ColoredViewController>.self, state: $0, setup: { [weak layout, weak self] cellView in
         layout?.append(collapsingItems: [cellView.viewController])
       })
     }
 
     typealias Supplementary = PagerHeaderSupplementaryView<TitleCollectionViewCell, MarkerDecorationView<TitleCollectionViewCell.Data>>
-    let supplementaryPager = CollectionCell<Supplementary>(data: titles, id: "", click: nil,
-                                                           type: .custom(kind:  PagerHeaderSupplementaryViewKind), setup: nil)
-    let supplementaryCollapsing = CollectionCell<CollapsingCell>(data: (), id: "", click: nil,
-                                                                 type: .custom(kind:  PagerHeaderCollapsingSupplementaryViewKind), setup: nil)
-    let section = MultipleSupplementariesSection(supplementaries: [supplementaryPager/*, supplementaryCollapsing*/], cells: cells)
-    collectionView.source.sections = [section]
-    collectionView.reloadData()
+    let supplementaryPager: Cellable = CellContainer<Supplementary>(
+      data: titles,
+      type: .custom(kind:  PagerHeaderSupplementaryViewKind)
+    )
+    let supplementaryCollapsing: Cellable = CellContainer<CollapsingCell>(
+      data: "collapsing",
+      type: .custom(kind:  PagerHeaderCollapsingSupplementaryViewKind)
+    )
+
+    let sections = [Section<String, UIColor>(
+      cells: cells,
+      state: "",
+      supplementaries: [supplementaryPager, supplementaryCollapsing]
+    )]
+    collectionView.source.apply(
+      sections: sections
+    )
+  }
+
+  override func viewDidLayoutSubviews() {
+    super.viewDidLayoutSubviews()
+    collectionView.frame = view.bounds
   }
 }
 

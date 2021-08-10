@@ -10,9 +10,7 @@ import Astrolabe
 import RxSwift
 import RxCocoa
 
-open class PlainCollectionViewLayout: EmptyViewCollectionViewLayout {
-
-  public typealias Source = CollectionViewSource & Selectable
+open class PlainCollectionViewLayout<Source: ReusableSource & Selectable>: EmptyViewCollectionViewLayout {
 
   open weak var hostPagerSource: Source?
   open var settings: Settings  { didSet { applySettings() } }
@@ -252,7 +250,7 @@ open class PlainCollectionViewLayout: EmptyViewCollectionViewLayout {
 
   internal func addJumpAttributes(to attributes: inout [UICollectionViewLayoutAttributes]) {
     guard attributes.count > 0 else { return }
-    guard let containerView = hostPagerSource?.containerView else { return }
+    guard let containerView = collectionView else { return }
     guard let source = jumpSourceLayoutAttribute?.copy() as? UICollectionViewLayoutAttributes,
       let target = jumpTargetLayoutAttribute?.copy() as? UICollectionViewLayoutAttributes else {
         return

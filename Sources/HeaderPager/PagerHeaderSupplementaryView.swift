@@ -12,10 +12,12 @@ import RxSwift
 import RxCocoa
 
 public protocol PagerHeaderAttributes {
+  associatedtype Source: ReusableSource
+
   var settings: Settings? { get }
   var invalidateTabFrames: Bool { get }
   var selectionClosure: ((Int) -> Void)? { get }
-  var hostPagerSource: CollectionViewSource? { get }
+  var hostPagerSource: Source? { get }
 }
 
 public protocol PagerHeaderSupplementaryViewModel {
@@ -48,15 +50,15 @@ where T: Reusable & Eventable,
   public typealias Event = Never
   public var data: ViewModel?
 
+  public typealias Source                        = CollectionViewSource<String, TitleCell.Data>
   public typealias TitleCell                     = T
   public typealias MarkerCell                    = M
-  public typealias Attributes                    = UICollectionViewLayoutAttributes & PagerHeaderAttributes
+  public typealias Attributes                    = PagerHeaderViewAttributes<Source>
   public typealias HeaderPagerContentLayout      = PagerHeaderContentCollectionViewLayout<TitleCell.Data, MarkerCell>
-  public typealias Item                          = CollectionCell<TitleCell>
 
-  public let pagerHeaderContainerView = CollectionView<CollectionViewSource>()
+  public let pagerHeaderContainerView = CollectionView<Source>()
   public var layout: HeaderPagerContentLayout?
-  public weak var hostPagerSource: CollectionViewSource?
+  public weak var hostPagerSource: CollectionViewSource<String, T.Data>?
 
   private let titleSubject = PublishSubject<T.Data>()
 
@@ -99,17 +101,17 @@ where T: Reusable & Eventable,
 
       if adjustedTitlesSet.map({ $0.id }) == titles.map({ $0.id }) { return }
 
-      let cells: [Cellable] = adjustedTitlesSet.map { title in
-        let item = Item(data: title, eventsEmmiter: titleSubject.asObserver(), clickEvent: title)
-        item.id = title.title
-        return item
+      let cells: [Cell<TitleCell.Data>] = adjustedTitlesSet.map {
+        return Cell(cell: TitleCell.self, state: $0, eventsEmmiter: titleSubject.asObserver(), clickEvent: $0)
       }
 
       if let layout = layout {
         layout.titles = adjustedTitlesSet
         invalidateTabFrames(nil)
       }
-      pagerHeaderContainerView.source.sections = [Section(cells: cells)]
+      pagerHeaderContainerView.source.sections = [
+        Section<String, TitleCell.Data>(cells: cells, state: "pager", supplementaries: [])
+      ]
       pagerHeaderContainerView.reloadData()
     }
   }

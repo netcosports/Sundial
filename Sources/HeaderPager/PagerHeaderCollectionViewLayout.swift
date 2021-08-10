@@ -14,7 +14,13 @@ public let PagerHeaderSupplementaryViewKind = "PagerHeaderSupplementaryViewKind"
 public let PagerHeaderCollapsingSupplementaryViewKind = "PagerHeaderCollapsingSupplementaryViewKind"
 public let PagerHeaderCollapsingFooterViewKind = "PagerHeaderCollapsingFooterViewKind"
 
-open class PagerHeaderCollectionViewLayout: PlainCollectionViewLayout {
+extension IndexPath {
+  static let header = IndexPath(index: 0)
+  static let collapsing = IndexPath(index: 0)
+  static let collapsingFooter = IndexPath(index: 0)
+}
+
+open class PagerHeaderCollectionViewLayout<Source: ReusableSource & Selectable>: PlainCollectionViewLayout<Source> {
 
   public let minHeaderHeight = BehaviorRelay<CGFloat>(value: 0)
   public let maxHeaderHeight = BehaviorRelay<CGFloat>(value: 240)
@@ -30,10 +36,6 @@ open class PagerHeaderCollectionViewLayout: PlainCollectionViewLayout {
 
   // FIXME: move to settings?
   open class var headerZIndex: Int { return 1024 }
-
-  static let headerIndex = IndexPath(index: 0)
-  static let collapsingIndex = IndexPath(index: 0)
-  static let collapsingFooterIndex = IndexPath(index: 0)
 
   fileprivate let expandedSubject = BehaviorSubject<Bool>(value: true)
   fileprivate var handlers: [CollapsingHeaderHandler] = []
@@ -113,20 +115,32 @@ open class PagerHeaderCollectionViewLayout: PlainCollectionViewLayout {
 
   open override func layoutAttributesForSupplementaryView(ofKind elementKind: String,
                                                           at indexPath: IndexPath) -> UICollectionViewLayoutAttributes? {
-    if elementKind == PagerHeaderSupplementaryViewKind, indexPath == PagerHeaderCollectionViewLayout.headerIndex {
+    if elementKind == PagerHeaderSupplementaryViewKind, indexPath == IndexPath.header {
       return pagerHeaderViewAttributes()
     }
 
-    if elementKind == PagerHeaderCollapsingSupplementaryViewKind, indexPath == PagerHeaderCollectionViewLayout.collapsingIndex {
+    if elementKind == PagerHeaderCollapsingSupplementaryViewKind, indexPath == IndexPath.collapsing {
       return collapsingHeaderAttributes()
     }
 
     if elementKind == PagerHeaderCollapsingFooterViewKind,
-      indexPath == PagerHeaderCollectionViewLayout.collapsingFooterIndex {
+      indexPath == IndexPath.collapsingFooter {
       return collapsingFooterAttributes()
     }
 
     return super.layoutAttributesForSupplementaryView(ofKind: elementKind, at: indexPath)
+  }
+
+  struct Reactive<Source: ReusableSource & Selectable> {
+    let base: PagerHeaderCollectionViewLayout<Source>
+
+    fileprivate init(_ base: PagerHeaderCollectionViewLayout<Source>) {
+      self.base = base
+    }
+  }
+
+  var reactive: Reactive<Source> {
+    return Reactive(self)
   }
 }
 
@@ -137,10 +151,12 @@ extension PagerHeaderCollectionViewLayout {
     return hostPagerSource?.sections.first?.supplementaries(for: .custom(kind: PagerHeaderSupplementaryViewKind)).isEmpty == false
   }
 
-  open func pagerHeaderViewAttributes() -> PagerHeaderViewAttributes? {
+  open func pagerHeaderViewAttributes() -> PagerHeaderViewAttributes<Source>? {
     guard hasPagerSupplementary else { return nil }
-    let pagerHeaderAttributes = PagerHeaderViewAttributes(forSupplementaryViewOfKind: PagerHeaderSupplementaryViewKind,
-                                                          with: PagerHeaderCollectionViewLayout.headerIndex)
+    let pagerHeaderAttributes = PagerHeaderViewAttributes<Source>(
+      forSupplementaryViewOfKind: PagerHeaderSupplementaryViewKind,
+      with: IndexPath.header
+    )
     pagerHeaderAttributes.zIndex = Int.max
     pagerHeaderAttributes.settings = self.settings
     pagerHeaderAttributes.hostPagerSource = hostPagerSource
@@ -224,7 +240,7 @@ extension PagerHeaderCollectionViewLayout {
     guard hasCollapsingHeader else { return nil }
 
     let сollapsingHeaderViewAttributes = CollapsingHeaderViewAttributes(forSupplementaryViewOfKind: PagerHeaderCollapsingSupplementaryViewKind,
-                                                                        with: PagerHeaderCollectionViewLayout.collapsingIndex)
+                                                                        with: IndexPath.collapsing)
     сollapsingHeaderViewAttributes.zIndex = type(of: self).headerZIndex
 
     guard let collectionView = collectionView else { return сollapsingHeaderViewAttributes }
@@ -260,7 +276,7 @@ extension PagerHeaderCollectionViewLayout {
 
     let сollapsingFooterViewAttributes = CollapsingHeaderViewAttributes(
       forSupplementaryViewOfKind: PagerHeaderCollapsingFooterViewKind,
-      with: PagerHeaderCollectionViewLayout.collapsingFooterIndex)
+      with: IndexPath.collapsingFooter)
     сollapsingFooterViewAttributes.zIndex = type(of: self).headerZIndex
     guard let collectionView = collectionView else {
       return сollapsingFooterViewAttributes
@@ -416,10 +432,9 @@ extension PagerHeaderCollectionViewLayout {
   }
 }
 
-// MARK: reactive
-public extension Reactive where Base: PagerHeaderCollectionViewLayout {
+extension PagerHeaderCollectionViewLayout.Reactive {
 
-  var collapsingItem: AnyObserver<CollapsingItem> {
+  public var collapsingItem: AnyObserver<CollapsingItem> {
     return base.collapsingItemSubject.asObserver()
   }
 }

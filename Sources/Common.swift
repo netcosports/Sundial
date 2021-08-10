@@ -16,7 +16,7 @@ public protocol Markerable {
   func apply(currentTitle: ViewModel?, nextTitle: ViewModel?, progress: CGFloat)
 }
 
-public protocol CollapsingItem: class {
+public protocol CollapsingItem: AnyObject {
 
   var scrollView: UIScrollView { get }
   var visible: BehaviorRelay<Bool> { get }

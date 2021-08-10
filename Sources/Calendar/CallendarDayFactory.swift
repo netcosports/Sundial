@@ -54,12 +54,17 @@ public enum SupplementaryRequest {
 }
 
 @available(iOS 10.0, *)
-public func callendarDayFactory<Event: DateIntervalContainer, Overlay: DateIntervalContainer>(
+public func callendarDayFactory<
+  Event: DateIntervalContainer,
+  Overlay: DateIntervalContainer,
+  SectionState: Hashable,
+  CellState: Hashable & CalendarDayIntervalContainer
+>(
   input: CallendarDayFactoryInput<Event, Overlay>,
   supplementaryClosure: (SupplementaryRequest) -> (Cellable?),
-  cellClosure: (Event, CalendarDayOffset, CalendarDayOffset) -> (Cellable & CalendarDayIntervalContainer),
-  sectionClosure: (([Cellable], [Cellable]) -> (Sectionable))? = nil
-) -> [Sectionable] {
+  cellClosure: (Event, CalendarDayOffset, CalendarDayOffset) -> Cell<CellState>,
+  sectionClosure: (([Cellable], [Cell<CellState>]) -> (Section<SectionState, CellState>))
+) -> [Section<SectionState, CellState>] {
   let startOfDay = input.startDate.startOfDay
   var supplementaries: [Cellable] = []
   let timestampInterval = 60.0 * 60.0
@@ -83,16 +88,11 @@ public func callendarDayFactory<Event: DateIntervalContainer, Overlay: DateInter
     }
   }
 
-  let cells: [Cellable] = input.events.map { event in
+  let cells: [Cell<CellState>] = input.events.map { event in
     let offsets = event.offsets(from: startOfDay, timestampInterval: timestampInterval)
     return cellClosure(event, offsets.start, offsets.end)
   }
 
-  let section: Sectionable
-  if let sectionClosure = sectionClosure {
-    section = sectionClosure(supplementaries, cells)
-  } else {
-    section = MultipleSupplementariesSection(supplementaries: supplementaries, cells: cells)
-  }
+  let section: Section<SectionState, CellState> = sectionClosure(supplementaries, cells)
   return [section]
 }

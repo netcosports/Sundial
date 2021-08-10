@@ -7,7 +7,7 @@
 
 import UIKit
 
-public protocol Progressable: class {
+public protocol Progressable: AnyObject {
   var progress: CGFloat { get }
 }
 

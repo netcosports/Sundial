@@ -9,12 +9,14 @@
 import UIKit
 import Astrolabe
 
-open class PagerHeaderViewAttributes: UICollectionViewLayoutAttributes, PagerHeaderAttributes {
+open class PagerHeaderViewAttributes<
+  Source: ReusableSource
+>: UICollectionViewLayoutAttributes, PagerHeaderAttributes {
 
   public var settings: Settings?
   public var invalidateTabFrames = false
   public var selectionClosure: ((Int) -> Void)?
-  public weak var hostPagerSource: CollectionViewSource?
+  public weak var hostPagerSource: Source?
 
   open override var frame: CGRect {
     get { return super.frame }
@@ -28,7 +30,7 @@ open class PagerHeaderViewAttributes: UICollectionViewLayoutAttributes, PagerHea
 
   open override func copy(with zone: NSZone? = nil) -> Any {
     let copy = super.copy(with: zone)
-    guard let typedCopy = copy as? PagerHeaderViewAttributes else {
+    guard let typedCopy = copy as? PagerHeaderViewAttributes<Source> else {
       return copy
     }
 
@@ -45,7 +47,7 @@ open class PagerHeaderViewAttributes: UICollectionViewLayoutAttributes, PagerHea
       return false
     }
 
-    if let other = object as? PagerHeaderViewAttributes {
+    if let other = object as? PagerHeaderViewAttributes<Source> {
       if self.settings != other.settings || self.invalidateTabFrames != other.invalidateTabFrames  {
         return false
       }

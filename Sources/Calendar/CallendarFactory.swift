@@ -8,9 +8,11 @@
 import Foundation
 import Astrolabe
 
-public typealias CellClosure = (Date) -> Cellable
-public typealias SectionClosure = (Date, [Cellable]) -> Sectionable
-public typealias CalendarFactoryResult = (monthLayout: CalendarCollectionViewLayout.MonthLayout, section: Sectionable)
+public typealias CellClosure<CellState: Hashable> = (Date) -> Cell<CellState>
+public typealias SectionClosure<SectionState: Hashable, CellState: Hashable> = (Date, [Cell<CellState>]) -> Section<SectionState, CellState>
+public typealias CalendarFactoryResult<SectionState: Hashable, CellState: Hashable> = (
+  monthLayout: CalendarCollectionViewLayout.MonthLayout, section: Section<SectionState, CellState>
+)
 
 public struct CallendarFactoryInput {
   let monthsForwardCount: Int
@@ -30,27 +32,24 @@ public struct CallendarFactoryInput {
 }
 
 @available(iOS 10.0, *)
-public func callendarFactory(input: CallendarFactoryInput,
-                             cellClosure: CellClosure,
-                             sectionClosure: SectionClosure? = nil) -> [CalendarFactoryResult] {
+public func callendarFactory<SectionState: Hashable, CellState: Hashable>(
+  input: CallendarFactoryInput,
+  cellClosure: CellClosure<CellState>,
+  sectionClosure: SectionClosure<SectionState, CellState>
+) -> [CalendarFactoryResult<SectionState, CellState>] {
   var startOfMonth = input.startDate.monthesBefore(input.monthsBackwardCount).startOfMonth
   var endOfMonth = startOfMonth.endOfMonth
   var date = startOfMonth
-  var results: [CalendarFactoryResult] = []
+  var results: [CalendarFactoryResult<SectionState, CellState>] = []
   (0..<(input.monthsBackwardCount + input.monthsForwardCount + 1)).forEach { _ in
-    var cells: [Cellable] = []
+    var cells: [Cell<CellState>] = []
 
     repeat {
       cells.append(cellClosure(date))
       date = date.nextDay
     } while date < endOfMonth
 
-    let section: Sectionable
-    if let sectionClosure = sectionClosure {
-      section = sectionClosure(startOfMonth, cells)
-    } else {
-      section = Section(cells: cells)
-    }
+    let section = sectionClosure(startOfMonth, cells)
     var startDayIndex = startOfMonth.weekDay - input.firstWeekday
     if startDayIndex < 0 {
       startDayIndex = 7 + startDayIndex

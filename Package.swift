@@ -11,10 +11,20 @@ let package = Package(
       .library(name: "Sundial", targets: ["Sundial"])
     ],
     dependencies: [
-      .package(url: "https://github.com/netcosports/Astrolabe.git", .upToNextMajor(from: "5.1.0"))
+      .package(url: "https://github.com/netcosports/Astrolabe.git", .branch("kmm")),
+      .package(url: "https://github.com/Quick/Nimble.git", .branch("main")),
+      .package(url: "https://github.com/Quick/Quick.git", .branch("main"))
     ],
     targets: [
-      .target(name: "Sundial", dependencies: ["Astrolabe"], path: "./Sources")
+      .target(name: "Sundial", dependencies: ["Astrolabe"], path: "./Sources"),
+      .testTarget(
+        name: "SundialTests",
+        dependencies: [
+          "Sundial",
+          "Nimble",
+          "Quick"
+        ]
+      )
     ],
     swiftLanguageVersions: [.v5]
 )
