@@ -92,7 +92,7 @@ class CollapsingHeaderHandler {
 
         let extraInset = collapsingItem.extraInset
         let topInset = maxHeight + sself.headerInset.value + extraInset.top
-        var bottomInset: CGFloat = height - (contentSize.height + sself.minHeaderHeight.value + sself.headerInset.value + extraInset.bottom)
+        var bottomInset: CGFloat = height - (contentSize.height + sself.minHeaderHeight.value + sself.headerInset.value)
         if bottomInset < 0.0  {
           bottomInset = extraInset.bottom
         }
