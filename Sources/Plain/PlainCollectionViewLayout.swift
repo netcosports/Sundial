@@ -103,7 +103,7 @@ open class PlainCollectionViewLayout: EmptyViewCollectionViewLayout {
   }
 
   open override func layoutAttributesForElements(in rect: CGRect) -> [UICollectionViewLayoutAttributes]? {
-    let sourceAttributes: [UICollectionViewLayoutAttributes]
+    var sourceAttributes: [UICollectionViewLayoutAttributes]
     if settings.shouldKeepFocusOnBoundsChange {
       sourceAttributes = layoutData
         .compactMap { (_, value) -> UICollectionViewLayoutAttributes? in
@@ -112,6 +112,7 @@ open class PlainCollectionViewLayout: EmptyViewCollectionViewLayout {
           }
           return nil
       }
+      sourceAttributes.append(contentsOf: decorations(in: rect))
     } else {
       sourceAttributes = super.layoutAttributesForElements(in: rect) ?? []
     }

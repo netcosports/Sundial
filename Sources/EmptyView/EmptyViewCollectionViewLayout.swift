@@ -99,12 +99,18 @@ open class EmptyViewCollectionViewLayout: UICollectionViewFlowLayout, PreparedLa
 
   open override func layoutAttributesForElements(in rect: CGRect) -> [UICollectionViewLayoutAttributes]? {
     var originalAttributes = super.layoutAttributesForElements(in: rect)
-    guard collectionView != nil else { return originalAttributes }
+    originalAttributes?.append(contentsOf: decorations(in: rect))
+    return originalAttributes
+  }
+
+  public func decorations(in rect: CGRect) -> [UICollectionViewLayoutAttributes] {
+    guard collectionView != nil else { return [] }
+    var originalAttributes: [UICollectionViewLayoutAttributes] = []
     if let emptyViewDecorationAttributes = emptyViewDecorationAttributes(), emptyViewDecorationAttributes.frame.intersects(rect) {
-      originalAttributes?.append(emptyViewDecorationAttributes)
+      originalAttributes.append(emptyViewDecorationAttributes)
     }
     if let loaderViewDecorationAttributes = loaderViewDecorationAttributes(), loaderViewDecorationAttributes.frame.intersects(rect) {
-      originalAttributes?.append(loaderViewDecorationAttributes)
+      originalAttributes.append(loaderViewDecorationAttributes)
     }
     return originalAttributes
   }
