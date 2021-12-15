@@ -6,6 +6,7 @@
 
 import UIKit
 import Astrolabe
+import SwiftUI
 
 public struct ShadowLayoutOptions {
 	public struct ShadowOptions: Equatable {
@@ -27,12 +28,23 @@ public struct ShadowLayoutOptions {
 			self.shadowOffset = shadowOffset
 		}
 	}
+  
+  public enum ShadowOptionsApplicability {
+    case section
+    case allCellsSeparately
+    case specificCells(indexes: [Int])
+    case excludingCells(indexes: [Int])
+    case cellRanges(ranges: [Range<Int>])
+  }
+  
   public let section: Int
 	public let shadowOptions: ShadowOptions?
+  public let cellsApplicability: ShadowOptionsApplicability?
 
-  public init(section: Int, shadowOptions: ShadowOptions? = .init()) {
+  public init(section: Int, shadowOptions: ShadowOptions? = .init(), cellsApplicability: ShadowOptionsApplicability = .section) {
     self.section = section
 		self.shadowOptions = shadowOptions
+    self.cellsApplicability = cellsApplicability
   }
 }
 
@@ -122,36 +134,82 @@ open class ShadowCollectionViewLayout<DecorationView: UICollectionReusableView>:
     register(DecorationView.self,
              forDecorationViewOfKind: DecorationView.kind)
   }
-
+  
   open override func layoutAttributesForElements(in rect: CGRect) -> [UICollectionViewLayoutAttributes]? {
     let attributes = super.layoutAttributesForElements(in: rect)
+    guard let attributes = attributes, let options = options else { return attributes }
+    
     var allAttributes = [UICollectionViewLayoutAttributes]()
-    if let attributes = attributes,
-      let options = options {
-      let cellsAttributes = attributes.filter { attr in
-        attr.representedElementCategory == .cell &&
-          options.contains(where: { $0.section == attr.indexPath.section })
-      }
-      let sections = Dictionary(grouping: cellsAttributes, by: { $0.indexPath.section })
-      sections.forEach {
-        if let attribute = $0.value.first,
-          let cellWidth = $0.value.filter({ $0.frame.width != collectionView?.frame.width }).compactMap({ $0.frame.width }).max(),
-          let sectionOptions = options.first(where: { attribute.indexPath.section == $0.section }) {
-          let height = $0.value.reduce(0) { $0 + $1.frame.height }
-          let decorationAttributes = ShadowDecorationViewLayoutAttributes(forDecorationViewOfKind: DecorationView.kind,
-          with: attribute.indexPath)
-          decorationAttributes.shadowOptions = sectionOptions.shadowOptions
-          decorationAttributes.frame = CGRect(x: attribute.frame.origin.x,
-                                              y: attribute.frame.origin.y,
-                                              width: cellWidth,
-                                              height: height)
-          decorationAttributes.zIndex = attribute.zIndex - 1
-          allAttributes.append(decorationAttributes)
-        }
-      }
-      allAttributes.append(contentsOf: attributes)
+    let cellsAttributes = attributes.filter { attr in
+      attr.representedElementCategory == .cell &&
+      options.contains(where: { $0.section == attr.indexPath.section })
     }
-
+    
+    
+    let sections = Dictionary(grouping: cellsAttributes, by: { $0.indexPath.section })
+    sections.forEach { (sectionIndex, sectionCellsAttributes) in
+      let sectionOptions = options.first(where: {$0.section == sectionIndex})
+      switch sectionOptions?.cellsApplicability {
+      case .section:
+        if let entireSectionShadowAttributes =  shadowAttributesGroup(behindSourceAttributes: sectionCellsAttributes,
+                                                                      shadowOptions: sectionOptions?.shadowOptions) {
+          allAttributes.append(entireSectionShadowAttributes)
+        }
+      case .allCellsSeparately:
+        sectionCellsAttributes.forEach { attribute in
+          allAttributes.append(shadowAttributes(behindSourceAttributes: attribute,
+                                                shadowOptions: sectionOptions?.shadowOptions))
+        }
+      case .specificCells(indexes: let cellsIndexes):
+        cellsIndexes.forEach { index in
+          if let attribute = sectionCellsAttributes.first(where: { $0.indexPath.row == index }) {
+            allAttributes.append(shadowAttributes(behindSourceAttributes: attribute,
+                                                  shadowOptions: sectionOptions?.shadowOptions))
+          }
+        }
+      case .excludingCells(indexes: let cellsIndexes):
+        sectionCellsAttributes.filter { !cellsIndexes.contains($0.indexPath.row)}.forEach { attribute in
+          allAttributes.append(shadowAttributes(behindSourceAttributes: attribute,
+                                                shadowOptions: sectionOptions?.shadowOptions))
+        }
+      case .cellRanges(ranges: let cellsRanges):
+        cellsRanges.map { range in sectionCellsAttributes.filter { range.contains($0.indexPath.row)}}.forEach { attributesInRange in
+          if let cellRangeAttributes = shadowAttributesGroup(behindSourceAttributes: attributesInRange, shadowOptions: sectionOptions?.shadowOptions) {
+            allAttributes.append(cellRangeAttributes)
+          }
+        }
+      default: break
+      }
+    }
+    allAttributes.append(contentsOf: attributes)
     return allAttributes
+  }
+  
+  private func shadowAttributes(behindSourceAttributes attributes: UICollectionViewLayoutAttributes, shadowOptions: ShadowLayoutOptions.ShadowOptions?, customSize: CGSize? = nil) -> ShadowDecorationViewLayoutAttributes {
+    let decorationAttributes = ShadowDecorationViewLayoutAttributes(forDecorationViewOfKind: DecorationView.kind,
+                                                                    with: attributes.indexPath)
+    decorationAttributes.shadowOptions = shadowOptions
+    decorationAttributes.frame = customSize.map({ CGRect(origin: attributes.frame.origin, size: $0) }) ?? attributes.frame
+    decorationAttributes.zIndex = attributes.zIndex - 1
+    return decorationAttributes
+  }
+  
+  private func shadowAttributesGroup(behindSourceAttributes attributesGroup: [UICollectionViewLayoutAttributes], shadowOptions: ShadowLayoutOptions.ShadowOptions?) -> ShadowDecorationViewLayoutAttributes? {
+    
+    guard let attribute = attributesGroup.first,
+          let cellWidth = attributesGroup
+            .filter({ $0.frame.width != collectionView?.frame.width })
+            .compactMap({ $0.frame.width }).max() ?? attributesGroup.first?.frame.width,
+          let cellHeight = attributesGroup
+            .filter({ $0.frame.height != collectionView?.frame.height })
+            .compactMap({ $0.frame.height }).max() ?? attributesGroup.first?.frame.height else {
+              return nil
+            }
+    let height = scrollDirection == .vertical ? attributesGroup.reduce(0) { $0 + $1.frame.height } : cellHeight
+    let width = scrollDirection == .horizontal ? attributesGroup.reduce(0) { $0 + $1.frame.width } : cellWidth
+    
+    return shadowAttributes(behindSourceAttributes: attribute,
+                            shadowOptions: shadowOptions,
+                            customSize: CGSize(width: width, height: height))
   }
 }
