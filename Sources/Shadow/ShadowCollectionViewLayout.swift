@@ -39,12 +39,12 @@ public struct ShadowLayoutOptions {
   
   public let section: Int
 	public let shadowOptions: ShadowOptions?
-  public let cellsApplicability: ShadowOptionsApplicability?
+  public let applicability: ShadowOptionsApplicability?
 
-  public init(section: Int, shadowOptions: ShadowOptions? = .init(), cellsApplicability: ShadowOptionsApplicability = .section) {
+  public init(section: Int, shadowOptions: ShadowOptions? = .init(), applicability: ShadowOptionsApplicability = .section) {
     self.section = section
 		self.shadowOptions = shadowOptions
-    self.cellsApplicability = cellsApplicability
+    self.applicability = applicability
   }
 }
 
@@ -149,7 +149,7 @@ open class ShadowCollectionViewLayout<DecorationView: UICollectionReusableView>:
     let sections = Dictionary(grouping: cellsAttributes, by: { $0.indexPath.section })
     sections.forEach { (sectionIndex, sectionCellsAttributes) in
       let sectionOptions = options.first(where: {$0.section == sectionIndex})
-      switch sectionOptions?.cellsApplicability {
+      switch sectionOptions?.applicability {
       case .section:
         if let entireSectionShadowAttributes =  shadowAttributesGroup(behindSourceAttributes: sectionCellsAttributes,
                                                                       shadowOptions: sectionOptions?.shadowOptions) {
