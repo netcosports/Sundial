@@ -1,0 +1,4 @@
+module Gnomon {
+    header "/Users/sergeimikhan/work/Sundial/.build/arm64-apple-macosx/debug/Gnomon.build/Gnomon-Swift.h"
+    requires objc
+}

@@ -1,0 +1,4 @@
+module Sundial {
+    header "/Users/sergeimikhan/work/Sundial/.build/arm64-apple-macosx/debug/Sundial.build/Sundial-Swift.h"
+    requires objc
+}

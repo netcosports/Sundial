@@ -1,0 +1,4 @@
+module GnomonDecodable {
+    header "/Users/sergeimikhan/work/Sundial/.build/arm64-apple-macosx/debug/GnomonDecodable.build/GnomonDecodable-Swift.h"
+    requires objc
+}
