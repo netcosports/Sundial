@@ -1,4 +1,0 @@
-module RxRelay {
-    header "/Users/sergeimikhan/work/Sundial/.build/arm64-apple-macosx/debug/RxRelay.build/RxRelay-Swift.h"
-    requires objc
-}

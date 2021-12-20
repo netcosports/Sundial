@@ -1,4 +1,0 @@
-module RxCocoa {
-    header "/Users/sergeimikhan/work/Sundial/.build/arm64-apple-macosx/debug/RxCocoa.build/RxCocoa-Swift.h"
-    requires objc
-}
