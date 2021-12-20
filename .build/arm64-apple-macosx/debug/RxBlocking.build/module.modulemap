@@ -1,0 +1,4 @@
+module RxBlocking {
+    header "/Users/sergeimikhan/work/Sundial/.build/arm64-apple-macosx/debug/RxBlocking.build/RxBlocking-Swift.h"
+    requires objc
+}

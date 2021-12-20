@@ -10,18 +10,32 @@ import UIKit
 open class StickyHeaderCollectionViewLayout: EmptyViewCollectionViewLayout {
 
   public struct Settings {
+
+    public enum InsetBehavior {
+      case fill
+      case additionalInset(value: CGFloat)
+    }
     public var collapsing: Bool
     public var minHeight: CGFloat
     public var sticky: Bool
     public var alignToEdges: Bool
     public var headerZIndex: Int
+    public var insetBehavior: InsetBehavior
 
-    public init(collapsing: Bool = true, sticky: Bool = false, minHeight: CGFloat = 0.0, alignToEdges: Bool = false, headerZIndex: Int = .max) {
+    public init(
+      collapsing: Bool = true,
+      sticky: Bool = false,
+      minHeight: CGFloat = 0.0,
+      alignToEdges: Bool = false,
+      headerZIndex: Int = .max,
+      insetBehavior: InsetBehavior = .fill
+    ) {
       self.minHeight = minHeight
       self.sticky = sticky
       self.alignToEdges = alignToEdges
       self.collapsing = collapsing
       self.headerZIndex = headerZIndex
+      self.insetBehavior = insetBehavior
     }
   }
 
@@ -59,7 +73,17 @@ open class StickyHeaderCollectionViewLayout: EmptyViewCollectionViewLayout {
     }
     let offset = collectionView.contentOffset.y
     var originY = offset
-    var height = topLayoutAttributes.frame.height - offset
+    switch settings.insetBehavior {
+      case .fill:
+        break
+      case .additionalInset(let topInset):
+      if offset > -topInset {
+        originY = offset + topInset
+      } else {
+        originY = 0.0
+      }
+    }
+    var height = topLayoutAttributes.frame.height - originY    
     if !settings.sticky && height < settings.minHeight {
       originY = offset - (settings.minHeight - height)
     }
@@ -79,6 +103,13 @@ open class StickyHeaderCollectionViewLayout: EmptyViewCollectionViewLayout {
       layoutAttributes.insert(stickyLayoutAttributes, at: 0)
     }
     return layoutAttributes
+  }
+
+  open override func shouldInvalidateLayout(
+    forPreferredLayoutAttributes preferredAttributes: UICollectionViewLayoutAttributes,
+    withOriginalAttributes originalAttributes: UICollectionViewLayoutAttributes
+  ) -> Bool {
+    return !preferredAttributes.isEqual(originalAttributes)
   }
 
   open override func targetContentOffset(forProposedContentOffset proposedContentOffset: CGPoint) -> CGPoint {

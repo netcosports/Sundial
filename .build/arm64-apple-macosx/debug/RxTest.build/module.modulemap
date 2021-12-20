@@ -1,0 +1,4 @@
+module RxTest {
+    header "/Users/sergeimikhan/work/Sundial/.build/arm64-apple-macosx/debug/RxTest.build/RxTest-Swift.h"
+    requires objc
+}

@@ -1,0 +1,4 @@
+module AstrolabeLoaders {
+    header "/Users/sergeimikhan/work/Sundial/.build/arm64-apple-macosx/debug/AstrolabeLoaders.build/AstrolabeLoaders-Swift.h"
+    requires objc
+}

@@ -1,0 +1,4 @@
+module AEXML {
+    header "/Users/sergeimikhan/work/Sundial/.build/arm64-apple-macosx/debug/AEXML.build/AEXML-Swift.h"
+    requires objc
+}
