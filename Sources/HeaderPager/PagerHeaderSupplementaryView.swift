@@ -18,13 +18,28 @@ public protocol PagerHeaderAttributes {
   var hostPagerSource: CollectionViewSource? { get }
 }
 
-open class PagerHeaderSupplementaryView<T: CollectionViewCell, M: CollectionViewCell>: CollectionViewCell, Reusable where T: Reusable, T.Data: Titleable, T.Data: Indicatorable {
+public protocol PagerHeaderSupplementaryViewModel {
+  associatedtype TitleCellViewModel
+  var titles: [TitleCellViewModel] { get }
+}
+
+extension Array: PagerHeaderSupplementaryViewModel {
+
+  public typealias TitleCellViewModel = Element
+
+  public var titles: [Element] {
+    return self
+  }
+}
+
+public typealias PagerHeaderSupplementaryView<T: CollectionViewCell, M: CollectionViewCell> = GenericPagerHeaderSupplementaryView<[T.Data], T, M> where T: Reusable, T.Data: Titleable, T.Data: Indicatorable
+
+open class GenericPagerHeaderSupplementaryView<ViewModel: PagerHeaderSupplementaryViewModel, T: CollectionViewCell, M: CollectionViewCell>: CollectionViewCell, Reusable where T: Reusable, T.Data: Titleable, T.Data: Indicatorable, ViewModel.TitleCellViewModel == T.Data {
 
   public typealias TitleCell                     = T
   public typealias MarkerCell                    = M
   public typealias Attributes                    = UICollectionViewLayoutAttributes & PagerHeaderAttributes
-  public typealias ViewModel                     = TitleCell.Data
-  public typealias HeaderPagerContentLayout      = PagerHeaderContentCollectionViewLayout<ViewModel, MarkerCell>
+  public typealias HeaderPagerContentLayout      = PagerHeaderContentCollectionViewLayout<TitleCell.Data, MarkerCell>
   public typealias Item                          = CollectionCell<TitleCell>
 
   public let pagerHeaderContainerView = CollectionView<CollectionViewSource>()
@@ -33,7 +48,7 @@ open class PagerHeaderSupplementaryView<T: CollectionViewCell, M: CollectionView
 
   open class var layoutType: HeaderPagerContentLayout.Type { return HeaderPagerContentLayout.self }
 
-  fileprivate let disposeBag = DisposeBag()
+  public let disposeBag = DisposeBag()
   fileprivate var currentLayoutAttributes: Attributes? {
     didSet {
       if let settings = currentLayoutAttributes?.settings, let layout = layout {
@@ -52,15 +67,29 @@ open class PagerHeaderSupplementaryView<T: CollectionViewCell, M: CollectionView
     }
   }
 
-  fileprivate var titles: [ViewModel] = [] {
+  fileprivate var titles: [TitleCell.Data] = [] {
     willSet(newTitles) {
 
-      if newTitles.map({ $0.id }) == titles.map({ $0.id }) { return }
+      #if DEBUG
+      let ids = newTitles.map { $0.id }
+      let set = Set<String>(ids)
+      assert(ids.count == set.count, "provideds titles must have unique IDs")
+      #endif
 
-      let cells: [Cellable] = newTitles.map { title in
+      let adjustedTitlesSet: [TitleCell.Data]
+      if UIView.userInterfaceLayoutDirection(for: pagerHeaderContainerView.semanticContentAttribute) == .rightToLeft {
+        adjustedTitlesSet = newTitles.reversed()
+      } else {
+        adjustedTitlesSet = newTitles
+      }
+
+      if adjustedTitlesSet.map({ $0.id }) == titles.map({ $0.id }) { return }
+
+      let cells: [Cellable] = adjustedTitlesSet.map { title in
         let item = Item(data: title) { [weak self] in
-          if let index = self?.titles.index(where: { $0.active && $0.id == title.id }) {
-            self?.currentLayoutAttributes?.selectionClosure?(index)
+          guard let self = self else { return }
+          if let index = self.titles.firstIndex(where: { $0.active && $0.id == title.id }) {
+            self.currentLayoutAttributes?.selectionClosure?(index)
           }
         }
         item.id = title.title
@@ -68,7 +97,7 @@ open class PagerHeaderSupplementaryView<T: CollectionViewCell, M: CollectionView
       }
 
       if let layout = layout {
-        layout.titles = newTitles
+        layout.titles = adjustedTitlesSet
         invalidateTabFrames(nil)
       }
       pagerHeaderContainerView.source.sections = [Section(cells: cells)]
@@ -94,12 +123,16 @@ open class PagerHeaderSupplementaryView<T: CollectionViewCell, M: CollectionView
 
   open override func layoutSubviews() {
     super.layoutSubviews()
+    layoutPagerHeaderContainerView()
+  }
+
+  open func layoutPagerHeaderContainerView() {
     pagerHeaderContainerView.frame = contentView.bounds
   }
 
-  public typealias Data = [ViewModel]
-  public func setup(with data: Data) {
-    let titles = data
+  public typealias Data = ViewModel
+  open func setup(with data: Data) {
+    let titles = data.titles
     if !self.titles.elementsEqual(titles, by: {
       return $0.id == $1.id
     }) {
@@ -115,9 +148,7 @@ open class PagerHeaderSupplementaryView<T: CollectionViewCell, M: CollectionView
     super.apply(layoutAttributes)
 
     if let pagerHeaderViewAttributes = layoutAttributes as? Attributes {
-      guard let hostViewController = pagerHeaderViewAttributes.hostPagerSource?.hostViewController else {
-        return
-      }
+      let hostViewController = pagerHeaderViewAttributes.hostPagerSource?.hostViewController
       if pagerHeaderContainerView.source.hostViewController == nil {
         setupSource(for: pagerHeaderViewAttributes, in: hostViewController)
       }
@@ -131,7 +162,7 @@ open class PagerHeaderSupplementaryView<T: CollectionViewCell, M: CollectionView
   }
 }
 
-private extension PagerHeaderSupplementaryView {
+private extension GenericPagerHeaderSupplementaryView {
 
   func invalidateTabFrames(_ width: CGFloat?) {
     let context = HeaderPagerContentLayout.InvalidationContext()
@@ -148,7 +179,7 @@ private extension PagerHeaderSupplementaryView {
     return layout
   }
 
-  func setupSource(for layoutAttributes: Attributes, in hostViewController: UIViewController) {
+  func setupSource(for layoutAttributes: Attributes, in hostViewController: UIViewController?) {
     self.hostPagerSource = layoutAttributes.hostPagerSource
     self.containerViewController = hostViewController
     pagerHeaderContainerView.source.hostViewController = hostViewController
