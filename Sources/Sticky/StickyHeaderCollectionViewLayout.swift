@@ -73,6 +73,7 @@ open class StickyHeaderCollectionViewLayout: EmptyViewCollectionViewLayout {
     }
     let offset = collectionView.contentOffset.y
     var originY = offset
+
     switch settings.insetBehavior {
       case .fill:
         break
@@ -83,9 +84,11 @@ open class StickyHeaderCollectionViewLayout: EmptyViewCollectionViewLayout {
         originY = 0.0
       }
     }
+
     var height = topLayoutAttributes.frame.height - originY    
+
     if !settings.sticky && height < settings.minHeight {
-      originY = offset - (settings.minHeight - height)
+      originY = originY - (settings.minHeight - height)
     }
     if height < settings.minHeight {
       height = settings.minHeight

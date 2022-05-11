@@ -145,7 +145,7 @@ where T: Reusable & Eventable,
   }
 
   public typealias Data = ViewModel
-  public func setup(with data: Data) {
+  open func setup(with data: Data) {
     let titles = data.titles
     if !self.titles.elementsEqual(titles, by: {
       return $0.id == $1.id

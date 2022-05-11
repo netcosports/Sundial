@@ -50,7 +50,7 @@ class CollapsingHeaderViewController: UIViewController {
 
   let disposeBag = DisposeBag()
 
-  let controller1 = TestViewController(.red)
+  let controller1 = StickyHeaderController()
   let controller2 = TestViewController(.blue)
   let controllerLoader = TestViewController(.orange, numberOfItems: 20)
   let controller3 = TestPagerViewControllerInner()
