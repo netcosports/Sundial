@@ -1,4 +1,0 @@
-module RxSwift {
-    header "/Users/sergeimikhan/work/Sundial/.build/arm64-apple-macosx/debug/RxSwift.build/RxSwift-Swift.h"
-    requires objc
-}

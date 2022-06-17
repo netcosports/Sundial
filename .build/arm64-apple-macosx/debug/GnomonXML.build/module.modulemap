@@ -1,4 +1,0 @@
-module GnomonXML {
-    header "/Users/sergeimikhan/work/Sundial/.build/arm64-apple-macosx/debug/GnomonXML.build/GnomonXML-Swift.h"
-    requires objc
-}
