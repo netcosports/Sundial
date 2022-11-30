@@ -201,7 +201,7 @@ private extension GenericPagerHeaderSupplementaryView {
     guard let layout = layout else { return }
 
     let contentSizeObservable: Observable<CGPoint> =
-      pagerHeaderContainerView.rx.observe(CGSize.self, #keyPath(UICollectionView.contentSize))
+      pagerHeaderContainerView.rx.observe(CGSize.self, #keyPath(UICollectionView.contentSize), retainSelf: false)
         .distinctUntilChanged({
           $0?.width == $1?.width
         }).map({ [weak self] _ in

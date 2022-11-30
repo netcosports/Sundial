@@ -9,7 +9,6 @@ import UIKit
 import RxSwift
 import RxCocoa
 
-
 class CollapsingHeaderHandler {
 
   let headerHeight: BehaviorRelay<CGFloat>
@@ -66,7 +65,7 @@ class CollapsingHeaderHandler {
     }).disposed(by: disposeBag)
 
     let contentSizeDriver = collapsingItem.scrollView.rx
-      .observe(CGSize.self, #keyPath(UICollectionView.contentSize))
+      .observe(CGSize.self, #keyPath(UICollectionView.contentSize), retainSelf: false)
       .flatMap { size -> Observable<CGSize> in
         guard let size = size else { return .empty() }
         return .just(size)
@@ -76,7 +75,7 @@ class CollapsingHeaderHandler {
       .distinctUntilChanged { $0.height == $1.height }
 
     let scrollViewHeightDriver = collapsingItem.scrollView.rx
-      .observe(CGRect.self, #keyPath(UICollectionView.bounds))
+      .observe(CGRect.self, #keyPath(UICollectionView.bounds), retainSelf: false)
       .flatMap { rect -> Observable<CGFloat> in
         guard let rect = rect else { return .empty() }
         return .just(rect.height)
@@ -142,9 +141,9 @@ class CollapsingHeaderHandler {
     .asObservable()
     .skip(1)
     .distinctUntilChanged()
-    .filter { [weak self] _ in
+    .filter { [weak self, weak collapsingItem] _ in
       guard let `self` = self else { return false }
-      let scrollView = collapsingItem.scrollView
+      guard let scrollView = collapsingItem?.scrollView else { return false }
 
       return scrollView.panGestureRecognizer.state != .possible
         || scrollView.isDecelerating
@@ -228,7 +227,8 @@ class CollapsingHeaderHandler {
         .asDriver()
         .distinctUntilChanged()
         .skip(1)
-        .map {
+        .map { [weak self, weak collapsingItem] in
+          guard let self = self, let collapsingItem = collapsingItem else { return .zero }
           return CGPoint(x: 0, y: -$0 - self.headerInset.value - collapsingItem.extraInset.top)
         }.drive(collapsingItem.scrollView.rx.contentOffset)
 
@@ -236,7 +236,8 @@ class CollapsingHeaderHandler {
         .asDriver()
         .distinctUntilChanged()
         .skip(1)
-        .map {
+        .map { [weak collapsingItem] in
+          guard let collapsingItem = collapsingItem else { return .zero }
           let y = collapsingItem.scrollView.contentSize.height - collapsingItem.scrollView.bounds.height + $0
           return CGPoint(x: 0, y: y)
         }.drive(collapsingItem.scrollView.rx.contentOffset)
