@@ -216,9 +216,13 @@ class CalendarDayViewController: UIViewController {
         return CollectionCell<OverlayCell>(data: viewModel, type: .custom(kind: SupplementaryViewKind.customOverlay))
       }
     }, cellClosure: { interval, start, end -> (Cellable & CalendarDayIntervalContainer) in
-      let data = EventCell.ViewModel(start: start, end: end,
-                                     title: timestampFormatter.string(from: interval.start))
-      return CollectionCell<EventCell>(data: data)
+      let title = timestampFormatter.string(from: interval.start)
+      let data = EventCell.ViewModel(
+        start: start,
+        end: end,
+        title: title
+      )
+      return CollectionCell<EventCell>(data: data, id: title)
     })
 
     let layout = CalendarDayCollectionViewLayout(

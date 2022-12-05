@@ -75,11 +75,11 @@ public class TestCell: CollectionViewCell, Reusable, Eventable {
     title.frame = contentView.bounds
   }
 
-  open func setup(with data: String) {
+  open func setup(with data: Data) {
     title.text = data
   }
 
-  public static func size(for data: String, containerSize: CGSize) -> CGSize {
+  public static func size(for data: Data, containerSize: CGSize) -> CGSize {
     return CGSize(width: containerSize.width, height: containerSize.width * 0.35)
   }
 }
@@ -118,7 +118,7 @@ class ColoredViewController: UIViewController, ReusedData, Eventable, Collapsing
 
     view.addSubview(containerView)
 
-    let cells: [Cellable] = (1...50).map { "Item \($0)" }.map { CollectionCell<TestCell>(data: $0) }
+    let cells: [Cellable] = (1...50).map { "Item \($0)" }.map { CollectionCell<TestCell>(data: $0, id: $0) }
     containerView.source.sections = [Section(cells: []), Section(cells: cells), Section(cells: []),]
   }
 

@@ -16,7 +16,6 @@
 		AA13A099244DBD27009AB1C7 /* CalendarDayViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA13A098244DBD27009AB1C7 /* CalendarDayViewController.swift */; };
 		AA22E94B1FC4569C0070DD70 /* TestViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA22E94A1FC4569C0070DD70 /* TestViewController.swift */; };
 		AA22E94D1FC4595E0070DD70 /* CollapsingHeaderViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA22E94C1FC4595E0070DD70 /* CollapsingHeaderViewController.swift */; };
-		AA766D2C276CB1F100B9169A /* StickyHeaderController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA766D2B276CB1F100B9169A /* StickyHeaderController.swift */; };
 		AAB5AE3D24227041009888BB /* CalendarViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAB5AE3C24227041009888BB /* CalendarViewController.swift */; };
 		AAC615A11FBF807E00C1F91B /* ViewControllerInner.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAC615A01FBF807E00C1F91B /* ViewControllerInner.swift */; };
 		AAC615A31FC0CAA100C1F91B /* CustomCells.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAC615A21FC0CAA100C1F91B /* CustomCells.swift */; };
@@ -293,7 +292,6 @@
 				AAEDF3FF24371756008528A6 /* CustomPagerHeaderSupplementaryView.swift in Sources */,
 				AA22E94D1FC4595E0070DD70 /* CollapsingHeaderViewController.swift in Sources */,
 				AA22E94B1FC4569C0070DD70 /* TestViewController.swift in Sources */,
-				AA766D2C276CB1F100B9169A /* StickyHeaderController.swift in Sources */,
 				AAB5AE3D24227041009888BB /* CalendarViewController.swift in Sources */,
 				AAC615A11FBF807E00C1F91B /* ViewControllerInner.swift in Sources */,
 				5A3F5100304DA94F5E45F093 /* ViewController.swift in Sources */,

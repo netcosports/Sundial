@@ -80,7 +80,9 @@ class TestViewController: UIViewController, Accessor, CollapsingItem {
     super.viewDidLoad()
 
     if numberOfItems > 1 {
-      let cells: [Cellable] = (1...numberOfItems).map { _ in Cell(data: color) }
+      let cells: [Cellable] = (1...numberOfItems).map { position in
+        Cell(data: color, id: "\(position)")
+      }
       sections = [ Section(cells: cells) ]
     }
     view.addSubview(containerView)

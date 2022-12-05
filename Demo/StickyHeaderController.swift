@@ -14,7 +14,15 @@ import SnapKit
 import RxSwift
 import RxCocoa
 
-public  class HeaderTestCell: CollectionViewCell, Reusable {
+public  class HeaderTestCell: CollectionViewCell, Reusable, Eventable {
+  public var eventSubject = PublishSubject<Event>()
+  
+  public typealias Event = Bool
+  
+  public var data: Data?
+  
+  public typealias Data = String
+  
 
   let title: UILabel = {
     let title = UILabel()
@@ -42,8 +50,10 @@ public  class HeaderTestCell: CollectionViewCell, Reusable {
     }
     setNeedsLayout()
   }
-
-  public static func size(for data: Void, containerSize: CGSize) -> CGSize {
+  public func setup(with data: Data) {
+    
+  }
+  public static func size(for data: Data, containerSize: CGSize) -> CGSize {
     return CGSize(width: containerSize.width, height: 276)
   }
 }
@@ -72,8 +82,8 @@ class StickyHeaderController: UIViewController, CollapsingItem {
 
     containerView.collectionViewLayout = StickyHeaderCollectionViewLayout(settings: settings)
     containerView.backgroundColor = .red
-    var cells: [Cellable] = (1...25).map { "Item \($0)" }.map { CollectionCell<TestCell>(data: $0) }
-    cells.insert(CollectionCell<HeaderTestCell>(data: ()), at: 0)
+    var cells: [Cellable] = (1...25).map { "Item \($0)" }.map { CollectionCell<TestCell>(data: $0, id: $0) }
+    cells.insert(CollectionCell<HeaderTestCell>(data: "", id: "HeaderTestCell"), at: 0)
     containerView.source.sections = [Section(cells: cells)]
     containerView.reloadData()
   }

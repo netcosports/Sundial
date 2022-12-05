@@ -50,7 +50,7 @@ class CollapsingHeaderViewController: UIViewController {
 
   let disposeBag = DisposeBag()
 
-  let controller1 = StickyHeaderController()
+  //let controller1 = StickyHeaderController()
   let controller2 = TestViewController(.blue)
   let controllerLoader = TestViewController(.orange, numberOfItems: 20)
   let controller3 = TestPagerViewControllerInner()
@@ -97,10 +97,10 @@ class CollapsingHeaderViewController: UIViewController {
       $0.edges.equalToSuperview()
     }
 
-    collasingItemsSubject.onNext([controller1, controller2, controllerLoader, controller4, controller5])
+    collasingItemsSubject.onNext([controller2, controllerLoader, controller4, controller5])
     controller3.collasingItemsSubject.bind(to: collasingItemsSubject).disposed(by: disposeBag)
 
-    controller1.view.backgroundColor = .clear
+    //controller1.view.backgroundColor = .clear
     controller2.view.backgroundColor = .clear
     controllerLoader.view.backgroundColor = .clear
     controller3.view.backgroundColor = .clear
