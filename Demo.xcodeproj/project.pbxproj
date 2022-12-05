@@ -9,9 +9,9 @@
 /* Begin PBXBuildFile section */
 		5A3F5100304DA94F5E45F093 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 607FACD71AFB9204008FA782 /* ViewController.swift */; };
 		607FACD61AFB9204008FA782 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 607FACD51AFB9204008FA782 /* AppDelegate.swift */; };
-		607FACDB1AFB9204008FA782 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 607FACD91AFB9204008FA782 /* Main.storyboard */; };
 		607FACDD1AFB9204008FA782 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 607FACDC1AFB9204008FA782 /* Images.xcassets */; };
-		607FACE01AFB9204008FA782 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 607FACDE1AFB9204008FA782 /* LaunchScreen.xib */; };
+		92BDAAC5293E2221001391AE /* AutoAlignedController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92BDAAC4293E2221001391AE /* AutoAlignedController.swift */; };
+		92BDAAC7293E2C02001391AE /* Launch.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 92BDAAC6293E2C02001391AE /* Launch.storyboard */; };
 		931DF1A916361586DCBEBDF8 /* Pods_Demo.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F946F9EAF20150C5D126D0EE /* Pods_Demo.framework */; };
 		AA13A099244DBD27009AB1C7 /* CalendarDayViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA13A098244DBD27009AB1C7 /* CalendarDayViewController.swift */; };
 		AA22E94B1FC4569C0070DD70 /* TestViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA22E94A1FC4569C0070DD70 /* TestViewController.swift */; };
@@ -29,10 +29,10 @@
 		607FACD41AFB9204008FA782 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		607FACD51AFB9204008FA782 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		607FACD71AFB9204008FA782 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
-		607FACDA1AFB9204008FA782 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		607FACDC1AFB9204008FA782 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
-		607FACDF1AFB9204008FA782 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/LaunchScreen.xib; sourceTree = "<group>"; };
 		6B83C4E7D65D0EC91CEBDDBD /* Pods-Demo.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Demo.debug.xcconfig"; path = "Pods/Target Support Files/Pods-Demo/Pods-Demo.debug.xcconfig"; sourceTree = "<group>"; };
+		92BDAAC4293E2221001391AE /* AutoAlignedController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AutoAlignedController.swift; sourceTree = "<group>"; };
+		92BDAAC6293E2C02001391AE /* Launch.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = Launch.storyboard; sourceTree = "<group>"; };
 		A34D8A759193196EEE6E28EF /* Pods-Demo.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Demo.release.xcconfig"; path = "Pods/Target Support Files/Pods-Demo/Pods-Demo.release.xcconfig"; sourceTree = "<group>"; };
 		A3C1E8423C944E7A0607154F /* README.md */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		AA13A098244DBD27009AB1C7 /* CalendarDayViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarDayViewController.swift; sourceTree = "<group>"; };
@@ -77,6 +77,7 @@
 		607FACC71AFB9204008FA782 = {
 			isa = PBXGroup;
 			children = (
+				92BDAAC6293E2C02001391AE /* Launch.storyboard */,
 				B555DCE81FC6DAEC00296E4B /* .fastlane */,
 				607FACF51AFB993E008FA782 /* Podspec Metadata */,
 				607FACD21AFB9204008FA782 /* Demo */,
@@ -108,14 +109,13 @@
 				AAE7481A1FC21A1600F66501 /* CustomViewsViewController.swift */,
 				607FACD71AFB9204008FA782 /* ViewController.swift */,
 				AAC615A01FBF807E00C1F91B /* ViewControllerInner.swift */,
-				607FACD91AFB9204008FA782 /* Main.storyboard */,
 				607FACDC1AFB9204008FA782 /* Images.xcassets */,
-				607FACDE1AFB9204008FA782 /* LaunchScreen.xib */,
 				607FACD31AFB9204008FA782 /* Supporting Files */,
 				AAB5AE3C24227041009888BB /* CalendarViewController.swift */,
 				AAEDF3FE24371756008528A6 /* CustomPagerHeaderSupplementaryView.swift */,
 				AA13A098244DBD27009AB1C7 /* CalendarDayViewController.swift */,
 				AA766D2B276CB1F100B9169A /* StickyHeaderController.swift */,
+				92BDAAC4293E2221001391AE /* AutoAlignedController.swift */,
 			);
 			path = Demo;
 			sourceTree = "<group>";
@@ -237,9 +237,8 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				607FACDB1AFB9204008FA782 /* Main.storyboard in Resources */,
-				607FACE01AFB9204008FA782 /* LaunchScreen.xib in Resources */,
 				607FACDD1AFB9204008FA782 /* Images.xcassets in Resources */,
+				92BDAAC7293E2C02001391AE /* Launch.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -291,6 +290,7 @@
 				AAC615A31FC0CAA100C1F91B /* CustomCells.swift in Sources */,
 				AAEDF3FF24371756008528A6 /* CustomPagerHeaderSupplementaryView.swift in Sources */,
 				AA22E94D1FC4595E0070DD70 /* CollapsingHeaderViewController.swift in Sources */,
+				92BDAAC5293E2221001391AE /* AutoAlignedController.swift in Sources */,
 				AA22E94B1FC4569C0070DD70 /* TestViewController.swift in Sources */,
 				AAB5AE3D24227041009888BB /* CalendarViewController.swift in Sources */,
 				AAC615A11FBF807E00C1F91B /* ViewControllerInner.swift in Sources */,
@@ -300,25 +300,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
-
-/* Begin PBXVariantGroup section */
-		607FACD91AFB9204008FA782 /* Main.storyboard */ = {
-			isa = PBXVariantGroup;
-			children = (
-				607FACDA1AFB9204008FA782 /* Base */,
-			);
-			name = Main.storyboard;
-			sourceTree = "<group>";
-		};
-		607FACDE1AFB9204008FA782 /* LaunchScreen.xib */ = {
-			isa = PBXVariantGroup;
-			children = (
-				607FACDF1AFB9204008FA782 /* Base */,
-			);
-			name = LaunchScreen.xib;
-			sourceTree = "<group>";
-		};
-/* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
 		607FACED1AFB9204008FA782 /* Debug */ = {

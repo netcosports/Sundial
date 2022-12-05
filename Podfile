@@ -10,4 +10,6 @@ target 'Demo' do
   pod 'SnapKit'
 
   pod 'Astrolabe', :git => 'git@github.com:netcosports/Astrolabe.git', :branch => 'kmm'
+  
+  pod 'PinLayout'
 end

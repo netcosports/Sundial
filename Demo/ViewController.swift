@@ -16,8 +16,8 @@ class ViewController: UIViewController {
 
   let collapsing = CollapsingHeaderViewController()
   let inners = [
-    CalendarDayViewController(),
-    CalendarViewController(),
+    //CalendarDayViewController(),
+    //CalendarViewController(),
     ViewControllerInner(.equal(size: 120), count: 5, margin: 10),
     ViewControllerInner(.content(.right), count: 3, margin: 10),
     ViewControllerInner(.content(.center), count: 3, margin: 10),
