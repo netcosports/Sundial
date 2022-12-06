@@ -39,31 +39,46 @@ open class AutoAlignedCollectionViewLayoutAttributes: UICollectionViewLayoutAttr
 
 open class AutoAlignedCollectionViewLayout: EmptyViewCollectionViewLayout {
 
-  public struct Settings {
-
-    public enum Alignment {
-      case start
-      case center
-      case end
+    public struct Settings {
+        
+        public enum Alignment {
+            case start
+            case center
+            case end
+        }
+        
+        public enum ScrollTarget {
+            case closest
+            case factor(Double)
+        }
+        
+        @frozen
+        public enum LayoutDirection {
+            case ltr
+            case rtl
+            case auto
+        }
+        
+        public let alignment: Alignment
+        public let inset: CGFloat
+        public let fillWithSideInsets: Bool
+        public let target: ScrollTarget
+        public let layoutDirection: LayoutDirection
+        
+        public init(
+            alignment: Alignment,
+            inset: CGFloat = 0.0,
+            fillWithSideInsets: Bool = true,
+            target: ScrollTarget = .closest,
+            layoutDirection: LayoutDirection = .auto
+        ) {
+            self.alignment = alignment
+            self.inset = inset
+            self.fillWithSideInsets = fillWithSideInsets
+            self.target = target
+            self.layoutDirection = layoutDirection
+        }
     }
-
-    public enum ScrollTarget {
-      case closest
-      case factor(Double)
-    }
-
-    public let alignment: Alignment
-    public let inset: CGFloat
-    public let fillWithSideInsets: Bool
-    public let target: ScrollTarget
-
-    public init(alignment: Alignment, inset: CGFloat = 0.0, fillWithSideInsets: Bool = true, target: ScrollTarget = .closest) {
-      self.alignment = alignment
-      self.inset = inset
-      self.fillWithSideInsets = fillWithSideInsets
-      self.target = target
-    }
-  }
 
   open var settings: Settings {
     didSet {

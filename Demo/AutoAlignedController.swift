@@ -14,15 +14,21 @@ import Sundial
 
 class AutoAlignedController: UIViewController {
   
-  public let containerView = CollectionView<CollectionViewSource>()
+  public let leftContainerView = CollectionView<CollectionViewSource>()
+  public let rightContainerView = CollectionView<CollectionViewSource>()
+  public let autoContainerView = CollectionView<CollectionViewSource>()
   
   typealias ItemCell = CollectionCell<AutoAlignedCell>
   
   override func viewDidLoad() {
     super.viewDidLoad()
-    self.view.addSubview(containerView)
+    self.view.addSubview(leftContainerView)
+    self.view.addSubview(autoContainerView)
+    self.view.addSubview(rightContainerView)
     self.view.backgroundColor = .magenta
-    containerView.backgroundColor = .systemBlue
+    leftContainerView.backgroundColor = .systemBlue
+    autoContainerView.backgroundColor = .cyan
+    rightContainerView.backgroundColor = .purple
     
     setupCollection()
     
@@ -30,27 +36,61 @@ class AutoAlignedController: UIViewController {
       ItemCell.init(data: "Cell \(index)", id: "\(index)")
     }
     
-    containerView.source.sections = [Section(cells: cells)]
-    containerView.reloadData()
+    leftContainerView.source.sections = [Section(cells: cells)]
+    leftContainerView.reloadData()
+    
+    autoContainerView.source.sections = [Section(cells: cells)]
+    autoContainerView.reloadData()
+    
+    rightContainerView.source.sections = [Section(cells: cells)]
+    rightContainerView.reloadData()
   }
   
   override func viewDidLayoutSubviews() {
     super.viewDidLayoutSubviews()
-    containerView.pin.top(100).horizontally().height(400)
+    leftContainerView.pin.top(100).horizontally().height(200)
+    autoContainerView.pin.below(of: leftContainerView).marginTop(20).horizontally().height(200)
+    rightContainerView.pin.below(of: autoContainerView).marginTop(20).horizontally().height(200)
   }
   
   private func setupCollection() {
     let layout = AutoAlignedCollectionViewLayout(
       settings: .init(
-        alignment: .start
+        alignment: .start,
+        layoutDirection: .ltr
       )
     )
     layout.scrollDirection = .horizontal
     layout.minimumLineSpacing = 0
     layout.minimumInteritemSpacing = 0
-    containerView.collectionViewLayout = layout
-    containerView.decelerationRate = .fast
-    containerView.showsHorizontalScrollIndicator = false
+    leftContainerView.collectionViewLayout = layout
+    leftContainerView.decelerationRate = .fast
+    leftContainerView.showsHorizontalScrollIndicator = false
+    
+    let layoutAuto = AutoAlignedCollectionViewLayout(
+      settings: .init(
+        alignment: .start
+      )
+    )
+    layoutAuto.scrollDirection = .horizontal
+    layoutAuto.minimumLineSpacing = 0
+    layoutAuto.minimumInteritemSpacing = 0
+    autoContainerView.collectionViewLayout = layoutAuto
+    autoContainerView.decelerationRate = .fast
+    autoContainerView.showsHorizontalScrollIndicator = false
+    
+    let rtlLayout = AutoAlignedCollectionViewLayout(
+      settings: .init(
+        alignment: .start,
+        layoutDirection: .rtl
+      )
+    )
+    rtlLayout.scrollDirection = .horizontal
+    rtlLayout.minimumLineSpacing = 0
+    rtlLayout.minimumInteritemSpacing = 0
+    rightContainerView.collectionViewLayout = rtlLayout
+    rightContainerView.decelerationRate = .fast
+    rightContainerView.showsHorizontalScrollIndicator = false
   }
 }
 
