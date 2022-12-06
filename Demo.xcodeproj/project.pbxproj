@@ -12,6 +12,8 @@
 		607FACDD1AFB9204008FA782 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 607FACDC1AFB9204008FA782 /* Images.xcassets */; };
 		92BDAAC5293E2221001391AE /* AutoAlignedController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92BDAAC4293E2221001391AE /* AutoAlignedController.swift */; };
 		92BDAAC7293E2C02001391AE /* Launch.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 92BDAAC6293E2C02001391AE /* Launch.storyboard */; };
+		92BDAACA293F454C001391AE /* en.lproj in Resources */ = {isa = PBXBuildFile; fileRef = 92BDAAC8293F454C001391AE /* en.lproj */; };
+		92BDAACB293F454C001391AE /* ar.lproj in Resources */ = {isa = PBXBuildFile; fileRef = 92BDAAC9293F454C001391AE /* ar.lproj */; };
 		931DF1A916361586DCBEBDF8 /* Pods_Demo.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F946F9EAF20150C5D126D0EE /* Pods_Demo.framework */; };
 		AA13A099244DBD27009AB1C7 /* CalendarDayViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA13A098244DBD27009AB1C7 /* CalendarDayViewController.swift */; };
 		AA22E94B1FC4569C0070DD70 /* TestViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA22E94A1FC4569C0070DD70 /* TestViewController.swift */; };
@@ -33,6 +35,8 @@
 		6B83C4E7D65D0EC91CEBDDBD /* Pods-Demo.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Demo.debug.xcconfig"; path = "Pods/Target Support Files/Pods-Demo/Pods-Demo.debug.xcconfig"; sourceTree = "<group>"; };
 		92BDAAC4293E2221001391AE /* AutoAlignedController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AutoAlignedController.swift; sourceTree = "<group>"; };
 		92BDAAC6293E2C02001391AE /* Launch.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = Launch.storyboard; sourceTree = "<group>"; };
+		92BDAAC8293F454C001391AE /* en.lproj */ = {isa = PBXFileReference; lastKnownFileType = folder; path = en.lproj; sourceTree = "<group>"; };
+		92BDAAC9293F454C001391AE /* ar.lproj */ = {isa = PBXFileReference; lastKnownFileType = folder; path = ar.lproj; sourceTree = "<group>"; };
 		A34D8A759193196EEE6E28EF /* Pods-Demo.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Demo.release.xcconfig"; path = "Pods/Target Support Files/Pods-Demo/Pods-Demo.release.xcconfig"; sourceTree = "<group>"; };
 		A3C1E8423C944E7A0607154F /* README.md */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		AA13A098244DBD27009AB1C7 /* CalendarDayViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarDayViewController.swift; sourceTree = "<group>"; };
@@ -100,6 +104,8 @@
 		607FACD21AFB9204008FA782 /* Demo */ = {
 			isa = PBXGroup;
 			children = (
+				92BDAAC9293F454C001391AE /* ar.lproj */,
+				92BDAAC8293F454C001391AE /* en.lproj */,
 				AADC3E482310262000234BB4 /* PagerHeader.playground */,
 				AAD9615D2304263B00CBCC7C /* AlignedLayout.playground */,
 				AA5CEC9C226F372900C130CE /* StickyHeaderLayout.playground */,
@@ -221,6 +227,7 @@
 				English,
 				en,
 				Base,
+				ar,
 			);
 			mainGroup = 607FACC71AFB9204008FA782;
 			productRefGroup = 607FACD11AFB9204008FA782 /* Products */;
@@ -237,7 +244,9 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				92BDAACB293F454C001391AE /* ar.lproj in Resources */,
 				607FACDD1AFB9204008FA782 /* Images.xcassets in Resources */,
+				92BDAACA293F454C001391AE /* en.lproj in Resources */,
 				92BDAAC7293E2C02001391AE /* Launch.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

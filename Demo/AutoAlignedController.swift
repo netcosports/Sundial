@@ -12,6 +12,7 @@ import PinLayout
 import RxSwift
 import Sundial
 
+
 class AutoAlignedController: UIViewController {
   
   public let leftContainerView = CollectionView<CollectionViewSource>()
@@ -30,18 +31,23 @@ class AutoAlignedController: UIViewController {
     autoContainerView.backgroundColor = .cyan
     rightContainerView.backgroundColor = .purple
     
+    
+    
     setupCollection()
     
     let cells: [Cellable] = (0...10).map { index in
       ItemCell.init(data: "Cell \(index)", id: "\(index)")
     }
     
+//    let cellId = "2"
+//    leftContainerView.autoScrollSubject.onNext(.init(target: .cellId(cellId), position: .center, animated: false))
+    
     leftContainerView.source.sections = [Section(cells: cells)]
     leftContainerView.reloadData()
     
     autoContainerView.source.sections = [Section(cells: cells)]
     autoContainerView.reloadData()
-    
+
     rightContainerView.source.sections = [Section(cells: cells)]
     rightContainerView.reloadData()
   }
@@ -69,7 +75,7 @@ class AutoAlignedController: UIViewController {
     
     let layoutAuto = AutoAlignedCollectionViewLayout(
       settings: .init(
-        alignment: .start
+        alignment: UIView.userInterfaceLayoutDirection(for: autoContainerView.semanticContentAttribute) == .rightToLeft ? .end : .start
       )
     )
     layoutAuto.scrollDirection = .horizontal
@@ -78,7 +84,7 @@ class AutoAlignedController: UIViewController {
     autoContainerView.collectionViewLayout = layoutAuto
     autoContainerView.decelerationRate = .fast
     autoContainerView.showsHorizontalScrollIndicator = false
-    
+
     let rtlLayout = AutoAlignedCollectionViewLayout(
       settings: .init(
         alignment: .start,

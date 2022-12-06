@@ -95,14 +95,21 @@ open class AutoAlignedCollectionViewLayout: EmptyViewCollectionViewLayout {
     fatalError("init(coder:) has not been implemented")
   }
 
-  open override func prepare() {
-    switch scrollDirection {
-    case .horizontal:
-      collectionView?.contentInset = UIEdgeInsets(top: sectionInset.top, left: startInset,
-                                                  bottom: sectionInset.bottom, right: endInset)
-    case .vertical:
-      collectionView?.contentInset = UIEdgeInsets(top: startInset, left: sectionInset.left,
-                                                  bottom: endInset, right: sectionInset.right)
+    open override func prepare() {
+        switch scrollDirection {
+        case .horizontal:
+            collectionView?.contentInset = UIEdgeInsets(
+                top: sectionInset.top,
+                left: startInset,
+                bottom: sectionInset.bottom, right: endInset
+            )
+        case .vertical:
+            collectionView?.contentInset = UIEdgeInsets(
+                top: startInset,
+                left: sectionInset.left,
+                bottom: endInset,
+                right: sectionInset.right
+            )
     @unknown default: break
     }
     super.prepare()
@@ -113,15 +120,16 @@ open class AutoAlignedCollectionViewLayout: EmptyViewCollectionViewLayout {
   }
 
   open override func layoutAttributesForElements(in rect: CGRect) -> [UICollectionViewLayoutAttributes]? {
-    guard  let collectionView = self.collectionView,
-      let attributes = super.layoutAttributesForElements(in: rect) else {
-      return nil
-    }
+      guard  let collectionView = self.collectionView,
+             let attributes = super.layoutAttributesForElements(in: rect) else {
+          return nil
+      }
+
     let horizontal = self.scrollDirection == .horizontal
     let offset = horizontal ? collectionView.contentOffset.x : collectionView.contentOffset.y
     let side = horizontal ? collectionView.frame.width : collectionView.frame.height
     let targetOffset: CGFloat
-    switch settings.alignment {
+    switch getRealAlignment() {
     case .start:
       targetOffset = offset + settings.inset
     case .center:
@@ -135,7 +143,7 @@ open class AutoAlignedCollectionViewLayout: EmptyViewCollectionViewLayout {
       var size = horizontal ? attributes.frame.width : attributes.frame.height
       size += horizontal ? minimumInteritemSpacing : minimumLineSpacing
       guard size > 0.0 else { return }
-      switch settings.alignment {
+      switch getRealAlignment() {
       case .start:
         currentItemOffset = horizontal ? attributes.frame.minX : attributes.frame.minY
       case .center:
@@ -148,6 +156,68 @@ open class AutoAlignedCollectionViewLayout: EmptyViewCollectionViewLayout {
     }
     return attributes
   }
+    
+    open override var flipsHorizontallyInOppositeLayoutDirection: Bool {
+//        switch settings.layoutDirection {
+//        case .ltr:
+//            return false
+//        case .rtl:
+//            return true
+//        case .auto:
+//            return isSystemRtl()
+//        }
+        
+        return true
+    }
+    
+    private func isLayoutInRtl() -> Bool {
+        switch settings.layoutDirection {
+        case .ltr:
+            return false
+        case .rtl:
+            return true
+        case .auto:
+            return isSystemRtl()
+        }
+    }
+    
+    private func isSystemRtl() -> Bool {
+        guard let collectionView = self.collectionView else {
+            return false
+        }
+        return UIView.userInterfaceLayoutDirection(for: collectionView.semanticContentAttribute) == .rightToLeft
+    }
+    
+    private func getRealAlignment() -> Settings.Alignment {
+//        if scrollDirection != .horizontal {
+//            return settings.alignment
+//        }
+//        switch settings.alignment {
+//        case .start:
+//            return isLayoutInRtl() ? .end : .start
+//        case .center:
+//            return .center
+//        case .end:
+//            return isLayoutInRtl() ? .start : .end
+//        }
+        
+        return settings.alignment
+    }
+    
+    open override var developmentLayoutDirection: UIUserInterfaceLayoutDirection {
+        print("tttt for dir: \(settings.layoutDirection) rtl: \(isLayoutInRtl()), system: \(isSystemRtl()), real aligment: \(getRealAlignment())")
+//            return isLayoutInRtl() ? .rightToLeft : .leftToRight
+        switch settings.layoutDirection {
+        case .ltr:
+            return isSystemRtl() ? .rightToLeft : .leftToRight
+        case .rtl:
+            return isSystemRtl() ? .leftToRight : .rightToLeft
+        case .auto:
+            return isLayoutInRtl() ? .leftToRight : .rightToLeft
+        }
+//        return .leftToRight
+    }
+    
   
   open override func targetContentOffset(forProposedContentOffset proposedContentOffset: CGPoint,
                                          withScrollingVelocity velocity: CGPoint) -> CGPoint {
@@ -239,7 +309,7 @@ private extension AutoAlignedCollectionViewLayout {
     let area = scrollDirection == .horizontal ? collectionView.frame.width : collectionView.frame.height
 
     var adjustedOffset: CGFloat
-    switch settings.alignment {
+    switch getRealAlignment() {
     case .start:
       adjustedOffset = offset
     case .end:
@@ -304,7 +374,7 @@ private extension AutoAlignedCollectionViewLayout {
     var offset: CGFloat
     let horizontal = scrollDirection == .horizontal
     let area = horizontal ? collectionView.frame.width : collectionView.frame.height
-    switch settings.alignment {
+    switch getRealAlignment() {
     case .start:
       offset = horizontal ? attributes.frame.minX : attributes.frame.minY
     case .end:
@@ -328,7 +398,7 @@ private extension AutoAlignedCollectionViewLayout {
     }
     let horizontal = scrollDirection == .horizontal
     let anchor: CGFloat
-    switch settings.alignment {
+    switch getRealAlignment() {
     case .start:
       anchor = horizontal ? layoutAttributes.frame.minX : layoutAttributes.frame.minY
     case .end:
@@ -348,7 +418,7 @@ private extension AutoAlignedCollectionViewLayout {
     }
     let area = scrollDirection == .horizontal ? collectionView.frame.width : collectionView.frame.height
     let size = scrollDirection == .horizontal ? firstItemSize.width : firstItemSize.height
-    switch settings.alignment {
+    switch getRealAlignment() {
     case .start:
       return settings.inset
     case .end:
@@ -368,7 +438,7 @@ private extension AutoAlignedCollectionViewLayout {
     }
     let area = scrollDirection == .horizontal ? collectionView.frame.width : collectionView.frame.height
     let size = scrollDirection == .horizontal ? lastItemSize.width : lastItemSize.height
-    switch settings.alignment {
+    switch getRealAlignment() {
     case .start:
       return (area - size) - settings.inset
     case .end:
