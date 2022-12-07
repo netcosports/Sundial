@@ -35,7 +35,7 @@ class AutoAlignedController: UIViewController {
     
     setupCollection()
     
-    let cells: [Cellable] = (0...10).map { index in
+    let cells: [Cellable] = (0...6).map { index in
       ItemCell.init(data: "Cell \(index)", id: "\(index)")
     }
     
@@ -63,6 +63,7 @@ class AutoAlignedController: UIViewController {
     let layout = AutoAlignedCollectionViewLayout(
       settings: .init(
         alignment: .start,
+        fillWithSideInsets: false,
         layoutDirection: .ltr
       )
     )
@@ -75,7 +76,7 @@ class AutoAlignedController: UIViewController {
     
     let layoutAuto = AutoAlignedCollectionViewLayout(
       settings: .init(
-        alignment: UIView.userInterfaceLayoutDirection(for: autoContainerView.semanticContentAttribute) == .rightToLeft ? .end : .start
+        alignment: .start
       )
     )
     layoutAuto.scrollDirection = .horizontal

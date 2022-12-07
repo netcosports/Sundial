@@ -158,16 +158,14 @@ open class AutoAlignedCollectionViewLayout: EmptyViewCollectionViewLayout {
   }
     
     open override var flipsHorizontallyInOppositeLayoutDirection: Bool {
-//        switch settings.layoutDirection {
-//        case .ltr:
-//            return false
-//        case .rtl:
-//            return true
-//        case .auto:
-//            return isSystemRtl()
-//        }
-        
-        return true
+        switch settings.layoutDirection {
+        case .ltr:
+            return isSystemRtl()
+        case .rtl:
+            return true
+        case .auto:
+            return isSystemRtl()
+        }
     }
     
     private func isLayoutInRtl() -> Bool {
@@ -183,7 +181,7 @@ open class AutoAlignedCollectionViewLayout: EmptyViewCollectionViewLayout {
     
     private func isSystemRtl() -> Bool {
         guard let collectionView = self.collectionView else {
-            return false
+            return UIApplication.shared.userInterfaceLayoutDirection == .rightToLeft
         }
         return UIView.userInterfaceLayoutDirection(for: collectionView.semanticContentAttribute) == .rightToLeft
     }
@@ -205,8 +203,6 @@ open class AutoAlignedCollectionViewLayout: EmptyViewCollectionViewLayout {
     }
     
     open override var developmentLayoutDirection: UIUserInterfaceLayoutDirection {
-        print("tttt for dir: \(settings.layoutDirection) rtl: \(isLayoutInRtl()), system: \(isSystemRtl()), real aligment: \(getRealAlignment())")
-//            return isLayoutInRtl() ? .rightToLeft : .leftToRight
         switch settings.layoutDirection {
         case .ltr:
             return isSystemRtl() ? .rightToLeft : .leftToRight
@@ -215,7 +211,6 @@ open class AutoAlignedCollectionViewLayout: EmptyViewCollectionViewLayout {
         case .auto:
             return isLayoutInRtl() ? .leftToRight : .rightToLeft
         }
-//        return .leftToRight
     }
     
   
