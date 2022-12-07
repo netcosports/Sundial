@@ -1,11 +1,22 @@
 PODS:
+  - Alidade (6.0)
   - Astrolabe (6.0.0):
     - RxCocoa (~> 6)
     - RxSwift (~> 6)
+  - Nocturnal (6.0.2):
+    - Alidade (~> 6)
+    - Astrolabe (~> 6)
+    - RxCocoa (~> 6)
+    - RxGesture
+    - RxSwift (~> 6)
+    - Sundial (~> 6)
   - PinLayout (1.10.3)
   - RxCocoa (6.2.0):
     - RxRelay (= 6.2.0)
     - RxSwift (= 6.2.0)
+  - RxGesture (4.0.4):
+    - RxCocoa (~> 6.0)
+    - RxSwift (~> 6.0)
   - RxRelay (6.2.0):
     - RxSwift (= 6.2.0)
   - RxSwift (6.2.0)
@@ -14,7 +25,9 @@ PODS:
     - Astrolabe (~> 6)
 
 DEPENDENCIES:
+  - "Alidade (from `git@github.com:netcosports/Alidade.git`, branch `kmm`)"
   - "Astrolabe (from `git@github.com:netcosports/Astrolabe.git`, branch `kmm`)"
+  - "Nocturnal (from `git@github.com:netcosports/Nocturnal.git`, branch `kmm`)"
   - PinLayout
   - SnapKit
   - Sundial (from `.`)
@@ -23,31 +36,47 @@ SPEC REPOS:
   trunk:
     - PinLayout
     - RxCocoa
+    - RxGesture
     - RxRelay
     - RxSwift
     - SnapKit
 
 EXTERNAL SOURCES:
+  Alidade:
+    :branch: kmm
+    :git: "git@github.com:netcosports/Alidade.git"
   Astrolabe:
     :branch: kmm
     :git: "git@github.com:netcosports/Astrolabe.git"
+  Nocturnal:
+    :branch: kmm
+    :git: "git@github.com:netcosports/Nocturnal.git"
   Sundial:
     :path: "."
 
 CHECKOUT OPTIONS:
+  Alidade:
+    :commit: a5f69cbb8894d18853efc8ab556150411b461128
+    :git: "git@github.com:netcosports/Alidade.git"
   Astrolabe:
     :commit: d43e1e9b071d7cd602370b6a7957e4651108d391
     :git: "git@github.com:netcosports/Astrolabe.git"
+  Nocturnal:
+    :commit: de5198ea3fd14a0cfcee58dea2a84006ef0f9b9d
+    :git: "git@github.com:netcosports/Nocturnal.git"
 
 SPEC CHECKSUMS:
+  Alidade: dd266774e98322fb53c115c459fc3482ef9be086
   Astrolabe: 29b16a5fa299a352001433bdf92fb1bbb9207b19
+  Nocturnal: 72a2ceb9732e6214648bab7c0a4cd7539f063102
   PinLayout: 0090ccbf29ae69af6ae5a15eaeaf27ed7b2c4d83
   RxCocoa: 4baf94bb35f2c0ab31bc0cb9f1900155f646ba42
+  RxGesture: f3efb47ed2d26a8082f7b660d4a59970e275a7f8
   RxRelay: e72dbfd157807478401ef1982e1c61c945c94b2f
   RxSwift: d356ab7bee873611322f134c5f9ef379fa183d8f
   SnapKit: 97b92857e3df3a0c71833cce143274bf6ef8e5eb
   Sundial: c3a667884126ea678c69d4ab401689739bbafba2
 
-PODFILE CHECKSUM: 347cdea0545a96eb595b089546ecaa4a6c55e70e
+PODFILE CHECKSUM: 34cf4da8816dd983a069b502e94a3e4372938ef3
 
 COCOAPODS: 1.11.3

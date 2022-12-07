@@ -11,6 +11,7 @@ import Astrolabe
 import PinLayout
 import RxSwift
 import Sundial
+import Nocturnal
 
 
 class AutoAlignedController: UIViewController {
@@ -39,8 +40,16 @@ class AutoAlignedController: UIViewController {
       ItemCell.init(data: "Cell \(index)", id: "\(index)")
     }
     
-//    let cellId = "2"
-//    leftContainerView.autoScrollSubject.onNext(.init(target: .cellId(cellId), position: .center, animated: false))
+    leftContainerView.subscribeToAutoscrollEvents()
+    autoContainerView.subscribeToAutoscrollEvents()
+    rightContainerView.subscribeToAutoscrollEvents()
+    
+    let cellId = "2"
+    leftContainerView.autoScrollSubject.onNext(.init(target: .cellId(cellId), position: .center, animated: false))
+    autoContainerView.autoScrollSubject.onNext(.init(target: .cellId(cellId), position: .center, animated: false))
+    rightContainerView.autoScrollSubject.onNext(.init(target: .cellId(cellId), position: .center, animated: false))
+    
+    
     
     leftContainerView.source.sections = [Section(cells: cells)]
     leftContainerView.reloadData()
@@ -54,7 +63,7 @@ class AutoAlignedController: UIViewController {
   
   override func viewDidLayoutSubviews() {
     super.viewDidLayoutSubviews()
-    leftContainerView.pin.top(100).horizontally().height(200)
+    leftContainerView.pin.top(self.view.pin.safeArea.top).horizontally().height(200)
     autoContainerView.pin.below(of: leftContainerView).marginTop(20).horizontally().height(200)
     rightContainerView.pin.below(of: autoContainerView).marginTop(20).horizontally().height(200)
   }
@@ -76,7 +85,7 @@ class AutoAlignedController: UIViewController {
     
     let layoutAuto = AutoAlignedCollectionViewLayout(
       settings: .init(
-        alignment: .start
+        alignment: .center
       )
     )
     layoutAuto.scrollDirection = .horizontal
@@ -88,7 +97,7 @@ class AutoAlignedController: UIViewController {
 
     let rtlLayout = AutoAlignedCollectionViewLayout(
       settings: .init(
-        alignment: .start,
+        alignment: .end,
         layoutDirection: .rtl
       )
     )
