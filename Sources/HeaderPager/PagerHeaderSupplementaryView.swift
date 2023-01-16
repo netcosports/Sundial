@@ -92,7 +92,7 @@ where T: Reusable & Eventable,
 
       let adjustedTitlesSet: [TitleCell.Data]
       if UIView.userInterfaceLayoutDirection(for: pagerHeaderContainerView.semanticContentAttribute) == .rightToLeft {
-        adjustedTitlesSet = newTitles.reversed()
+        adjustedTitlesSet = newTitles
       } else {
         adjustedTitlesSet = newTitles
       }

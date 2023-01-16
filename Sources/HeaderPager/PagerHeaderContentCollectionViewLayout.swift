@@ -37,6 +37,48 @@ open class PagerHeaderContentCollectionViewLayout<TitleViewModel: ViewModelable,
   }
 
   required public init?(coder aDecoder: NSCoder) { fatalError() }
+    
+    open override var flipsHorizontallyInOppositeLayoutDirection: Bool {
+  //    switch settings.layoutDirection {
+  //      case .ltr:
+  //          return isSystemRtl()
+  //      case .rtl:
+  //          return true
+  //      case .auto:
+  //          print("tttt is system: \(isSystemRtl())")
+  //          return isSystemRtl()
+  //      }
+      return isSystemRtl()
+    }
+      
+    private func isLayoutInRtl() -> Bool {
+  //    switch settings.layoutDirection {
+  //    case .ltr:
+  //      return false
+  //    case .rtl:
+  //      return true
+  //    case .auto:
+  //      return isSystemRtl()
+  //    }
+        return isSystemRtl()
+    }
+      
+    private func isSystemRtl() -> Bool {
+      return UIApplication.shared.userInterfaceLayoutDirection == .rightToLeft
+    }
+      
+    open override var developmentLayoutDirection: UIUserInterfaceLayoutDirection {
+  //    switch settings.layoutDirection {
+  //    case .ltr:
+  //        return isSystemRtl() ? .rightToLeft : .leftToRight
+  //    case .rtl:
+  //        return isSystemRtl() ? .leftToRight : .rightToLeft
+  //    case .auto:
+  //        return isLayoutInRtl() ? .leftToRight : .rightToLeft
+  //    }
+      return isLayoutInRtl() ? .leftToRight : .rightToLeft
+    }
+
 
   override open func prepare() {
     super.prepare()

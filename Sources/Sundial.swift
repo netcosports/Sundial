@@ -137,55 +137,61 @@ public extension Reactive where Base: PreparedLayout {
 // MARK: - Settings
 
 public struct Settings: Equatable {
-  public var stripHeight: CGFloat
-  public var markerHeight: CGFloat
-  public var itemMargin: CGFloat
-  public var stripInsets: UIEdgeInsets
-  public var backgroundColor: UIColor
-  public var anchor: Anchor
-  public var inset: UIEdgeInsets
-  public var alignment: PagerHeaderSupplementaryAlignment
-  public var pagesOnScreen: Int {
-    willSet {
-      assert(newValue > 0, "number of pages on screen should be greater than 0")
+    public var stripHeight: CGFloat
+    public var markerHeight: CGFloat
+    public var itemMargin: CGFloat
+    public var stripInsets: UIEdgeInsets
+    public var backgroundColor: UIColor
+    public var anchor: Anchor
+    public var inset: UIEdgeInsets
+    public var alignment: PagerHeaderSupplementaryAlignment
+    public var pagesOnScreen: Int {
+        willSet {
+            assert(newValue > 0, "number of pages on screen should be greater than 0")
+        }
     }
-  }
-  public var jumpingPolicy: JumpingPolicy {
-    willSet {
-      assert(newValue == .disabled || pagesOnScreen == 1, "jumping policy doesn't support 2+ pages currently")
+    public var jumpingPolicy: JumpingPolicy {
+        willSet {
+            assert(newValue == .disabled || pagesOnScreen == 1, "jumping policy doesn't support 2+ pages currently")
+        }
     }
-  }
-  public var shouldKeepFocusOnBoundsChange: Bool
-  public var numberOfTitlesWhenHidden: Int
-  public var pagerIndependentScrolling: Bool
+    public var shouldKeepFocusOnBoundsChange: Bool
+    public var numberOfTitlesWhenHidden: Int
+    public var pagerIndependentScrolling: Bool
+    let layoutDirection: SundialLayoutDirection
 
-  public init(stripHeight: CGFloat = 80.0,
-              markerHeight: CGFloat = 5.5,
-              itemMargin: CGFloat = 12.0,
-              stripInsets: UIEdgeInsets = .zero,
-              backgroundColor: UIColor = .clear,
-              anchor: Anchor = .centered,
-              inset: UIEdgeInsets = .zero,
-              alignment: PagerHeaderSupplementaryAlignment = .top,
-              pagesOnScreen: Int = 1,
-              jumpingPolicy: JumpingPolicy = .disabled,
-              shouldKeepFocusOnBoundsChange: Bool = false,
-              numberOfTitlesWhenHidden: Int = 0,
-              pagerIndependentScrolling: Bool = false) {
-    self.stripHeight = stripHeight
-    self.markerHeight = markerHeight
-    self.itemMargin = itemMargin
-    self.stripInsets = stripInsets
-    self.backgroundColor = backgroundColor
-    self.anchor = anchor
-    self.inset = inset
-    self.alignment = alignment
-    assert(pagesOnScreen > 0, "number of pages on screen should be greater than 0")
-    self.pagesOnScreen = pagesOnScreen
-    assert(jumpingPolicy == .disabled || pagesOnScreen == 1, "jumping policy doesn't support 2+ pages currently")
-    self.jumpingPolicy = jumpingPolicy
-    self.shouldKeepFocusOnBoundsChange = shouldKeepFocusOnBoundsChange
-    self.numberOfTitlesWhenHidden = numberOfTitlesWhenHidden
-    self.pagerIndependentScrolling = pagerIndependentScrolling
-  }
+
+    public init(
+        stripHeight: CGFloat = 80.0,
+        markerHeight: CGFloat = 5.5,
+        itemMargin: CGFloat = 12.0,
+        stripInsets: UIEdgeInsets = .zero,
+        backgroundColor: UIColor = .clear,
+        anchor: Anchor = .centered,
+        inset: UIEdgeInsets = .zero,
+        alignment: PagerHeaderSupplementaryAlignment = .top,
+        pagesOnScreen: Int = 1,
+        jumpingPolicy: JumpingPolicy = .disabled,
+        shouldKeepFocusOnBoundsChange: Bool = false,
+        numberOfTitlesWhenHidden: Int = 0,
+        pagerIndependentScrolling: Bool = false,
+        layoutDirection: SundialLayoutDirection = .auto
+    ) {
+        self.stripHeight = stripHeight
+        self.markerHeight = markerHeight
+        self.itemMargin = itemMargin
+        self.stripInsets = stripInsets
+        self.backgroundColor = backgroundColor
+        self.anchor = anchor
+        self.inset = inset
+        self.alignment = alignment
+        assert(pagesOnScreen > 0, "number of pages on screen should be greater than 0")
+        self.pagesOnScreen = pagesOnScreen
+        assert(jumpingPolicy == .disabled || pagesOnScreen == 1, "jumping policy doesn't support 2+ pages currently")
+        self.jumpingPolicy = jumpingPolicy
+        self.shouldKeepFocusOnBoundsChange = shouldKeepFocusOnBoundsChange
+        self.numberOfTitlesWhenHidden = numberOfTitlesWhenHidden
+        self.pagerIndependentScrolling = pagerIndependentScrolling
+        self.layoutDirection = layoutDirection
+    }
 }

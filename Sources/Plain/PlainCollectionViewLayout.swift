@@ -179,6 +179,44 @@ open class PlainCollectionViewLayout: EmptyViewCollectionViewLayout {
     }
     settingsReuseBag = disposeBag
   }
+    
+    open override var flipsHorizontallyInOppositeLayoutDirection: Bool {
+      switch settings.layoutDirection {
+        case .ltr:
+            return isSystemRtl()
+        case .rtl:
+            return true
+        case .auto:
+            return isSystemRtl()
+        }
+    }
+      
+    private func isLayoutInRtl() -> Bool {
+      switch settings.layoutDirection {
+      case .ltr:
+        return false
+      case .rtl:
+        return true
+      case .auto:
+        return isSystemRtl()
+      }
+    }
+      
+    private func isSystemRtl() -> Bool {
+      return UIApplication.shared.userInterfaceLayoutDirection == .rightToLeft
+    }
+      
+    open override var developmentLayoutDirection: UIUserInterfaceLayoutDirection {
+      switch settings.layoutDirection {
+      case .ltr:
+          return isSystemRtl() ? .rightToLeft : .leftToRight
+      case .rtl:
+          return isSystemRtl() ? .leftToRight : .rightToLeft
+      case .auto:
+          return isLayoutInRtl() ? .leftToRight : .rightToLeft
+      }
+    }
+
 
   // TODO: should we handle more general case? (When we have 2+ sections)
   private func indexPath(for item: Int) -> IndexPath? {

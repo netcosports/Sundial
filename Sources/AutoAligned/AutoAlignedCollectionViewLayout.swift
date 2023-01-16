@@ -52,25 +52,18 @@ open class AutoAlignedCollectionViewLayout: EmptyViewCollectionViewLayout {
             case factor(Double)
         }
         
-        @frozen
-        public enum LayoutDirection {
-            case ltr
-            case rtl
-            case auto
-        }
-        
         public let alignment: Alignment
         public let inset: CGFloat
         public let fillWithSideInsets: Bool
         public let target: ScrollTarget
-        public let layoutDirection: LayoutDirection
+        public let layoutDirection: SundialLayoutDirection
         
         public init(
             alignment: Alignment,
             inset: CGFloat = 0.0,
             fillWithSideInsets: Bool = true,
             target: ScrollTarget = .closest,
-            layoutDirection: LayoutDirection = .auto
+            layoutDirection: SundialLayoutDirection = .auto
         ) {
             self.alignment = alignment
             self.inset = inset
