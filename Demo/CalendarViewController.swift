@@ -13,9 +13,7 @@ import Sundial
 import RxSwift
 import RxCocoa
 
-public class DayCell: CollectionViewCell, Reusable, Eventable {
-  public let eventSubject = PublishSubject<Event>()
-  public typealias Event = String
+public class DayCell: CollectionViewCell, Reusable {
   public var data: Data?
 
   let day: UILabel = {
@@ -50,7 +48,7 @@ public class DayCell: CollectionViewCell, Reusable, Eventable {
     }
   }
 
-  public struct ViewModel: Hashable {
+  public struct ViewModel: Hashable, Identifyable {
     public init(day: String, month: String) {
       self.day = day
       self.month = month
@@ -58,6 +56,10 @@ public class DayCell: CollectionViewCell, Reusable, Eventable {
 
     let day: String
     let month: String
+    
+    public var id: String {
+      return day + month
+    }
   }
 
   public typealias Data = ViewModel
@@ -90,7 +92,7 @@ class CalendarViewController: UIViewController {
         let day = dayFormatter.string(from: date)
         let month = monthFormatter.string(from: date)
         let data = DayCell.ViewModel(day: day, month: month)
-        return CollectionCell<DayCell>(data: data, id: day + month)
+        return CollectionCell<DayCell>(data: data)
       }
     )
     let monthes = results.map { $0.monthLayout }

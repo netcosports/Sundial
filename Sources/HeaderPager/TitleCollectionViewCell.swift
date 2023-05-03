@@ -22,9 +22,7 @@ extension UIEdgeInsets: Hashable {
   }
 }
 
-open class TitleCollectionViewCell: CollectionViewCell, Reusable, Eventable {
-  public typealias Event = TitleViewModel
-  public let eventSubject = PublishSubject<TitleViewModel>()
+open class TitleCollectionViewCell: CollectionViewCell, Reusable {
 
   public let titleLabel: UILabel = {
     let label = UILabel()
@@ -60,7 +58,7 @@ open class TitleCollectionViewCell: CollectionViewCell, Reusable, Eventable {
     titleInsets = .zero
   }
 
-  public struct TitleViewModel: Titleable, Indicatorable, Hashable {
+  public struct TitleViewModel: Titleable, Indicatorable, Hashable, Identifyable {
 
     public let title: String
     public let id: String

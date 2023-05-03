@@ -13,11 +13,8 @@ import Sundial
 import RxSwift
 import RxCocoa
 
-public  class CollapsingCell: CollectionViewCell, Reusable, Eventable {
-  public let eventSubject = PublishSubject<Event>()
-  public typealias Event = String
+public  class CollapsingCell: CollectionViewCell, Reusable {
   public var data: Data?
-
 
   let title: UILabel = {
     let title = UILabel()
@@ -49,12 +46,9 @@ public  class CollapsingCell: CollectionViewCell, Reusable, Eventable {
   }
 }
 
-public class TestCell: CollectionViewCell, Reusable, Eventable {
+public class TestCell: CollectionViewCell, Reusable {
 
-  public let eventSubject = PublishSubject<Event>()
-  public typealias Event = String
   public var data: Data?
-
   public typealias Data = String
 
   let title: UILabel = {
@@ -84,10 +78,7 @@ public class TestCell: CollectionViewCell, Reusable, Eventable {
   }
 }
 
-class ColoredViewController: UIViewController, ReusedData, Eventable, CollapsingItem {
-  let eventSubject = PublishSubject<String>()
-  typealias Event = String
-
+class ColoredViewController: UIViewController, ReusedData, CollapsingItem {
 
   var scrollView: UIScrollView {
     return containerView
@@ -118,7 +109,7 @@ class ColoredViewController: UIViewController, ReusedData, Eventable, Collapsing
 
     view.addSubview(containerView)
 
-    let cells: [Cellable] = (1...50).map { "Item \($0)" }.map { CollectionCell<TestCell>(data: $0, id: $0) }
+    let cells: [Cellable] = (1...50).map { "Item \($0)" }.map { CollectionCell<TestCell>(data: $0) }
     containerView.source.sections = [Section(cells: []), Section(cells: cells), Section(cells: []),]
   }
 
@@ -212,8 +203,8 @@ class ViewControllerInner: UIViewController {
     }
     typealias Supplementary = PagerHeaderSupplementaryView<TitleCollectionViewCell, MarkerDecorationView<TitleCollectionViewCell.Data>>
 
-    let supplementaryPager = CollectionCell<Supplementary>(data: titles, id: "", type: .custom(kind:  PagerHeaderSupplementaryViewKind), setup: nil)
-    let supplementaryCollapsing = CollectionCell<CollapsingCell>(data: "", id: "", type: .custom(kind:  PagerHeaderCollapsingSupplementaryViewKind), setup: nil)
+    let supplementaryPager = CollectionCell<Supplementary>(data: titles, type: .custom(kind:  PagerHeaderSupplementaryViewKind), setup: nil)
+    let supplementaryCollapsing = CollectionCell<CollapsingCell>(data: "", type: .custom(kind:  PagerHeaderCollapsingSupplementaryViewKind), setup: nil)
     let section = MultipleSupplementariesSection(supplementaries: [supplementaryPager, supplementaryCollapsing], cells: cells)
     collectionView.source.sections = [section]
     collectionView.reloadData()

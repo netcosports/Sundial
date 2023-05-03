@@ -12,9 +12,14 @@ import RxCocoa
 import Astrolabe
 import Sundial
 
-class ColoredTestCell: CollectionViewCell, Reusable, Eventable {
-  let eventSubject = PublishSubject<Event>()
-  typealias Event = String
+extension UIColor: Identifyable {
+  
+  public var id: String {
+    return "\(self)"
+  }
+}
+
+class ColoredTestCell: CollectionViewCell, Reusable {
   var data: Data?
 
   let title: UILabel = {
@@ -81,7 +86,7 @@ class TestViewController: UIViewController, Accessor, CollapsingItem {
 
     if numberOfItems > 1 {
       let cells: [Cellable] = (1...numberOfItems).map { position in
-        Cell(data: color, id: "\(position)")
+        Cell(data: color)
       }
       sections = [ Section(cells: cells) ]
     }

@@ -59,7 +59,7 @@ CHECKOUT OPTIONS:
     :commit: a5f69cbb8894d18853efc8ab556150411b461128
     :git: "git@github.com:netcosports/Alidade.git"
   Astrolabe:
-    :commit: d43e1e9b071d7cd602370b6a7957e4651108d391
+    :commit: 683845cda2a847edb16d14b7b585cd6f23ecb528
     :git: "git@github.com:netcosports/Astrolabe.git"
   Nocturnal:
     :commit: de5198ea3fd14a0cfcee58dea2a84006ef0f9b9d

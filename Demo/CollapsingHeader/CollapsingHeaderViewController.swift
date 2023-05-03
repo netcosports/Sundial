@@ -12,11 +12,9 @@ import Sundial
 import RxSwift
 import RxCocoa
 
-class Header: CollectionViewCell, Reusable, Eventable {
-  let eventSubject = PublishSubject<Event>()
-  typealias Event = String
+class Header: CollectionViewCell, Reusable {
+  
   var data: Data?
-
   typealias Data = String
 
   func setup(with data: String) {

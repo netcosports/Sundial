@@ -9,11 +9,13 @@
 import Sundial
 import Astrolabe
 
-struct SomeData<T: Hashable>: PagerHeaderSupplementaryViewModel, Hashable {
+struct SomeData<T: Hashable & Identifyable>: PagerHeaderSupplementaryViewModel, Hashable {
   var titles: [T]
+  var id: String { return "Some data" }
 }
 
-class CustomPagerHeaderSupplementaryView<T: CollectionViewCell, M: CollectionViewCell>: GenericPagerHeaderSupplementaryView<SomeData<T.Data>, T, M> where T: Reusable & Eventable, T.Data: Titleable, T.Data: Indicatorable, T.Data == T.Event {
+class CustomPagerHeaderSupplementaryView<T: CollectionViewCell, M: CollectionViewCell>: GenericPagerHeaderSupplementaryView<SomeData<T.Data>, T, M>
+where T: Reusable, T.Data: Titleable, T.Data: Indicatorable, T.Data: Identifyable {
 
   let label: UILabel = {
     let label = UILabel()
@@ -25,8 +27,8 @@ class CustomPagerHeaderSupplementaryView<T: CollectionViewCell, M: CollectionVie
     super.setup()
     contentView.addSubview(label)
 
-    layout?.progress.subscribe(onNext: { [weak self] in
-      self?.label.text = "\($0.pages.lowerBound) - \($0.progress)"
+    layout?.progress.subscribe(onNext: { [weak self] progress in
+      self?.label.text = "\(progress.pages.lowerBound) - \(progress.progress)"
     }).disposed(by: disposeBag)
   }
 

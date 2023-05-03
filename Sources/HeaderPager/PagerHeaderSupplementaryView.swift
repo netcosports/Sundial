@@ -18,12 +18,19 @@ public protocol PagerHeaderAttributes {
   var hostPagerSource: CollectionViewSource? { get }
 }
 
-public protocol PagerHeaderSupplementaryViewModel {
-  associatedtype TitleCellViewModel
+public protocol PagerHeaderSupplementaryViewModel: Identifyable {
+  associatedtype TitleCellViewModel: Identifyable
   var titles: [TitleCellViewModel] { get }
 }
 
-extension Array: PagerHeaderSupplementaryViewModel {
+extension Array: Identifyable where Element: Identifyable {
+  
+  public var id: String {
+    return titles.reduce("", { $0 + $1.id })
+  }
+}
+
+extension Array: PagerHeaderSupplementaryViewModel where Element: Identifyable {
 
   public typealias TitleCellViewModel = Element
 
@@ -32,20 +39,20 @@ extension Array: PagerHeaderSupplementaryViewModel {
   }
 }
 
-public typealias PagerHeaderSupplementaryView<T: CollectionViewCell, M: CollectionViewCell> = GenericPagerHeaderSupplementaryView<[T.Data], T, M> where T: Reusable & Eventable, T.Data: Titleable, T.Data: Indicatorable, T.Event == T.Data
+public typealias PagerHeaderSupplementaryView<T: CollectionViewCell, M: CollectionViewCell> = GenericPagerHeaderSupplementaryView<[T.Data], T, M>
+where T: Reusable, T.Data: Titleable, T.Data: Indicatorable, T.Data: Identifyable
 
 open class GenericPagerHeaderSupplementaryView<
   ViewModel: PagerHeaderSupplementaryViewModel & Hashable,
   T: CollectionViewCell,
   M: CollectionViewCell
->: CollectionViewCell, Reusable, Eventable
-where T: Reusable & Eventable,
+>: CollectionViewCell, Reusable
+where T: Reusable,
       T.Data: Titleable,
       T.Data: Indicatorable,
-      T.Event == T.Data,
+      T.Data: Identifyable,
       ViewModel.TitleCellViewModel == T.Data {
-  public var eventSubject = PublishSubject<Never>()
-  public typealias Event = Never
+
   public var data: ViewModel?
 
   public typealias TitleCell                     = T
@@ -100,7 +107,7 @@ where T: Reusable & Eventable,
       if adjustedTitlesSet.map({ $0.id }) == titles.map({ $0.id }) { return }
 
       let cells: [Cellable] = adjustedTitlesSet.map { title in
-        return Item(data: title, id: title.title, eventsEmmiter: titleSubject.asObserver(), clickEvent: title)
+        return Item(data: title)
       }
 
       if let layout = layout {

@@ -59,9 +59,7 @@ extension String {
   }
 }
 
-open class CustomTitleCollectionViewCell: CollectionViewCell, Reusable, Eventable {
-  public let eventSubject = PublishSubject<Event>()
-  public typealias Event = String
+open class CustomTitleCollectionViewCell: CollectionViewCell, Reusable {
 
   public let titleLabel: UILabel = {
     let label = UILabel()

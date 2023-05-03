@@ -14,16 +14,11 @@ import SnapKit
 import RxSwift
 import RxCocoa
 
-public  class HeaderTestCell: CollectionViewCell, Reusable, Eventable {
-  public var eventSubject = PublishSubject<Event>()
-  
-  public typealias Event = Bool
+public  class HeaderTestCell: CollectionViewCell, Reusable {
   
   public var data: Data?
-  
   public typealias Data = String
   
-
   let title: UILabel = {
     let title = UILabel()
     title.textColor = .white

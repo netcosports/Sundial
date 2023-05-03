@@ -32,19 +32,17 @@ class AutoAlignedController: UIViewController {
     autoContainerView.backgroundColor = .cyan
     rightContainerView.backgroundColor = .purple
     
-    
-    
     setupCollection()
     
     let cells: [Cellable] = (0...6).map { index in
-      ItemCell.init(data: "Cell \(index)", id: "\(index)")
+      ItemCell.init(data: "Cell \(index)")
     }
     
     leftContainerView.subscribeToAutoscrollEvents()
     autoContainerView.subscribeToAutoscrollEvents()
     rightContainerView.subscribeToAutoscrollEvents()
     
-    let cellId = "2"
+    let cellId = "Cell 2"
     leftContainerView.autoScrollSubject.onNext(.init(target: .cellId(cellId), position: .center, animated: false))
     autoContainerView.autoScrollSubject.onNext(.init(target: .cellId(cellId), position: .center, animated: false))
     rightContainerView.autoScrollSubject.onNext(.init(target: .cellId(cellId), position: .center, animated: false))
@@ -110,15 +108,16 @@ class AutoAlignedController: UIViewController {
   }
 }
 
+extension String: Identifyable {
+  
+  public var id: String {
+    return self
+  }
+}
 
-class AutoAlignedCell: CollectionViewCell, Reusable, Eventable {
-  var eventSubject =  PublishSubject<Event>()
-  
-  typealias Event = Bool
-  
+class AutoAlignedCell: CollectionViewCell, Reusable {
   
   private let root = UIView()
-  
   private let titleView = UILabel()
   
   override func setup() {
@@ -142,8 +141,6 @@ class AutoAlignedCell: CollectionViewCell, Reusable, Eventable {
   }
   
   var data: String?
-  
-  
   typealias Data = String
   
   static func size(for data: String, containerSize: CGSize) -> CGSize {

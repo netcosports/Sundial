@@ -25,15 +25,17 @@ extension CollectionCell: CalendarDayIntervalContainer where Data: CalendarDayIn
   }
 }
 
-public class NowIndicatorCell: CollectionViewCell, Reusable, Eventable {
+public class NowIndicatorCell: CollectionViewCell, Reusable {
 
-  public let eventSubject = PublishSubject<Event>()
-  public typealias Event = String
   public var data: Data?
 
-  public struct ViewModel: CalendarDayIntervalContainer, Hashable {
+  public struct ViewModel: CalendarDayIntervalContainer, Hashable, Identifyable {
     public var start: CalendarDayOffset
     public var end: CalendarDayOffset
+    
+    public var id: String {
+      return "\(start)-\(end)"
+    }
   }
 
   public typealias Data = ViewModel
@@ -52,16 +54,17 @@ public class NowIndicatorCell: CollectionViewCell, Reusable, Eventable {
   }
 }
 
-public class EventCell: CollectionViewCell, Reusable, Eventable {
-
-  public let eventSubject = PublishSubject<Event>()
-  public typealias Event = String
+public class EventCell: CollectionViewCell, Reusable {
   public var data: Data?
 
-  public struct ViewModel: CalendarDayIntervalContainer, Hashable {
+  public struct ViewModel: CalendarDayIntervalContainer, Hashable, Identifyable {
     public var start: CalendarDayOffset
     public var end: CalendarDayOffset
     var title: String
+    
+    public var id: String {
+      return title
+    }
   }
 
   let title: UILabel = {
@@ -92,10 +95,8 @@ public class EventCell: CollectionViewCell, Reusable, Eventable {
   }
 }
 
-public class TimestampCell: CollectionViewCell, Reusable, Eventable {
+public class TimestampCell: CollectionViewCell, Reusable {
 
-  public let eventSubject = PublishSubject<Event>()
-  public typealias Event = String
   public var data: Data?
 
   let title: UILabel = {
@@ -139,15 +140,17 @@ public class TimestampCell: CollectionViewCell, Reusable, Eventable {
 }
 
 
-public class OverlayCell: CollectionViewCell, Reusable, Eventable {
+public class OverlayCell: CollectionViewCell, Reusable {
 
-  public let eventSubject = PublishSubject<Event>()
-  public typealias Event = String
   public var data: Data?
 
-  public struct ViewModel: CalendarDayIntervalContainer, Hashable {
+  public struct ViewModel: CalendarDayIntervalContainer, Hashable, Identifyable {
     public var start: CalendarDayOffset
     public var end: CalendarDayOffset
+    
+    public var id: String {
+      return "\(start)-\(end)"
+    }
   }
 
   open override func setup() {
@@ -222,7 +225,7 @@ class CalendarDayViewController: UIViewController {
         end: end,
         title: title
       )
-      return CollectionCell<EventCell>(data: data, id: title)
+      return CollectionCell<EventCell>(data: data)
     })
 
     let layout = CalendarDayCollectionViewLayout(
