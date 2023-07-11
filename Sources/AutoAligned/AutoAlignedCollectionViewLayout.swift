@@ -99,9 +99,12 @@ open class AutoAlignedCollectionViewLayout: EmptyViewCollectionViewLayout {
 
   open override func layoutAttributesForElements(in rect: CGRect) -> [UICollectionViewLayoutAttributes]? {
     guard  let collectionView = self.collectionView,
-      let attributes = super.layoutAttributesForElements(in: rect) as? [AutoAlignedCollectionViewLayoutAttributes] else {
+           let superAttributes = super.layoutAttributesForElements(in: rect) else {
       return nil
     }
+    let attributes = superAttributes.compactMap({ $0 as? AutoAlignedCollectionViewLayoutAttributes })
+    let restAttributes = superAttributes.filter { ($0 as? AutoAlignedCollectionViewLayoutAttributes) == nil }
+
     let horizontal = self.scrollDirection == .horizontal
     let offset = horizontal ? collectionView.contentOffset.x : collectionView.contentOffset.y
     let side = horizontal ? collectionView.frame.width : collectionView.frame.height
@@ -130,7 +133,7 @@ open class AutoAlignedCollectionViewLayout: EmptyViewCollectionViewLayout {
       let distance = abs(currentItemOffset - targetOffset)
       attributes.progress = max(0.0, 1.0 - distance / size)
     }
-    return attributes
+    return attributes + restAttributes
   }
 
   open override func targetContentOffset(forProposedContentOffset proposedContentOffset: CGPoint,
