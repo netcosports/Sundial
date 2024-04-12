@@ -97,6 +97,7 @@ public enum Anchor: Equatable {
 
 public enum DecorationAlignment: Equatable {
   case top
+  case bottom
   case topOffset(behaviorRelay: BehaviorRelay<CGFloat>)
 
   public static func == (lhs: DecorationAlignment, rhs: DecorationAlignment) -> Bool {

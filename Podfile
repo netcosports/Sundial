@@ -1,7 +1,7 @@
 use_frameworks!
 
 inhibit_all_warnings!
-platform :ios, '9.0'
+platform :ios, '12.0'
 
 target 'Demo' do
   pod 'Sundial', :path => '.', :inhibit_warnings => false

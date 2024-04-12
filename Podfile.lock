@@ -15,7 +15,7 @@ DEPENDENCIES:
   - Sundial (from `.`)
 
 SPEC REPOS:
-  https://github.com/cocoapods/specs.git:
+  https://github.com/CocoaPods/Specs.git:
     - RxCocoa
     - RxSwift
     - SnapKit
@@ -39,6 +39,6 @@ SPEC CHECKSUMS:
   SnapKit: fe8a619752f3f27075cc9a90244d75c6c3f27e2a
   Sundial: 5da7783a41b993c2e4202e71f76d02ea54e4322e
 
-PODFILE CHECKSUM: 9ee88892407f54a107f7a5c3a26434a6711cb2c9
+PODFILE CHECKSUM: 0e33d6788acbf3dcc85e50df74a17af5e1b310d5
 
-COCOAPODS: 1.7.5
+COCOAPODS: 1.15.2

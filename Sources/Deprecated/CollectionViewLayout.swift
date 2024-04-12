@@ -28,6 +28,8 @@ open class GenericCollectionViewLayout<DecorationView: CollectionViewCell & Deco
       topOffset = 0.0
     case .topOffset(let variable):
       topOffset = variable.value
+    case .bottom:
+      topOffset = collectionView.frame.height - settings.stripHeight - settings.inset.bottom
     }
 
     return CGRect(x: collectionView.contentOffset.x,
