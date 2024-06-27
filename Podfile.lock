@@ -1,44 +1,49 @@
 PODS:
   - Astrolabe/Core (4.2.3):
-    - RxCocoa (~> 4.5)
-    - RxSwift (~> 4.5)
-  - RxCocoa (4.5.0):
-    - RxSwift (>= 4.4.2, ~> 4.4)
-  - RxSwift (4.5.0)
-  - SnapKit (4.2.0)
+    - RxCocoa
+    - RxSwift
+  - RxCocoa (6.7.1):
+    - RxRelay (= 6.7.1)
+    - RxSwift (= 6.7.1)
+  - RxRelay (6.7.1):
+    - RxSwift (= 6.7.1)
+  - RxSwift (6.7.1)
+  - SnapKit (5.7.1)
   - Sundial (5.0.1):
     - Astrolabe/Core
 
 DEPENDENCIES:
-  - "Astrolabe/Core (from `git@github.com:netcosports/Astrolabe.git`, branch `swift-5.0`)"
+  - "Astrolabe/Core (from `git@github.com:netcosports/Astrolabe.git`, branch `rolandgarros`)"
   - SnapKit
   - Sundial (from `.`)
 
 SPEC REPOS:
-  https://github.com/CocoaPods/Specs.git:
+  trunk:
     - RxCocoa
+    - RxRelay
     - RxSwift
     - SnapKit
 
 EXTERNAL SOURCES:
   Astrolabe:
-    :branch: swift-5.0
+    :branch: rolandgarros
     :git: "git@github.com:netcosports/Astrolabe.git"
   Sundial:
     :path: "."
 
 CHECKOUT OPTIONS:
   Astrolabe:
-    :commit: 8902cedc4bdafcc8bd24f70b859aee9f5b37e1df
+    :commit: 460ffb1b16f35e63567cc256c6243f80962d4983
     :git: "git@github.com:netcosports/Astrolabe.git"
 
 SPEC CHECKSUMS:
-  Astrolabe: 0287f943b9391fabf9f1879373ea36181fc55d03
-  RxCocoa: cbf70265dc65a981d4ac982e513c10cf23df24a0
-  RxSwift: f172070dfd1a93d70a9ab97a5a01166206e1c575
-  SnapKit: fe8a619752f3f27075cc9a90244d75c6c3f27e2a
-  Sundial: 5da7783a41b993c2e4202e71f76d02ea54e4322e
+  Astrolabe: 36b63292a0fc10f12db69d5ed4df05882f158857
+  RxCocoa: f5609cb4637587a7faa99c5d5787e3ad582b75a4
+  RxRelay: 4151ba01152436b08271e08410135e099880eae5
+  RxSwift: b9a93a26031785159e11abd40d1a55bcb8057e52
+  SnapKit: d612e99e678a2d3b95bf60b0705ed0a35c03484a
+  Sundial: 00953061dcefb715e4007520eafc90b4d8e08e29
 
-PODFILE CHECKSUM: 0e33d6788acbf3dcc85e50df74a17af5e1b310d5
+PODFILE CHECKSUM: d9f0cc37a7ff3160add1bed4c104168069f32bc8
 
 COCOAPODS: 1.15.2

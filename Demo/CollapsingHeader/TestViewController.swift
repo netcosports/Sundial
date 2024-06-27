@@ -93,7 +93,7 @@ class TestLoaderViewController: UIViewController, Accessor, CollapsingItem, Load
     if numberOfItems > 1 {
       let cells: [Cellable] = (1...numberOfItems).map { _ in Cell(data: color) }
       let sections = [ Section(cells: cells) ]
-      return Observable.just(sections).delay(1.0, scheduler: MainScheduler.instance)
+      return Observable.just(sections).delay(.seconds(1), scheduler: MainScheduler.instance)
     }
 
     return nil

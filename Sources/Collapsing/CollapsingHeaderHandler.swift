@@ -201,7 +201,7 @@ class CollapsingHeaderHandler {
     let previous = current.skip(1)
     return Observable.zip(current, previous).map { offsets -> Direction in
       return offsets.0 > offsets.1 ? .topToBottom : .bottomToTop
-    }.buffer(timeSpan: 1.0, count: 5, scheduler: MainScheduler.instance)
+    }.buffer(timeSpan: .seconds(1), count: 5, scheduler: MainScheduler.instance)
     .flatMap { directions -> Observable<Direction> in
       guard !directions.isEmpty else { return .empty() }
       if directions.filter({ $0 == .topToBottom }).isEmpty {
